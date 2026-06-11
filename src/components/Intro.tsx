@@ -12,28 +12,28 @@ interface Props {
 
 /* Outer tiles rotate through these intro images */
 const OUTER_PHOTOS = [
-  "/intro 1.png",
-  "/intro 2.png",
-  "/intro 3.png",
-  "/intro 4.png",
-  "/intro 6.png",
-  "/intro 9.png",
-  "/intro 10.png",
-  "/intro 11.png",
+  "/intro 1.webp",
+  "/intro 2.webp",
+  "/intro 3.webp",
+  "/intro 4.webp",
+  "/intro 6.webp",
+  "/intro 9.webp",
+  "/intro 10.webp",
+  "/intro 11.webp",
 ].map(encodeURI);
 
 /* Center tile uses its own dedicated set; always settles on center 3 */
 const CENTER_PHOTOS = [
-  "/intro center 1.png",
-  "/intro center 2.png",
-  "/intro center 3.png",
-  "/intro center 4.png",
+  "/intro center 1.webp",
+  "/intro center 2.webp",
+  "/intro center 3.webp",
+  "/intro center 4.webp",
 ].map(encodeURI);
 
 const OUTER_POOL = OUTER_PHOTOS;
 const CENTER_POOL = CENTER_PHOTOS;
 
-const CENTER_FINAL = encodeURI("/intro center 3.png");
+const CENTER_FINAL = encodeURI("/intro center 3.webp");
 
 function preloadPool() {
   [...OUTER_PHOTOS, ...CENTER_PHOTOS].forEach((src) => {
