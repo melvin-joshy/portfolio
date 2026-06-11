@@ -1,0 +1,124 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --font-inter: system-ui, -apple-system, "Segoe UI", BlinkMacSystemFont, sans-serif;
+  /* --font-bebas, --font-caveat, --font-serif are provided by next/font (see layout.tsx) */
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  --color-ink: #0a0a0a;
+  --color-paper: #ede7d8;
+  --color-cream: #e8ddd0;
+  --color-accent: #c4a882;
+  --color-danger: #c0392b;
+  --color-ember: #e05555;
+  --focus-ring: 0 0 0 2px var(--color-ink), 0 0 0 4px var(--color-accent);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html,
+body {
+  min-height: 100%;
+  overflow-x: hidden;
+  background: var(--color-ink);
+  color: var(--color-cream);
+  -webkit-font-smoothing: antialiased;
+}
+
+
+::selection {
+  background: var(--color-accent);
+  color: var(--color-ink);
+}
+
+button {
+  background: transparent;
+  border: none;
+  -webkit-appearance: none;
+  appearance: none;
+  -webkit-tap-highlight-color: transparent;
+  color: inherit;
+}
+
+button:hover,
+button:focus,
+button:focus-visible,
+button:active {
+  background: transparent;
+}
+
+:where(a, button, input, [tabindex]):focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 4px;
+  box-shadow: var(--focus-ring);
+}
+
+.mj-stage {
+  height: 100svh;
+  min-height: 620px;
+}
+
+.mj-icon-button {
+  min-width: 44px;
+  min-height: 44px;
+}
+
+/* Below lg (matches the Tailwind `lg:` breakpoint where the side columns hide):
+   let the stage grow and scroll so the mobile hero + work stack naturally. */
+@media (max-width: 1023px) {
+  .mj-stage {
+    height: auto;
+    min-height: 100svh;
+    overflow: visible;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ── Ticker default: always white/dim, never red at rest ── */
+.ticker-name {
+  color: rgba(255, 255, 255, 0.55) !important;
+  transition: color 0.15s ease;
+}
+
+/* ── Ticker selected: brighter white ── */
+.ticker-btn[data-active="true"] .ticker-name {
+  color: rgba(255, 255, 255, 0.92) !important;
+}
+
+/* ── Ticker hover (non-selected): subtle lift + red name ── */
+.ticker-btn:not([data-active="true"]):hover {
+  background: rgba(255, 255, 255, 0.04) !important;
+  opacity: 0.85 !important;
+}
+
+.ticker-btn:hover .ticker-name {
+  color: #e05555 !important;
+}
+
+/* ── Ticker hover: thumb ring ── */
+.ticker-btn:hover .ticker-thumb {
+  box-shadow: 0 0 0 1px rgba(224, 85, 85, 0.5) !important;
+}
+
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
