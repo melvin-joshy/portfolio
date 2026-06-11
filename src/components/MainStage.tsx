@@ -376,10 +376,10 @@ function GridBackground({ theme }: { theme: "dark" | "light" }) {
         }}
       />
 
-      {/* ── Darken overlay so text stays readable ── */}
+      {/* ── Darken overlay — mutes the baked-in blueprint chrome so foreground type leads ── */}
       <div style={{
         position: "absolute", inset: 0,
-        background: dark ? "rgba(0,0,0,0.30)" : "rgba(255,255,255,0.25)",
+        background: dark ? "rgba(0,0,0,0.46)" : "rgba(255,255,255,0.30)",
       }} />
 
       {/* ── Vignette — edges deeper ── */}
@@ -611,16 +611,6 @@ export default function MainStage({ visible }: { visible: boolean }) {
     } catch {}
   }, []);
 
-  const toggleTheme = useCallback(() => {
-    setTheme(current => {
-      const nextTheme = current === "dark" ? "light" : "dark";
-      try {
-        localStorage.setItem("mj_theme_v1", nextTheme);
-      } catch {}
-      return nextTheme;
-    });
-  }, []);
-
   const triggerRaccoon = useCallback((d: 1 | -1) => {
     if (raccoonTimer.current) clearTimeout(raccoonTimer.current);
     setRaccoonDir(d);
@@ -793,7 +783,7 @@ export default function MainStage({ visible }: { visible: boolean }) {
                 <Tag
                   key={label}
                   {...(onClick ? { onClick } : { href, target: label === "Resume" ? "_blank" : undefined, rel: label === "Resume" ? "noopener noreferrer" : undefined })}
-                  className="transition-colors duration-300 uppercase tracking-[0.25em] text-[10px]"
+                  className="inline-flex items-center min-h-[44px] px-1 transition-colors duration-300 uppercase tracking-[0.25em] text-[10px]"
                   style={{ color: theme === "light" ? "rgba(0,0,0,0.78)" : "rgba(255,255,255,0.72)" }}
                 >
                   <ScribbleUnderline
@@ -895,7 +885,7 @@ export default function MainStage({ visible }: { visible: boolean }) {
                 <motion.h2
                   key={`name-${active}`}
                   className="font-bebas tracking-wider leading-none text-center"
-                  style={{ fontSize: "clamp(34px, 6.5vw, 96px)", color: theme === "light" ? "rgba(0,0,0,0.88)" : "rgba(255,255,255,0.85)" }}
+                  style={{ fontSize: "clamp(34px, 6.5vw, 96px)", color: theme === "light" ? "rgba(0,0,0,0.94)" : "rgba(255,255,255,0.96)" }}
                   initial={{ y: dir > 0 ? "65%" : "-65%" }}
                   animate={{ y: "0%" }}
                   exit={{ y: dir > 0 ? "-65%" : "65%" }}
@@ -1007,10 +997,10 @@ export default function MainStage({ visible }: { visible: boolean }) {
                     className="absolute left-4 bottom-3.5 z-[4] flex items-center gap-1.5 pointer-events-none"
                     style={{
                       fontFamily: "var(--font-mono)",
-                      fontSize: 9,
-                      letterSpacing: "0.18em",
+                      fontSize: 10,
+                      letterSpacing: "0.16em",
                       textTransform: "uppercase",
-                      color: cursorMode === "view" ? "#fff" : "rgba(255,255,255,0.78)",
+                      color: cursorMode === "view" ? "#fff" : "rgba(255,255,255,0.9)",
                       transition: "color 0.2s ease",
                     }}
                   >
@@ -1041,8 +1031,8 @@ export default function MainStage({ visible }: { visible: boolean }) {
               <AnimatePresence mode="wait">
                 <motion.p
                   key={`desc-${active}`}
-                  className="text-[11px] md:text-[10px] tracking-wide text-center"
-                  style={{ maxWidth: "min(420px, 82vw)", color: theme === "light" ? "rgba(0,0,0,0.65)" : "rgba(255,255,255,0.45)" }}
+                  className="text-[13px] md:text-[12px] tracking-wide text-center"
+                  style={{ maxWidth: "min(440px, 84vw)", color: theme === "light" ? "rgba(0,0,0,0.72)" : "rgba(255,255,255,0.72)" }}
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}

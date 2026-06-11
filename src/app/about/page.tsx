@@ -175,7 +175,9 @@ export default function AboutPage() {
               const commonStyle = {
                 fontSize: 10, letterSpacing: "0.25em", textTransform: "uppercase" as const,
                 color: "rgba(0,0,0,0.72)", textDecoration: "none", background: "none", border: "none",
-                cursor: "pointer", padding: 0,
+                cursor: "pointer",
+                // ≥44px touch target for mobile a11y
+                display: "inline-flex", alignItems: "center", minHeight: 44, padding: "0 4px",
               };
               const inner = (
                 <ScribbleUnderline color="#c0392b" strokeWidth={1.6} offsetY={2}>
@@ -316,7 +318,7 @@ export default function AboutPage() {
               initial={{ opacity: 0, x: -20 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true, margin: "-60px" }} transition={{ duration: 0.65, ease: EASE }}
             >
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src="/graduation.png" alt="" className="about-card-image" style={{
+              <img src="/graduation.webp" alt="" className="about-card-image" style={{
                 position: "absolute", left: 20, top: "50%", transform: "translateY(-50%)",
                 width: 260, height: "auto", display: "block",
                 filter: hoveredCard === "academic" ? "none" : "invert(1)",
@@ -343,7 +345,7 @@ export default function AboutPage() {
               initial={{ opacity: 0, x: -20 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true, margin: "-60px" }} transition={{ duration: 0.65, ease: EASE, delay: 0.1 }}
             >
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src="/4 patterbs.png" alt="" className="about-card-image" style={{
+              <img src="/4 patterbs.webp" alt="" className="about-card-image" style={{
                 position: "absolute", left: 20, top: "50%", transform: "translateY(-50%)",
                 width: 260, height: "auto", display: "block",
                 filter: hoveredCard === "design" ? "none" : "invert(1)",
@@ -380,7 +382,7 @@ export default function AboutPage() {
                 </p>
               </div>
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src="/racoon 1.svg" alt="" className="about-card-image" style={{
+              <img src="/racoon 1.webp" alt="" className="about-card-image" style={{
                 position: "absolute", right: 20, top: "50%", transform: "translateY(-50%)",
                 width: 260, height: "auto", display: "block",
                 filter: hoveredCard === "opportunities" ? "none" : "invert(1)",
@@ -407,7 +409,7 @@ export default function AboutPage() {
                 </p>
               </div>
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src="/racoon 2.svg" alt="" className="about-card-image" style={{
+              <img src="/racoon 2.webp" alt="" className="about-card-image" style={{
                 position: "absolute", right: 20, top: "50%", transform: "translateY(-50%)",
                 width: 260, height: "auto", display: "block",
                 filter: hoveredCard === "soundtracks" ? "none" : "invert(1)",
@@ -443,7 +445,7 @@ export default function AboutPage() {
               initial={{ opacity: 0, x: -20 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true, margin: "-60px" }} transition={{ duration: 0.65, ease: EASE }}
             >
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src="/racoon 3.svg" alt="" className="about-card-image" style={{
+              <img src="/racoon 3.webp" alt="" className="about-card-image" style={{
                 position: "absolute", left: 20, top: "50%", transform: "translateY(-50%)",
                 width: 260, height: "auto", display: "block",
                 filter: hoveredCard === "screentime" ? "none" : "invert(1)",
@@ -470,7 +472,7 @@ export default function AboutPage() {
               initial={{ opacity: 0, x: -20 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true, margin: "-60px" }} transition={{ duration: 0.65, ease: EASE, delay: 0.1 }}
             >
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src="/2 tt.png" alt="" className="about-card-image" style={{
+              <img src="/2 tt.webp" alt="" className="about-card-image" style={{
                 position: "absolute", left: 20, top: "50%", transform: "translateY(-50%)",
                 width: 260, height: "auto", display: "block",
                 filter: hoveredCard === "beyondtable" ? "none" : "invert(1)",
@@ -507,7 +509,7 @@ export default function AboutPage() {
                 </p>
               </div>
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src="/3-chai.png" alt="" className="about-card-image" style={{
+              <img src="/3-chai.webp" alt="" className="about-card-image" style={{
                 position: "absolute", right: 20, top: "50%", transform: "translateY(-50%)",
                 width: 260, height: "auto", display: "block",
                 filter: hoveredCard === "teatime" ? "none" : "invert(1)",

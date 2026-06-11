@@ -9,46 +9,39 @@ interface Props {
 }
 
 /* ─────────────── Fill pool for the flicker grid ─────────────── */
-/* Only the genuinely photographic assets — the rest in /public are white
-   mockups/sketches that read as empty squares on a dark grid. */
-const PHOTOS = [
-  "/over aura.webp",
-  "/deco cover.webp",
-  "/stamp image.webp",
+
+/* Outer tiles rotate through these intro images */
+const OUTER_PHOTOS = [
+  "/intro 1.png",
+  "/intro 2.png",
+  "/intro 3.png",
+  "/intro 4.png",
+  "/intro 6.png",
+  "/intro 9.png",
+  "/intro 10.png",
+  "/intro 11.png",
 ].map(encodeURI);
 
-/* Vivid colour tiles (the hero's project palette) so every slot is always
-   filled — never blank — even with few photos. */
-const GRADS = [
-  "linear-gradient(150deg,#5a7abf,#243a6a)", // blue
-  "linear-gradient(150deg,#6f8f4a,#36421f)", // moss
-  "linear-gradient(150deg,#bf954a,#6a4a1f)", // gold
-  "linear-gradient(150deg,#3a9f72,#16513a)", // green
-  "linear-gradient(150deg,#8a5abf,#3a2060)", // purple
-  "linear-gradient(150deg,#bf5a8a,#6a2040)", // magenta
-  "linear-gradient(150deg,#4a9faf,#1f5560)", // teal
-  "linear-gradient(150deg,#bf5a5a,#6a2424)", // red
-];
+/* Center tile uses its own dedicated set; always settles on center 3 */
+const CENTER_PHOTOS = [
+  "/intro center 1.png",
+  "/intro center 2.png",
+  "/intro center 3.png",
+  "/intro center 4.png",
+].map(encodeURI);
 
-const POOL = [...PHOTOS, ...GRADS];
-const isGrad = (s: string) => s.startsWith("linear-gradient");
+const OUTER_POOL = OUTER_PHOTOS;
+const CENTER_POOL = CENTER_PHOTOS;
 
-const CENTER_FINAL = encodeURI("/over aura.webp");
+const CENTER_FINAL = encodeURI("/intro center 3.png");
 
-/* Track which photos have actually decoded, so a tile only ever shows a loaded
-   image (gradients are always available) — a slot is never blank. */
-const loadedSrcs = new Set<string>();
 function preloadPool() {
-  PHOTOS.forEach((src) => {
+  [...OUTER_PHOTOS, ...CENTER_PHOTOS].forEach((src) => {
     const img = new Image();
-    img.onload = () => loadedSrcs.add(src);
     img.src = src;
-    if (img.complete && img.naturalWidth > 0) loadedSrcs.add(src);
   });
 }
-function pickFill(exclude: string) {
-  const avail = POOL.filter((s) => isGrad(s) || loadedSrcs.has(s));
-  const pool = avail.length >= 2 ? avail : POOL;
+function pickFill(exclude: string, pool: string[]) {
   let next = pool[Math.floor(Math.random() * pool.length)];
   let guard = 0;
   while (next === exclude && guard++ < 6) next = pool[Math.floor(Math.random() * pool.length)];
@@ -72,7 +65,8 @@ const HOLE_H = "calc(min(17vmin, 152px) * 0.75)";
 
 function GridTile({ index, phase }: { index: number; phase: Phase }) {
   const isCenter = index === CENTER;
-  const [img, setImg] = useState(() => POOL[(index * 3) % POOL.length]);
+  const pool = isCenter ? CENTER_POOL : OUTER_POOL;
+  const [img, setImg] = useState(() => pool[(index * 3) % pool.length]);
   const lastRef = useRef(img);
 
   // Flicker only during the live grid; freeze (settle) and beyond.
@@ -82,17 +76,19 @@ function GridTile({ index, phase }: { index: number; phase: Phase }) {
       return;
     }
     const swap = () => {
-      const next = pickFill(lastRef.current);
+      const next = pickFill(lastRef.current, pool);
       lastRef.current = next;
       setImg(next);
     };
-    const period = 520 + (index % 5) * 120; // calm cadence
+    const period = 600;
     let interval = 0;
     const start = window.setTimeout(() => {
       swap();
       interval = window.setInterval(swap, period);
     }, (index % 9) * 140);
     return () => { clearTimeout(start); clearInterval(interval); };
+  // pool is derived from isCenter (stable), safe to omit from deps
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [phase, index, isCenter]);
 
   // Grid is intact through 'grid' and 'settle'; it breaks apart from 'collapse'.
@@ -108,7 +104,7 @@ function GridTile({ index, phase }: { index: number; phase: Phase }) {
         className="relative overflow-hidden rounded-[2px]"
         style={{ aspectRatio: "4 / 3", background: "#0a0a0a", zIndex: 5 }}
       >
-        <TileFill fill={img} onFail={() => setImg(pickFill(img))} />
+        <TileFill fill={img} onFail={() => setImg(pickFill(img, CENTER_POOL))} />
         <div className="absolute inset-0 bg-black/10" />
       </motion.div>
     );
@@ -133,17 +129,13 @@ function GridTile({ index, phase }: { index: number; phase: Phase }) {
           : { duration: 0.45, ease: EASE_OUT, delay: 0.03 * index }
       }
     >
-      <TileFill fill={img} onFail={() => setImg(pickFill(img))} />
+      <TileFill fill={img} onFail={() => setImg(pickFill(img, OUTER_POOL))} />
       <div className="absolute inset-0 bg-black/10" />
     </motion.div>
   );
 }
 
-/* Always-fill tile: a photo (cover, with fallback) or a vivid gradient — never blank */
 function TileFill({ fill, onFail }: { fill: string; onFail: () => void }) {
-  if (isGrad(fill)) {
-    return <div style={{ position: "absolute", inset: 0, background: fill }} />;
-  }
   return (
     // eslint-disable-next-line @next/next/no-img-element
     <img

@@ -396,7 +396,7 @@ export const projects: Project[] = [
     kind: "case-study",
     id: "aura",
     heroAnimation: "/Aura.json",
-    cover: "/over aura.png",
+    cover: "/over aura.webp",
     behanceUrl: "https://www.behance.net/gallery/202910085/AURA-Your-personal-mental-health-partner",
     name: "AURA",
     tag: "UX Case Study",

@@ -68,7 +68,7 @@ export function ProjectChrome({ children }: { children: React.ReactNode }) {
                       target: label === "Resume" ? "_blank" : undefined,
                       rel: label === "Resume" ? "noopener noreferrer" : undefined,
                     })}
-                className="transition-colors duration-300 uppercase tracking-[0.25em] text-[10px]"
+                className="inline-flex items-center min-h-[44px] px-1 transition-colors duration-300 uppercase tracking-[0.25em] text-[10px]"
                 style={{ color: "rgba(255,255,255,0.72)" }}
               >
                 <ScribbleUnderline color="#c0392b" strokeWidth={1.6} offsetY={2}>
