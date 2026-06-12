@@ -163,57 +163,57 @@ export const projects: Project[] = [
     industry: "Farm Experiences · Hospitality",
     deliverables: ["Live · Tempo YC S23"],
     overview:
-      "Mary's Land Farm runs farm experiences across multiple locations: alpaca encounters, cooking classes, barn stays, weddings. The brief was to replace Roller, their booking backend.\n\nWhen I mapped how the team actually operated, I found seven tools: Roller, Wavelength, Google Calendar, Excel, Remote Lock, WordPress, Google Forms. No single person had a complete picture of the business.\n\nI made the case to build one platform and replace all seven.",
+      "Mary's Land Farm runs farm experiences across multiple locations — alpaca encounters, cooking classes, barn stays, weddings. The brief was to replace Roller, their booking backend.\n\nMapping how the team actually worked, I found seven tools doing the job of one, and no single view of the business. So I made the case to replace all seven with one platform.",
     problem:
-      "The problem wasn't any single tool; each did its job. The problem was the gaps: copy-pasting booking context into message replies, reconciling Excel against Roller, switching apps to answer a simple guest question.\n\nOne example: a guest sends a message. The team reads it in Wavelength, opens Roller to find the booking, copies the details, switches back to reply. Four context switches for one response.\n\nThe platform needed to eliminate those gaps, not compete with the individual tools.",
+      "Each tool did its job; the problem was the gaps between them. A single guest message meant four context switches — read it in Wavelength, open Roller to find the booking, copy the details, switch back to reply.\n\nThe platform had to close those gaps, not compete with the tools.",
     goals: [
       "No context switching: every decision made without opening another tab.",
       "One source of truth: bookings, messages, experiences, and reports in one system.",
       "Role-based access: each employee sees exactly what they need, nothing more.",
     ],
     approach:
-      "One constraint drove every screen: the information needed to make a decision had to be visible where the work was happening, not one click away, not in another app.\n\nThe messaging panel shows booking details. The dashboard surfaces today's schedule alongside revenue. Appointment cards mirror the customer-facing listing. Every tool-switch the team used to make became a panel instead.",
+      "One constraint drove every screen: the information to make a decision had to live where the work was happening — not a click away, not in another app. Every tool-switch the team used to make became a panel instead.",
     solutionBlocks: [
       {
         index: "01",
         title: "Appointments, Venues & Rooms — the product catalog",
         body:
-          "Every farm experience (Alpaca Encounter, Cooking Class, Barn Overnight Stay) is an image card with photography, pricing, duration, capacity, and tags. Publishing a card here creates the customer-facing listing automatically, replacing WordPress.\n\nI used cards instead of a data table deliberately. The team manages real experiences, not abstract records; seeing the product the way a guest sees it keeps decisions grounded.",
+          "Every experience is an image card — photo, price, duration, capacity, tags. Publishing one auto-creates the customer-facing listing, replacing WordPress. Cards, not a data table: the team sees the product the way a guest does, which keeps decisions grounded.",
         media: [{ src: "/Marysfarm-1.webp", label: "Experience cards — price, capacity, tags", aspect: "wide" }],
       },
       {
         index: "02",
         title: "Bookings Management — 235 bookings, one table",
         body:
-          "235 bookings in a single table: reference, customer, experience, check-in, check-out, guests, status, balance due, and source.\n\nThe source column (Web or Admin) replaced manual Excel tracking of where bookings originated. Filters for check-in time, status, and type. Calendar view and Add Booking always one click away.",
+          "235 bookings in one table — reference, customer, experience, check-in/out, guests, status, balance, source. The Source column (Web or Admin) replaced manual Excel tracking; filters, calendar view, and Add Booking are always one click away.",
         media: [{ src: "/Marysfarm-2.webp", label: "235 bookings, one table — with Web/Admin source", aspect: "wide" }],
       },
       {
         index: "03",
         title: "Messaging — the feature that wasn't in scope",
         body:
-          "The farm was running guest SMS through Wavelength. Every reply meant four context switches: read message, open Roller, find booking, come back to respond.\n\nBuilt two-way SMS into the platform with a guest profile panel alongside each conversation: booking reference, experience, date, and status visible without leaving the screen.\n\nNot in the original brief. Should have been.",
+          "Guest SMS lived in Wavelength, so every reply meant four context switches. I built two-way SMS into the platform, with a guest-profile panel — booking reference, experience, date, status — beside each conversation. Not in the original brief. Should have been.",
         media: [{ src: "/Marysfarm-3.webp", label: "Messaging with live booking context alongside", aspect: "wide" }],
       },
       {
         index: "04",
         title: "Notification Templates — SendGrid made simple",
         body:
-          "The team was running automated emails through SendGrid but couldn't manage templates without technical help. Broken formatting and wrong send timing were routine.\n\nBuilt a simplified editor: rich text, variable insertion, trigger rules (\"1 minute after checkout,\" \"24 hours before check-in\") with a live desktop/mobile preview. They went from filing a request to doing it themselves.",
+          "The team ran automated emails through SendGrid but couldn't manage templates without technical help — broken formatting and wrong timing were routine. I built a simple editor: rich text, variable insertion, trigger rules (\"24 hours before check-in\"), and a live desktop/mobile preview. They went from filing a request to doing it themselves.",
         media: [{ src: "/Marysfarm-4.webp", label: "Template editor — variables, triggers, live preview", aspect: "wide" }],
       },
       {
         index: "05",
         title: "Dashboard — one screen, whole business",
         body:
-          "Revenue, bookings, average order value, 12-month trend, today's schedule, items needing attention — one screen.\n\nBefore this, assembling that picture meant opening Excel, Roller, and Google Calendar separately. Quick Actions surface the four most-used tasks. No buried navigation.",
+          "Revenue, bookings, average order value, 12-month trend, today's schedule — one screen. Before, assembling that picture meant opening Excel, Roller, and Google Calendar separately. Quick Actions surface the four most-used tasks; no buried navigation.",
         media: [{ src: "/Marysfarm-5.webp", label: "Dashboard — the whole business, one screen", aspect: "wide" }],
       },
       {
         index: "06",
         title: "Reports — build and export the numbers on demand",
         body:
-          "The team needed answers — revenue, bookings, payment status — without exporting raw data and rebuilding spreadsheets by hand every month.\n\nBuilt a report builder: pick a type (sales summary, bookings, attendance, revenue breakdown), set a date range, choose exactly the fields you need (customer, booking, financials, payment), and preview before exporting.\n\nOne place to answer \"how did we do?\" — no reconciliation, no spreadsheets.",
+          "The team needed answers — revenue, bookings, payment status — without rebuilding spreadsheets by hand every month. I built a report builder: pick a type, set a date range, choose the fields you need, preview, then export. One place to answer \"how did we do?\" — no reconciliation, no spreadsheets.",
         media: [{ src: "/Marysfarm-6.webp", label: "Report builder — sales summary, fields, live preview", aspect: "wide" }],
       },
     ],
