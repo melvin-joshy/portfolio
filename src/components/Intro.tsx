@@ -22,6 +22,9 @@ const OUTER_PHOTOS = [
   "/intro 11.webp",
   "/intro 12.webp",
   "/ontra-cover.webp",
+  "/Crewslink -Cover.webp",
+  "/Clarity cover.webp",
+  "/Framestudio cover.webp",
 ].map(encodeURI);
 
 /* Center tile uses its own dedicated set; always settles on center 3 */
@@ -281,11 +284,13 @@ export default function Intro({ onRevealStart, onComplete }: Props) {
     timers.push(window.setTimeout(() => setPhase("settle"), 5200));   // flicker → freeze
     timers.push(window.setTimeout(() => setPhase("collapse"), 5900)); // hold, then break apart
     timers.push(window.setTimeout(() => setPhase("red"), 6700));      // red closes in
-    timers.push(window.setTimeout(() => setPhase("reveal"), 7300));   // hole scales open (~1.5s, done ~8800)
-    // Fire the hero's entrance 0.5s BEFORE the red fully clears, so the side text
-    // eases in overlapping the tail of the reveal — not after a dead beat.
-    timers.push(window.setTimeout(startReveal, 8200));
-    timers.push(window.setTimeout(finish, 8950));
+    timers.push(window.setTimeout(() => setPhase("reveal"), 7300));   // hole scales open
+    // Fire the hero's entrance AS the hole starts opening, so the cards fan out and
+    // side text ease in together with the reveal — no dead gap before the deck moves.
+    timers.push(window.setTimeout(startReveal, 7400));
+    // Unmount the intro shortly after the hole is open enough to read the hero, so full
+    // interactivity (clicking a card) returns ~1s sooner instead of waiting out the tail.
+    timers.push(window.setTimeout(finish, 8100));
     return () => timers.forEach(clearTimeout);
   }, [reducedMotion, finish, startReveal]);
 
@@ -353,7 +358,7 @@ export default function Intro({ onRevealStart, onComplete }: Props) {
             animate={opening ? { scale: 36, opacity: 1 } : { scale: 1, opacity: 1 }}
             transition={
               opening
-                ? { duration: 1.5, ease: EASE_IN_OUT }
+                ? { duration: 0.7, ease: EASE_IN_OUT }
                 : { opacity: { duration: 0.3, ease: EASE_IN_OUT } }
             }
           />

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Bebas_Neue, Caveat, Pixelify_Sans, Spectral } from "next/font/google";
 import "./globals.css";
 import RouteTransition from "@/components/RouteTransition";
+import CustomCursor from "@/components/CustomCursor";
 
 // Self-hosted via next/font — no render-blocking @import, no extra round-trips,
 // no layout shift. Variables match the names used across globals.css/components.
@@ -39,6 +40,7 @@ export default function RootLayout({
   return (
     <html lang="en" className={fontVars}>
       <body className="antialiased">
+        <CustomCursor />
         <RouteTransition>{children}</RouteTransition>
       </body>
     </html>

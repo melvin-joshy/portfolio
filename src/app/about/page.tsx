@@ -71,19 +71,31 @@ export default function AboutPage() {
     <div className="about-page" style={{ background: CREAM, fontFamily: "var(--font-inter)" }}>
       <style>{`
         @media (max-width: 1023px) {
+          /* Shorter hero so the dark section peeks below the fold (signals scroll)
+             and the headline isn't marooned in vertical whitespace. */
           .about-hero {
             position: relative !important;
             height: auto !important;
-            min-height: 100svh !important;
+            min-height: 78svh !important;
+          }
+          .about-hero-body {
+            padding: 16px 20px 40px !important;
           }
 
+          /* Nav matches the main page: logo left, links right, no India//clock. */
           .about-nav {
             grid-template-columns: auto 1fr !important;
-            padding: 0 16px !important;
+            padding: 8px 16px !important;
           }
-
+          .about-nav > div:first-child {
+            display: none !important;
+          }
+          .about-nav > button {
+            justify-self: start !important;
+          }
           .about-nav > div:last-child {
             gap: 16px !important;
+            justify-content: flex-end !important;
           }
 
           .about-grid {
@@ -203,6 +215,7 @@ export default function AboutPage() {
 
         {/* Hero — centered */}
         <div
+          className="about-hero-body"
           style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", padding: "0 48px" }}
           onMouseMove={(e) => { rawX.set(e.clientX + 20); rawY.set(e.clientY - 140); }}
         >
@@ -267,7 +280,7 @@ export default function AboutPage() {
             >
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
-                src="/stamp image.png"
+                src="/stamp image.webp"
                 alt="Melvin Joshy"
                 style={{ width: 180, height: "auto", display: "block", filter: "drop-shadow(0 12px 32px rgba(0,0,0,0.22))" }}
               />
@@ -521,8 +534,11 @@ export default function AboutPage() {
 
             {/* Footer */}
             <div style={{ minHeight: 420, padding: "80px 64px", display: "flex", flexDirection: "column", justifyContent: "flex-end" }}>
-              <p style={{ fontSize: 8, letterSpacing: "0.22em", textTransform: "uppercase", color: "rgba(255,255,255,0.38)", marginBottom: 8 }}>© 2025 Melvin Joshy</p>
-              <p style={{ fontSize: 8, letterSpacing: "0.22em", textTransform: "uppercase", color: "rgba(255,255,255,0.22)", marginBottom: 8 }}>Designed &amp; built from scratch</p>
+              <p style={{ fontSize: 8, letterSpacing: "0.22em", textTransform: "uppercase", color: "rgba(255,255,255,0.38)", marginBottom: 8 }}>© 2026 Melvin Joshy</p>
+              <p style={{ fontSize: 8, letterSpacing: "0.22em", textTransform: "uppercase", color: "rgba(255,255,255,0.22)", marginBottom: 8 }}>
+                Crafted with{" "}
+                <span style={{ color: "#c0392b", fontFamily: "var(--font-mono)", letterSpacing: 0, textTransform: "none" }}>:&gt;</span>
+              </p>
               <a href="mailto:melvinjoshy5@gmail.com" style={{ fontSize: 8, letterSpacing: "0.22em", textTransform: "uppercase", color: "rgba(255,255,255,0.38)", textDecoration: "none" }}>
                 melvinjoshy5@gmail.com
               </a>

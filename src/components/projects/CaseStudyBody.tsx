@@ -4,6 +4,7 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import type { CaseStudyProject } from "@/data/projects";
 import { Chapter } from "./Chapter";
+import { MetaStrip } from "./MetaStrip";
 import { ChapterTOC, type TOCItem } from "./ChapterTOC";
 import { WireNote } from "./Wireframe";
 import { ScribbleUnderline } from "../ScribbleUnderline";
@@ -105,20 +106,23 @@ function CaseStudyBodyInner({ project }: { project: CaseStudyProject }) {
         )}
       </article>
 
-      {/* Chapter column — same 640px center axis as the cover. Sidebar floats to its left on desktop. */}
-      <div className="relative mx-auto mt-20 max-w-[640px]">
-        <aside className="mb-12 md:absolute md:right-full md:top-0 md:mb-0 md:mr-12 md:w-[180px]">
-          <div className="md:sticky md:top-24">
-            <MetaRow label="Role" value={project.role} />
-            {project.team && <MetaRow label="Team" value={project.team} />}
-            <MetaRow label="Duration" value={project.duration} />
-            <MetaRow label="Year" value={project.year} />
-            {project.tools && project.tools.length > 0 && (
-              <MetaRow label="Tools" value={project.tools.join(" · ")} />
-            )}
-          </div>
-        </aside>
+      {/* Meta strip — same narrow column as body (matches client / build templates) */}
+      <div className="mx-auto mt-20 max-w-[640px]">
+        <MetaStrip
+          items={[
+            { label: "Role", value: project.role },
+            ...(project.team ? [{ label: "Team", value: project.team }] : []),
+            { label: "Duration", value: project.duration },
+            { label: "Year", value: project.year },
+            ...(project.tools && project.tools.length > 0
+              ? [{ label: "Tools", value: project.tools.join(" · ") }]
+              : []),
+          ]}
+        />
+      </div>
 
+      {/* Chapter column — same 640px center axis as the cover */}
+      <div className="relative mx-auto mt-8 max-w-[640px]">
         <div className="min-w-0">
           <div id="overview" className="scroll-mt-24" />
           {project.chapters.map((c, i) => (
@@ -167,7 +171,7 @@ function CaseStudyBodyInner({ project }: { project: CaseStudyProject }) {
               {project.id === "aura" && (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img
-                  src={encodeURI("/Aura mascot.png")}
+                  src={encodeURI("/Aura mascot.webp")}
                   alt="Aura mascot"
                   className="mb-6"
                   style={{
@@ -253,28 +257,9 @@ function CoverImage({ src, alt }: { src: string; alt: string }) {
       onClick={() => lb?.open({ src })}
       data-cursor="ZOOM"
       data-cursor-variant="zoom"
-      className="mt-12 w-full cursor-none"
+      className="mt-12 w-full cursor-none rounded-sm"
       style={{ aspectRatio: "16/10", objectFit: "cover" }}
     />
-  );
-}
-
-function MetaRow({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="mb-5">
-      <p
-        className="text-[10px] tracking-[0.28em] uppercase text-white/40"
-        style={{ fontFamily: "var(--font-mono)", fontWeight: 500 }}
-      >
-        {label}
-      </p>
-      <p
-        className="mt-2 text-[12px] tracking-[0.16em] uppercase text-white/82"
-        style={{ fontFamily: "var(--font-mono)" }}
-      >
-        {value}
-      </p>
-    </div>
   );
 }
 

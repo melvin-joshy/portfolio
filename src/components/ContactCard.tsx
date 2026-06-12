@@ -30,7 +30,7 @@ export default function ContactCard({ open, onClose }: Props) {
     <AnimatePresence>
       {open && (
         <motion.div
-          className="fixed inset-0 z-[800] flex items-end justify-center pb-20 md:items-center md:pb-0"
+          className="fixed inset-0 z-[800] flex items-center justify-center p-4"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}

@@ -25,12 +25,10 @@ export function NextProjectCards({ nexts }: { nexts: Project[] }) {
 
 function NextCard({ project }: { project: Project }) {
   const tag = project.tag.replace(/\s*·\s*\d{4}[–\-]?(?:Present|\d{4})?$/i, "");
-  return (
-    <Link
-      href={`/projects/${project.id}`}
-      data-cursor="view →"
-      className="group block cursor-none"
-    >
+  const external = project.externalUrl;
+
+  const inner = (
+    <>
       {/* Image / colour block — fixed aspect ratio */}
       <div
         className="relative w-full overflow-hidden rounded-sm"
@@ -68,6 +66,31 @@ function NextCard({ project }: { project: Project }) {
           {project.description}
         </p>
       </div>
+    </>
+  );
+
+  // External projects (e.g. Tempo) open the live site in a new tab — no internal page.
+  if (external) {
+    return (
+      <a
+        href={external}
+        target="_blank"
+        rel="noopener noreferrer"
+        data-cursor="visit ↗"
+        className="group block cursor-none"
+      >
+        {inner}
+      </a>
+    );
+  }
+
+  return (
+    <Link
+      href={`/projects/${project.id}`}
+      data-cursor="view →"
+      className="group block cursor-none"
+    >
+      {inner}
     </Link>
   );
 }

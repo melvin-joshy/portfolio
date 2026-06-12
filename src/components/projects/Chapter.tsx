@@ -67,8 +67,12 @@ function LazyVideo({
 
 export function Chapter({ chapter, index, id }: { chapter: ChapterT; index: number; id?: string }) {
   const images = chapter.media?.filter(m => m.type !== "video") ?? [];
-  const videos = chapter.media?.filter(m => m.type === "video") ?? [];
+  const phoneVideos = chapter.media?.filter(m => m.type === "video" && m.mockup === "phone") ?? [];
+  const videos = chapter.media?.filter(m => m.type === "video" && m.mockup !== "phone") ?? [];
+  /* undefined = no media defined yet (show wireframe placeholder)
+     []        = intentionally text-only (no wireframe)            */
   const hasMedia = (chapter.media?.length ?? 0) > 0;
+  const mediaExplicitlyEmpty = Array.isArray(chapter.media) && chapter.media.length === 0;
 
   return (
     <motion.section
@@ -110,11 +114,12 @@ export function Chapter({ chapter, index, id }: { chapter: ChapterT; index: numb
                     {images.map((m, i) => <ImageTile key={i} media={m} />)}
                   </div>
                 )}
+                {phoneVideos.map((m, i) => <PhoneVideoTile key={i} media={m} />)}
                 {videos.map((m, i) => <VideoTile key={i} media={m} />)}
               </>
           }
         </>
-      ) : (
+      ) : mediaExplicitlyEmpty ? null : (
         <>
           <div className="mt-8 grid gap-5 md:grid-cols-2">
             <WireBox aspect="4/3" label={`Ch. ${String(index + 1).padStart(2, "0")} · A`} hint="screen / sketch / data" />
@@ -137,13 +142,14 @@ function DualPhoneTray({ items }: { items: Media[] }) {
   const lb = useLightbox();
   return (
     <div
-      className="mt-8 w-full rounded-sm flex items-center justify-center gap-8 px-10 py-6"
+      className="mt-8 w-full rounded-sm flex items-center justify-center gap-3 px-3 py-5 sm:gap-8 sm:px-10 sm:py-6"
       style={{ background: "#f5f5f5" }}
     >
       {items.map((m, i) => {
-        const dims = { maxWidth: 230, maxHeight: 460, width: "auto", height: "auto", objectFit: "contain" as const, display: "block" as const, cursor: "none" as const };
+        // Responsive: each phone caps at 40vw on mobile so two fit side-by-side, 220px on desktop.
+        const dims = { maxWidth: "min(220px, 40vw)", maxHeight: 460, width: "auto", height: "auto", objectFit: "contain" as const, display: "block" as const, cursor: "none" as const };
         return (
-          <div key={i} className="flex flex-col items-center gap-3">
+          <div key={i} className="flex min-w-0 flex-col items-center gap-3">
             {m.type === "video" ? (
               <LazyVideo src={m.src} onClick={() => lb?.open(m)} style={dims} />
             ) : (
@@ -151,7 +157,7 @@ function DualPhoneTray({ items }: { items: Media[] }) {
               <img src={encodeURI(m.src)} alt={m.caption ?? ""} onClick={() => lb?.open(m)} data-cursor="ZOOM" data-cursor-variant="zoom" style={dims} />
             )}
             {m.caption && (
-              <p className="mt-1 text-[12px] text-white/50 text-center" style={{ fontFamily: "var(--font-mono)" }}>
+              <p className="mt-1 text-[10px] sm:text-[12px] text-black/45 text-center" style={{ fontFamily: "var(--font-mono)" }}>
                 {m.caption}
               </p>
             )}
@@ -218,6 +224,109 @@ function ImageTile({ media }: { media: Media }) {
       {media.caption && (
         <figcaption
           className="mt-3 text-[12px] text-white/50"
+          style={{ fontFamily: "var(--font-mono)" }}
+        >
+          {media.caption}
+        </figcaption>
+      )}
+    </figure>
+  );
+}
+
+/* ── Phone mockup video tile ── */
+function PhoneVideoTile({ media }: { media: Media }) {
+  return (
+    <figure className="mt-8">
+      {/* Scene background */}
+      <div style={{
+        width: "100%",
+        borderRadius: 12,
+        background: media.videoBg
+          ? `url("${encodeURI(media.videoBg)}") center/cover no-repeat`
+          : "radial-gradient(ellipse 90% 70% at 50% 45%, #1c1c2e 0%, #0d0d18 60%, #060608 100%)",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        padding: "52px 24px 44px",
+      }}>
+        {/* Phone outer shell */}
+        <div style={{
+          position: "relative",
+          width: "min(260px, 68vw)",
+          flexShrink: 0,
+        }}>
+          {/* Left side buttons — volume up / down / silent */}
+          <div style={{ position: "absolute", left: -4, top: 88, width: 4, height: 34, background: "#2a2a2a", borderRadius: "3px 0 0 3px", boxShadow: "inset 1px 0 0 rgba(255,255,255,0.08)" }} />
+          <div style={{ position: "absolute", left: -4, top: 132, width: 4, height: 34, background: "#2a2a2a", borderRadius: "3px 0 0 3px", boxShadow: "inset 1px 0 0 rgba(255,255,255,0.08)" }} />
+          <div style={{ position: "absolute", left: -4, top: 72, width: 4, height: 10, background: "#2a2a2a", borderRadius: "3px 0 0 3px", boxShadow: "inset 1px 0 0 rgba(255,255,255,0.08)" }} />
+          {/* Right side button — power */}
+          <div style={{ position: "absolute", right: -4, top: 108, width: 4, height: 52, background: "#2a2a2a", borderRadius: "0 3px 3px 0", boxShadow: "inset -1px 0 0 rgba(255,255,255,0.08)" }} />
+
+          {/* Phone body */}
+          <div style={{
+            background: "linear-gradient(160deg, #2a2a2a 0%, #1a1a1a 40%, #111 100%)",
+            borderRadius: 44,
+            padding: 10,
+            boxShadow:
+              "0 0 0 1px rgba(255,255,255,0.12), " +
+              "0 0 0 1.5px rgba(0,0,0,0.8), " +
+              "0 32px 80px -12px rgba(0,0,0,0.9), " +
+              "0 8px 24px -4px rgba(0,0,0,0.7), " +
+              "inset 0 1px 0 rgba(255,255,255,0.07)",
+          }}>
+            {/* Screen bezel */}
+            <div style={{
+              borderRadius: 36,
+              overflow: "hidden",
+              background: "#000",
+              position: "relative",
+              aspectRatio: "9 / 19.5",
+            }}>
+              {/* Video content */}
+              <LazyVideo
+                src={media.src}
+                poster={media.poster}
+                style={{
+                  position: "absolute",
+                  inset: 0,
+                  width: "100%",
+                  height: "100%",
+                  objectFit: "cover",
+                  display: "block",
+                }}
+              />
+
+
+              {/* Screen glare — top-left specular */}
+              <div style={{
+                position: "absolute",
+                inset: 0,
+                background: "linear-gradient(145deg, rgba(255,255,255,0.07) 0%, transparent 38%)",
+                pointerEvents: "none",
+                zIndex: 5,
+                borderRadius: 36,
+              }} />
+            </div>
+          </div>
+
+          {/* Subtle phone glow underneath */}
+          <div style={{
+            position: "absolute",
+            bottom: -24,
+            left: "10%",
+            right: "10%",
+            height: 40,
+            background: "rgba(120, 140, 255, 0.12)",
+            filter: "blur(20px)",
+            borderRadius: "50%",
+            pointerEvents: "none",
+          }} />
+        </div>
+      </div>
+
+      {media.caption && (
+        <figcaption
+          className="mt-3 text-[12px] text-white/50 text-center"
           style={{ fontFamily: "var(--font-mono)" }}
         >
           {media.caption}

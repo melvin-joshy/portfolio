@@ -15,6 +15,7 @@ import Lottie from "lottie-react";
 import { ScribbleUnderline } from "@/components/ScribbleUnderline";
 import Artifacts from "@/components/Artifacts";
 import ContactCard from "@/components/ContactCard";
+import CertificateCard from "@/components/CertificateCard";
 import { projects as allProjects } from "@/data/projects";
 
 /* ─────────────── Data ─────────────── */
@@ -187,7 +188,7 @@ function Cursor({ mode }: { mode: CursorMode }) {
 
 /* ─────────────── Pixel hover overlay ─────────────── */
 
-function PixelHover({ accent }: { accent: string }) {
+function PixelHover({ accent, src }: { accent: string; src?: string }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
@@ -201,18 +202,53 @@ function PixelHover({ accent }: { accent: string }) {
     canvas.height = h;
     const cols = 26, rows = 16;
     const cw = w / cols, ch = h / rows;
-    for (let r = 0; r < rows; r++) {
-      for (let c = 0; c < cols; c++) {
-        const alpha = Math.random() * 0.18 + 0.04;
-        ctx.fillStyle = accent;
-        ctx.globalAlpha = alpha;
-        ctx.fillRect(c * cw, r * ch, cw, ch);
-        ctx.globalAlpha = 0.06;
-        ctx.strokeStyle = "rgba(0,0,0,1)";
-        ctx.strokeRect(c * cw, r * ch, cw, ch);
+
+    const drawFromImage = (imgEl: HTMLImageElement) => {
+      /* Downsample to grid size, then upscale with no smoothing = pixelation */
+      const off = document.createElement("canvas");
+      off.width = cols; off.height = rows;
+      const offCtx = off.getContext("2d");
+      if (!offCtx) return;
+      offCtx.drawImage(imgEl, 0, 0, cols, rows);
+      ctx.imageSmoothingEnabled = false;
+      ctx.drawImage(off, 0, 0, cols, rows, 0, 0, w, h);
+      /* Subtle dark grid lines to define the pixel grid */
+      ctx.globalAlpha = 0.08;
+      ctx.strokeStyle = "#000";
+      for (let r = 0; r < rows; r++)
+        for (let c = 0; c < cols; c++)
+          ctx.strokeRect(c * cw, r * ch, cw, ch);
+      ctx.globalAlpha = 1;
+    };
+
+    const drawAccentFallback = () => {
+      for (let r = 0; r < rows; r++) {
+        for (let c = 0; c < cols; c++) {
+          ctx.fillStyle = accent;
+          ctx.globalAlpha = Math.random() * 0.18 + 0.04;
+          ctx.fillRect(c * cw, r * ch, cw, ch);
+          ctx.globalAlpha = 0.06;
+          ctx.strokeStyle = "#000";
+          ctx.strokeRect(c * cw, r * ch, cw, ch);
+        }
       }
+      ctx.globalAlpha = 1;
+    };
+
+    if (src) {
+      const img = new Image();
+      img.src = encodeURI(src);
+      /* Image is preloaded on mount so usually already .complete */
+      if (img.complete) {
+        drawFromImage(img);
+      } else {
+        img.onload = () => drawFromImage(img);
+        img.onerror = drawAccentFallback;
+      }
+    } else {
+      drawAccentFallback();
     }
-  }, [accent]);
+  }, [accent, src]);
 
   return (
     <motion.canvas
@@ -440,7 +476,7 @@ function TickerItem({
   const lastThumbRef = useRef(thumbIdx);
 
   const nameColor = hovered
-    ? "#e05555"
+    ? "#c0392b"
     : isActive
     ? (theme === "light" ? "rgba(0,0,0,0.92)" : "rgba(255,255,255,0.92)")
     : theme === "light"
@@ -498,7 +534,7 @@ function TickerItem({
           <span
             style={{
               display: "inline-flex",
-              color: hovered ? "#e05555" : theme === "light" ? "rgba(0,0,0,0.45)" : "rgba(255,255,255,0.5)",
+              color: hovered ? "#c0392b" : theme === "light" ? "rgba(0,0,0,0.45)" : "rgba(255,255,255,0.5)",
               transition: "color 0.15s ease, transform 0.15s ease",
               transform: hovered ? "translate(1px,-1px)" : "none",
             }}
@@ -524,6 +560,29 @@ export default function MainStage({ visible }: { visible: boolean }) {
   const [artifactTouch, setArtifactTouch] = useState(false);
   const [easterEggActive, setEasterEggActive] = useState(false);
   const [contactOpen, setContactOpen] = useState(false);
+  const [certUnlocked, setCertUnlocked] = useState(false);
+  const [certOpen, setCertOpen] = useState(false);
+
+  // Reward unlock: show the certificate nav item once all 7 artifacts are found.
+  // Read on mount so it persists across reloads; Artifacts also notifies live via onUnlock.
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem("mj_artifacts_v2");
+      const arr = raw ? JSON.parse(raw) : [];
+      if (Array.isArray(arr) && arr.length >= 7) setCertUnlocked(true);
+    } catch {}
+  }, []);
+
+  const handleArtifactsUnlock = useCallback(() => {
+    setCertUnlocked(true);
+    let seen = false;
+    try { seen = localStorage.getItem("mj_cert_seen") === "1"; } catch {}
+    if (seen) return;
+    window.setTimeout(() => {
+      setCertOpen(true);
+      try { localStorage.setItem("mj_cert_seen", "1"); } catch {}
+    }, 1600);
+  }, []);
   const raccoonTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const artifactTouchTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const easterEggTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -540,6 +599,8 @@ export default function MainStage({ visible }: { visible: boolean }) {
   const tickerContainerRef = useRef<HTMLDivElement>(null);
   const tickerMX = useMotionValue(0);
   const tickerX  = useSpring(tickerMX, { stiffness: 280, damping: 32, mass: 0.7 });
+  const dragRef = useRef({ active: false, startX: 0, startMX: 0, moved: false });
+  const justDraggedRef = useRef(false);
 
   const centerTicker = useCallback((vIdx: number) => {
     const cw = tickerContainerRef.current?.offsetWidth ?? window.innerWidth;
@@ -560,8 +621,26 @@ export default function MainStage({ visible }: { visible: boolean }) {
   }, [tickerMX]);
 
   const cur = projects[active];
-  const midProj  = projects[(active + 1) % N];
-  const backProj = projects[(active + 2) % N];
+
+  // Peek (next) card lags `active` until the front-card slide settles. Without this,
+  // `active` jumps instantly and the peek momentarily shows active+2 while the old
+  // front is still sliding out — exposing the wrong project mid-transition.
+  const [peekBase, setPeekBase] = useState(active);
+  useEffect(() => {
+    const t = setTimeout(() => setPeekBase(active), 900); // ≈ full mode="wait" exit+enter
+    return () => clearTimeout(t);
+  }, [active]);
+  const midProj = projects[(peekBase + 1) % N];
+
+  /* Preload all heroImages once on mount so navigating between cards is instant */
+  useEffect(() => {
+    projects.forEach(p => {
+      if (p.heroImage) {
+        const img = new Image();
+        img.src = encodeURI(p.heroImage);
+      }
+    });
+  }, []);
 
   useEffect(() => {
     try {
@@ -652,10 +731,50 @@ export default function MainStage({ visible }: { visible: boolean }) {
     triggerRaccoon(delta > 0 ? 1 : -1);
   }, [active, pick, triggerRaccoon, centerTicker, normalizeTicker]);
 
+  /* ── Swipe / drag the ticker (mobile-first) — 1:1 follow, snap to nearest on release ── */
+  const onTickerPointerDown = useCallback((e: React.PointerEvent) => {
+    dragRef.current = { active: true, startX: e.clientX, startMX: tickerMX.get(), moved: false };
+    try { (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId); } catch {}
+  }, [tickerMX]);
+
+  const onTickerPointerMove = useCallback((e: React.PointerEvent) => {
+    const d = dragRef.current;
+    if (!d.active) return;
+    const dx = e.clientX - d.startX;
+    if (Math.abs(dx) > 4) d.moved = true;
+    const nx = d.startMX + dx;
+    tickerMX.jump(nx);  // bypass spring during drag for a 1:1 grab feel
+    tickerX.jump(nx);
+  }, [tickerMX, tickerX]);
+
+  const onTickerPointerUp = useCallback(() => {
+    const d = dragRef.current;
+    if (!d.active) return;
+    d.active = false;
+    if (!d.moved) return; // no movement → let the TickerItem click handle it
+    justDraggedRef.current = true;
+    setTimeout(() => { justDraggedRef.current = false; }, 60);
+
+    const cw = tickerContainerRef.current?.offsetWidth ?? window.innerWidth;
+    const prevMod = ((vIdxRef.current % N) + N) % N;
+    const targetV = Math.round((cw / 2 - ITEM_W / 2 - tickerMX.get()) / ITEM_W);
+    vIdxRef.current = targetV;
+    centerTicker(targetV);   // snap: tickerMX moves, tickerX springs to it
+    normalizeTicker();
+    const mod = ((targetV % N) + N) % N;
+    if (mod !== active) {
+      const dir = ((mod - prevMod + N) % N) <= N / 2 ? 1 : -1;
+      setDir(dir);
+      setActive(mod);
+      triggerRaccoon(dir);
+    }
+  }, [tickerMX, centerTicker, normalizeTicker, active, triggerRaccoon]);
+
   // Auto-advance
   useEffect(() => {
     if (!visible || reducedMotion) return;
     const id = setInterval(() => {
+      if (dragRef.current.active) return; // don't fight a live swipe
       vIdxRef.current += 1;
       centerTicker(vIdxRef.current);
       setDir(1);
@@ -713,6 +832,8 @@ export default function MainStage({ visible }: { visible: boolean }) {
           onRaccoonSignal={triggerArtifactRaccoon}
           onSpotlightSignal={triggerSpotlightRaccoon}
           onEasterEgg={triggerEasterEgg}
+          heroVisible={visible}
+          onUnlock={handleArtifactsUnlock}
         />
 
         {/* Content layer — explicitly above the grid */}
@@ -742,6 +863,7 @@ export default function MainStage({ visible }: { visible: boolean }) {
           </div>
           <div className="flex flex-wrap justify-end gap-x-5 gap-y-2 text-[10px] tracking-[0.25em] uppercase">
             {[
+              ...(certUnlocked ? [{ label: "Reward", onClick: () => setCertOpen(true), href: undefined }] : []),
               { label: "About", onClick: () => go("/about"), href: undefined },
               { label: "Resume", onClick: undefined, href: "https://drive.google.com/file/d/1YRxY_9YcVx3SqbN-la49XKdes4CCp1xh/view?usp=sharing" },
               { label: "Contact", onClick: () => setContactOpen(true), href: undefined },
@@ -790,7 +912,7 @@ export default function MainStage({ visible }: { visible: boolean }) {
               className="mx-auto mt-4 max-w-[34ch] text-[14px] leading-relaxed"
               style={{ color: theme === "light" ? "rgba(0,0,0,0.6)" : "rgba(255,255,255,0.55)" }}
             >
-              Currently at <span style={{ color: "#e05555" }}>Tempo</span> (YC&nbsp;S23). Zero to one, repeatedly.
+              Currently at <span style={{ color: "#c0392b" }}>Tempo</span> (YC&nbsp;S23). Zero to one, repeatedly.
             </p>
             <div
               className="mt-7 flex items-center justify-center gap-2 text-[9px] uppercase tracking-[0.3em]"
@@ -873,78 +995,91 @@ export default function MainStage({ visible }: { visible: boolean }) {
               onMouseEnter={() => setCardHover(true)}
             >
               {/* Raccoon mascot — sits above the card top edge */}
+              {/* Outer: horizontal nudge + flip — separate from vertical so they don't conflict */}
               <motion.div
                 className="absolute pointer-events-none select-none"
                 style={{ bottom: "calc(100% - 44px)", right: "-8px", zIndex: 20 }}
                 animate={{
-                  // Hardware-accelerated full transform string instead of FM shorthand x/scaleX
                   transform: `translateX(${raccoonFrame === 3 ? raccoonDir * 14 : 0}px) scaleX(${raccoonDir === -1 ? -1 : 1})`,
-                  // Subtle vertical bob on mid-walk frame — like a real walk cycle
-                  y: raccoonFrame === "handsup" ? -28 : raccoonFrame === 2 ? -2 : 0,
                 }}
                 transition={{
                   transform: raccoonFrame === 3
-                    ? { duration: 0.13, ease: [0.22, 1, 0.36, 1] }   // nudge out: snappy ease-out
-                    : { duration: 0.24, ease: [0.77, 0, 0.175, 1] },  // return: rubber-band ease-in-out
-                  y: raccoonFrame === "handsup"
-                    ? { type: "spring", duration: 0.38, bounce: 0.18 }
-                    : { duration: 0.12, ease: [0.22, 1, 0.36, 1] },
+                    ? { duration: 0.13, ease: [0.22, 1, 0.36, 1] }
+                    : { duration: 0.24, ease: [0.77, 0, 0.175, 1] },
                 }}
               >
-                <AnimatePresence mode="popLayout">
-                  {(raccoonFrame === "hi" || raccoonFrame === "handsup") ? (
-                    /* Special poses pop in with a spring jump */
-                    <motion.img
-                      key={raccoonFrame}
-                      src={raccoonFrame === "hi" ? "/racoon hi.webp" : "/racoon handsup.webp"}
-                      alt=""
-                      initial={{ y: -10, opacity: 0, scale: 0.92 }}
-                      animate={{ y: 0, opacity: 1, scale: 1 }}
-                      exit={{ y: -6, opacity: 0, scale: 0.95 }}
-                      transition={{ type: "spring", duration: 0.38, bounce: 0.32 }}
-                      style={{ width: "clamp(140px, 18vw, 220px)", height: "auto", display: "block" }}
-                    />
-                  ) : (
-                    /* Walk frames: fast opacity crossfade + blur masks hard swap */
-                    <motion.img
-                      key={raccoonFrame}
-                      src={`/racoon ${raccoonFrame}.webp`}
-                      alt=""
-                      initial={{ opacity: 0.6, filter: "blur(1px)" }}
-                      animate={{ opacity: 1, filter: "blur(0px)" }}
-                      transition={{ duration: 0.06, ease: "easeOut" }}
-                      style={{ width: "clamp(140px, 18vw, 220px)", height: "auto", display: "block" }}
-                    />
-                  )}
-                </AnimatePresence>
+                {/* Inner: vertical bob + special-pose lift — own transition, no conflict */}
+                <motion.div
+                  style={{ position: "relative" }}
+                  animate={{
+                    transform: `translateY(${
+                      raccoonFrame === "handsup" ? -2 :
+                      raccoonFrame === "hi" ? -22 :
+                      raccoonFrame === 2 ? -2 : 0
+                    }px)`,
+                  }}
+                  transition={{
+                    transform: (raccoonFrame === "handsup" || raccoonFrame === "hi")
+                      ? { type: "spring", duration: 0.38, bounce: 0.18 }
+                      : { duration: 0.12, ease: [0.22, 1, 0.36, 1] },
+                  }}
+                >
+                  {/* Walk frames: single persistent <img>, src just swaps — no mount/unmount, no ghosting */}
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={`/racoon ${typeof raccoonFrame === "number" ? raccoonFrame : 1}.webp`}
+                    alt=""
+                    style={{
+                      width: "clamp(140px, 18vw, 220px)",
+                      height: "auto",
+                      display: "block",
+                      visibility: typeof raccoonFrame === "number" ? "visible" : "hidden",
+                    }}
+                  />
+
+                  {/* Special poses (hi / handsup) pop in over the walk frame */}
+                  <AnimatePresence>
+                    {(raccoonFrame === "hi" || raccoonFrame === "handsup") && (
+                      <motion.img
+                        key={raccoonFrame}
+                        src={raccoonFrame === "hi" ? "/racoon hi.webp" : "/racoon handsup.webp"}
+                        alt=""
+                        initial={{ y: -10, opacity: 0, scale: 0.92 }}
+                        animate={{ y: 0, opacity: 1, scale: 1 }}
+                        exit={{ y: -6, opacity: 0, scale: 0.95 }}
+                        transition={{ type: "spring", duration: 0.38, bounce: 0.32 }}
+                        style={{
+                          position: "absolute",
+                          inset: 0,
+                          width: "clamp(140px, 18vw, 220px)",
+                          height: "auto",
+                          display: "block",
+                        }}
+                      />
+                    )}
+                  </AnimatePresence>
+                </motion.div>
               </motion.div>
-              {/* Back card — fans out on entrance, spreads further on hover */}
+              {/* Next card (active + 1) — the single peek the front slides away to reveal */}
               <motion.div
                 className="absolute inset-0 rounded-[6px] overflow-hidden"
                 animate={{
                   x: visible ? (cardHover ? 18 : 12) : 0,
                   y: visible ? (cardHover ? 22 : 16) : 0,
                   rotate: visible ? (cardHover ? 2.4 : 1.6) : 0,
-                  scale: visible ? (cardHover ? 0.88 : 0.9) : 0.92,
-                  opacity: visible ? (cardHover ? 0.65 : 0.55) : 0,
-                }}
-                transition={SPRING}
-                style={{ background: backProj.bg, zIndex: 1, border: "1px solid rgba(255,255,255,0.04)" }}
-              />
-
-              {/* Middle card — fans out on entrance, spreads further on hover */}
-              <motion.div
-                className="absolute inset-0 rounded-[6px] overflow-hidden"
-                animate={{
-                  x: visible ? (cardHover ? 9 : 6) : 0,
-                  y: visible ? (cardHover ? 12 : 8) : 0,
-                  rotate: visible ? (cardHover ? 1.1 : 0.7) : 0,
-                  scale: visible ? (cardHover ? 0.94 : 0.95) : 0.965,
-                  opacity: visible ? (cardHover ? 0.85 : 0.75) : 0,
+                  scale: visible ? (cardHover ? 0.9 : 0.92) : 0.945,
+                  opacity: visible ? (cardHover ? 0.88 : 0.78) : 0,
                 }}
                 transition={SPRING}
                 style={{ background: midProj.bg, zIndex: 2, border: "1px solid rgba(255,255,255,0.05)" }}
-              />
+              >
+                {midProj.heroImage && (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={encodeURI(midProj.heroImage)} alt="" aria-hidden
+                    className="absolute inset-0 w-full h-full pointer-events-none"
+                    style={{ objectFit: "cover" }} />
+                )}
+              </motion.div>
 
               {/* Front card — lifts on hover */}
               <AnimatePresence mode="wait" custom={dir}>
@@ -955,9 +1090,7 @@ export default function MainStage({ visible }: { visible: boolean }) {
                   key={`card-${active}`}
                   className="absolute inset-0 rounded-[6px] overflow-hidden border border-white/[0.07] text-left"
                   style={{
-                    background: cur.heroImage
-                      ? `url(${encodeURI(cur.heroImage)}) center/cover no-repeat, ${cur.bg}`
-                      : cur.bg,
+                    background: cur.bg,
                     zIndex: 3,
                   }}
                   custom={dir}
@@ -1026,7 +1159,7 @@ export default function MainStage({ visible }: { visible: boolean }) {
                   {/* Pixel hover overlay */}
                   <AnimatePresence>
                     {cursorMode === "view" && (
-                      <PixelHover key={`px-${active}`} accent={cur.accent} />
+                      <PixelHover key={`px-${active}`} accent={cur.accent} src={cur.heroImage} />
                     )}
                   </AnimatePresence>
 
@@ -1093,9 +1226,9 @@ export default function MainStage({ visible }: { visible: boolean }) {
                 whileHover={{ scaleX: 1 }}
                 transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}
               />
-              <ScribbleUnderline color="#c0392b" strokeWidth={1.8} offsetY={2}>
+              <ScribbleUnderline color="#c0392b" strokeWidth={1.6} offsetY={2}>
                 Currently
-                <br />at <span style={{ color: "#e05555" }}>Tempo.</span>
+                <br />at <span style={{ color: "#c0392b" }}>Tempo.</span>
                 <br />YC S23.
               </ScribbleUnderline>
             </motion.a>
@@ -1117,9 +1250,13 @@ export default function MainStage({ visible }: { visible: boolean }) {
         {/* ── Centered endless ticker ── */}
         <div
           ref={tickerContainerRef}
-          className="shrink-0 overflow-hidden relative"
-          style={{ height: 88, minHeight: 88, borderTop: `1px dashed ${theme === "light" ? "rgba(0,0,0,0.18)" : "rgba(255,255,255,0.14)"}` }}
+          className="shrink-0 overflow-hidden relative select-none"
+          style={{ height: 88, minHeight: 88, borderTop: `1px dashed ${theme === "light" ? "rgba(0,0,0,0.18)" : "rgba(255,255,255,0.14)"}`, touchAction: "pan-y", cursor: "grab" }}
           onMouseEnter={() => setCursorMode("default")}
+          onPointerDown={onTickerPointerDown}
+          onPointerMove={onTickerPointerMove}
+          onPointerUp={onTickerPointerUp}
+          onPointerCancel={onTickerPointerUp}
         >
           {/* Edge fades */}
           <div className="absolute inset-y-0 left-0 w-24 pointer-events-none z-10"
@@ -1139,6 +1276,8 @@ export default function MainStage({ visible }: { visible: boolean }) {
                 theme={theme}
                 itemW={ITEM_W}
                 onPick={() => {
+                  // Ignore the click that fires at the end of a drag.
+                  if (justDraggedRef.current) return;
                   // Already centred → enter the case study. Otherwise focus it.
                   if (p.id === cur.id) openProject(p);
                   else pickDirect(projects.indexOf(p));
@@ -1154,10 +1293,11 @@ export default function MainStage({ visible }: { visible: boolean }) {
           style={{ borderTop: `1px solid ${theme === "light" ? "rgba(0,0,0,0.06)" : "rgba(255,255,255,0.05)"}` }}
         >
           <p className="text-[8px] tracking-[0.2em] uppercase" style={{ color: theme === "light" ? "rgba(0,0,0,0.68)" : "rgba(255,255,255,0.62)" }}>
-            © 2025 Melvin Joshy
+            © 2026 Melvin Joshy
           </p>
           <p className="text-[8px] tracking-[0.2em] uppercase" style={{ color: theme === "light" ? "rgba(0,0,0,0.55)" : "rgba(255,255,255,0.50)" }}>
-            Crafted with love
+            Crafted with{" "}
+            <span style={{ color: "#c0392b", fontFamily: "var(--font-mono)", letterSpacing: 0, textTransform: "none" }}>:&gt;</span>
           </p>
           <motion.a
             href="mailto:melvinjoshy5@gmail.com"
@@ -1166,7 +1306,7 @@ export default function MainStage({ visible }: { visible: boolean }) {
             onMouseEnter={() => setCursorMode("view")}
             onMouseLeave={() => setCursorMode("default")}
           >
-            <ScribbleUnderline color="#c0392b" strokeWidth={1.4} offsetY={2}>
+            <ScribbleUnderline color="#c0392b" strokeWidth={1.6} offsetY={2}>
               melvinjoshy5@gmail.com
             </ScribbleUnderline>
           </motion.a>
@@ -1177,6 +1317,7 @@ export default function MainStage({ visible }: { visible: boolean }) {
 
       {/* Contact card overlay */}
       <ContactCard open={contactOpen} onClose={() => setContactOpen(false)} />
+      <CertificateCard open={certOpen} onClose={() => setCertOpen(false)} />
     </>
   );
 }

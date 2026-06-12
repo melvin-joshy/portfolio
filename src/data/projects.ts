@@ -9,6 +9,10 @@ export type Media = {
   type?: "video";
   /** Optional poster frame shown before the video loads */
   poster?: string;
+  /** "phone" wraps the video inside an iOS-style phone frame mockup */
+  mockup?: "phone";
+  /** Background image URL for the phone mockup scene */
+  videoBg?: string;
   /** "contain" shows the full asset with a background; "cover" fills the box (default) */
   fit?: "cover" | "contain";
 };
@@ -107,41 +111,68 @@ export const projects: Project[] = [
     duration: "Personal Project",
     tools: ["Next.js", "OpenAI Whisper", "Supabase", "Framer Motion", "Tailwind"],
     problem: "Built because I kept forgetting things that mattered.",
+    cover: "/Clarity cover.webp",
+    heroImage: "/Clarity cover.webp",
     chapters: [
       {
         eyebrow: "Why it exists",
         title: "The friction killed the habit",
-        body: "I never journaled. The friction of processing a thought and then writing it down meant the moment was gone before I started.\n\nThen I started juggling more at once and forgetting things that mattered. Not big things, small ones: an idea at 11pm, a follow-up, a thought to revisit later.\n\nI didn't need a notes app or a to-do list. I needed somewhere to dump whatever was in my head, move on, and trust it would be there later.\n\nSo I built Clarity.",
+        body: "I never journaled. The friction of processing a thought and then writing it down meant the moment was gone before I started.\n\nThen I started juggling more at once and forgetting things that mattered. Not big things, small ones: an idea at 11pm, a follow-up, a thought to revisit later.\n\nI needed somewhere to dump whatever was in my head, move on, and trust it would be there later.\n\nSo I built Clarity.",
+        media: [],
       },
       {
         eyebrow: "The core problem",
         title: "Too much friction between thought and capture",
         body: "Every existing tool demanded the same thing: process the thought, then write it. Notes apps, journal apps, voice memos all made you do the work before anything went down.\n\nThoughts don't work that way. They arrive unformed, messy, usually mid-task.\n\nThe insight: capture should cost nothing. Organisation comes later.",
+        media: [
+          { src: "/Clarity Too much friction.webp" },
+        ],
       },
       {
         eyebrow: "The design challenge",
         title: "Reducing, not adding",
-        body: "The hardest problem wasn't what to build. It was what to remove.\n\nEvery feature created friction: a category picker, a priority flag, a due date field. Each made sense alone. Together they turned a thought dump into a form.\n\nThe goal was calm, not productivity. You're not rushing or being evaluated, you're speaking, and the interface had to understand that.\n\nNo urgency: nothing on screen should make you feel behind. No friction: the path from thought to captured stays as short as possible. No pressure: this isn't a task manager, so you never have to act on what you capture.",
+        body: "The hardest problem wasn't what to build. It was what to remove.\n\nEvery feature created friction: a category picker, a priority flag, a due date field. Each made sense alone. Together they turned a thought dump into a form.\n\nThe goal was calm, not productivity.\n\nNo urgency: nothing on screen should make you feel behind. No friction: the path from thought to captured stays as short as possible. No pressure: this isn't a task manager, so you never have to act on what you capture.",
+        media: [
+          { src: "/Clarity Reducing, not adding.webp" },
+        ],
       },
       {
         eyebrow: "How it works",
         title: "Speak. We'll organise it.",
         body: "Tap the microphone and speak. Clarity transcribes live, word by word, the way lyrics surface in a music app, so you watch the thought form as you talk.\n\nWhen you stop, AI does three things. It categorises the thought into one of your four life themes, extracts any task buried inside, and headlines it with a short summary.\n\nThe raw transcription and the AI summary sit side by side in the detail view: your words, and what the AI understood. You stay in control.",
+        media: [
+          {
+            src: "/clarity main.mp4",
+            type: "video",
+            mockup: "phone",
+            videoBg: "/Clarity bg for main.webp",
+            caption: "End-to-end flow: tap, speak, organised.",
+          },
+        ],
       },
       {
         eyebrow: "The categorisation decision",
         title: "AI does the heavy lifting. You keep the final say.",
         body: "Early versions asked people to tag their own thoughts, typing @work or @personal before speaking. Logical, but it felt like homework.\n\nIf you categorise before you capture, you're processing before dumping, which defeats the point. So categorisation moved to AI: speak freely, and it figures out where the thought goes.\n\nFull AI control felt wrong too. These are your thoughts, so you see what the AI decided and why. That's \"AI UNDERSTOOD\": transparent AI, not invisible AI.",
+        media: [
+          { src: "/Clarity AI does the heavy lifting.webp" },
+        ],
       },
       {
         eyebrow: "The two modes",
         title: "One question: what do you need right now?",
-        body: "Organise mode was always the plan: a categorised view of everything, browsable by theme, sortable by date.\n\nFocus mode wasn't. It emerged from using the app, because the organised view showed everything, good thoughts, anxious late-night ones, half-formed ideas, when sometimes you only need to know what deserves attention today.\n\nFocus mode answers that. Just the tasks pulled from your voice: no context, no clutter, one clean list.\n\nThe first version put tasks front and centre with a badge count and an urgency flag, and it instantly felt like a to-do app you were behind on. So those came out: no count, no urgency, just the tasks waiting quietly when you need them.",
+        body: "Organise mode was always the plan: a categorised view of everything, browsable by theme, sortable by date.\n\nFocus mode wasn't. It emerged from using the app, because the organised view showed everything when sometimes you only need to know what deserves attention today.\n\nFocus mode answers that. Just the tasks pulled from your voice: no context, no clutter, one clean list.\n\nThe first version had a badge count and urgency flags. It instantly felt like a to-do app you were behind on. So those came out.",
+        media: [
+          { src: "/Clarity what do you need right now_.webp" },
+        ],
       },
       {
         eyebrow: "The waveform",
         title: "Calm before you tap",
         body: "The radial waveform on the home screen isn't the recording visualiser; that's a separate bottom waveform that glows as you speak. The radial is abstract, a signal that this is calm and breathing, alive but unhurried, not a productivity tool.\n\nA small detail that sets the tone before you tap the microphone.",
+        media: [
+          { src: "/Clarity Calm before you tap.webp" },
+        ],
       },
     ],
     reflection:
@@ -320,6 +351,8 @@ export const projects: Project[] = [
     description: "Designed for dispatchers who can't afford to look twice.",
     bg: "linear-gradient(155deg, #1e3a2f 0%, #0f2018 55%, #060c09 100%)",
     accent: "#3a8f62",
+    cover: "/Crewslink -Cover.webp",
+    heroImage: "/Crewslink -Cover.webp",
     client: "CrewsLink",
     role: "Sole Designer",
     scope: ["End-to-end admin platform"],
@@ -329,6 +362,7 @@ export const projects: Project[] = [
       "The person behind every on-time pickup.\n\nCrewsLink coordinates ground transportation for airlines like WestJet and Air Canada across 37+ airports. The platform moves 24,000+ crew members monthly. Behind that is a dispatcher, someone on screen for 10-hour shifts, managing live trips, tracking drivers, and rebooking pickups in under 4 minutes when flights change.\n\nThat person is who I designed for.",
     problem:
       "Dispatch software is built for completeness, not speed. Every field present. Every option visible. The result: dense interfaces that slow down the people who need to move fastest.\n\nOne principle guided every decision: can a tired dispatcher at hour 10 understand this in 2 seconds?",
+    problemImage: "/Crewslink -problem.webp",
     goals: [
       "Status legibility: every driver's state visible at a glance, no dropdowns.",
       "Trip flow: booking, managing, and reconciling trips in fewer screens.",
@@ -342,30 +376,35 @@ export const projects: Project[] = [
         title: "Map Overview",
         body:
           "The command center. Live driver positions on the map. Left panel shows all drivers with color-coded status. Persistent pill filter bar at the top, one click to isolate Available, On the way, or Arrived drivers. No dropdowns. No nested menus.",
+        media: [{ src: "/Crewslink -1.webp", label: "Map Overview — live positions, status pills", aspect: "wide" }],
       },
       {
         index: "02",
         title: "New Booking",
         body:
           "Trip details and passenger info side by side. Live trip summary updates as fields are filled. Map visible throughout, so dispatchers confirm pickup and dropoff visually without switching screens.",
+        media: [{ src: "/crewslink -2.webp", label: "New Booking — details, summary, map in one view", aspect: "wide" }],
       },
       {
         index: "03",
         title: "Trip Management",
         body:
           "65 trips in one view. The Flight Connected column tells dispatchers instantly which bookings auto-update with flight data and which need manual attention. Active and Closed trips separated by a single toggle.",
+        media: [{ src: "/crewslink -3.webp", label: "Trip Management — 65 trips, Flight Connected column", aspect: "wide" }],
       },
       {
         index: "04",
         title: "Contract & Billing Management",
         body:
           "Airlines operate on complex contracts per airport, route, and vehicle type. The contract table surfaces expiring contracts proactively. Billing consolidates Client, Vendor, and Driver pay into one place, with no reconciliation across systems.",
+        media: [{ src: "/crewslink -4.webp", label: "Contract & Billing — one consolidated view", aspect: "wide" }],
       },
       {
         index: "05",
         title: "Permissions",
         body:
           "Role-based access across every module. Dispatchers, vendor admins, drivers, and airline clients each see only what they need. New users onboarded with one template click.",
+        media: [{ src: "/crewslink -5.webp", label: "Permissions — role-based access, template onboarding", aspect: "wide" }],
       },
     ],
     outcome:
@@ -389,6 +428,8 @@ export const projects: Project[] = [
       "PWA showcase tool for presenting web apps inside device frames with custom backgrounds and recordings.",
     bg: "linear-gradient(155deg, #2a1e38 0%, #180f25 55%, #090610 100%)",
     accent: "#8a5abf",
+    cover: "/Framestudio cover.webp",
+    heroImage: "/Framestudio cover.webp",
     oneLiner: "Showing my work deserved a better tool. So I built one.",
     stack: ["Next.js", "Tailwind", "Canvas API", "PWA"],
     status: "Live PWA",
@@ -400,9 +441,9 @@ export const projects: Project[] = [
     insight:
       "Frame Studio was built to showcase Clarity. Then I used Frame Studio to showcase Frame Studio. Then I used both to build my portfolio.\n\nA tool that builds itself into the story of everything else I've made.",
     gallery: [
-      { src: "", label: "Frame Studio · Clarity loaded · terracotta bg", aspect: "wide" },
-      { src: "", label: "Frame Studio · Maryland Farm dashboard · moss bg", aspect: "wide" },
-      { src: "", label: "Background options panel", aspect: "wide" },
+      { src: "/Framestudio -1.webp", label: "Frame Studio · app loaded in a device frame", aspect: "wide" },
+      { src: "/Framestudio -3.webp", label: "Background presets — gradients, grid, dots", aspect: "wide" },
+      { src: "/Framestudio -3-1.webp", label: "Export & shareable link", aspect: "wide" },
     ],
   },
   {
@@ -446,7 +487,7 @@ export const projects: Project[] = [
         body: "Young people know they need help. Cost, scheduling, and stigma keep them from it, and existing apps feel clinical or ignore how someone feels day to day. The bar: support that reads like a friend, not a product.",
         media: [
           {
-            src: "/aura 1.png",
+            src: "/aura 1.webp",
             caption: "Onboarding · meet Aura",
             aspect: "tall",
             fit: "contain",
@@ -549,11 +590,11 @@ export const projects: Project[] = [
         body: "Home & Style Discovery opens with curated lookbooks and style guides, with AR entry one tap from any product page. Guided onboarding removes calibration confusion; placement is true-to-scale, with real dimensions, materials, and textures. Advanced controls handle color, dimensions, and lighting, saved rooms enable sharing, and checkout happens inside the AR view.",
         media: [
           {
-            src: "/Deco AR 3.png",
+            src: "/Deco AR 3.webp",
             caption: "AR controls · color, dimensions, lighting",
           },
           {
-            src: "/Deco AR 4.png",
+            src: "/Deco AR 4.webp",
             caption: "Checkout · cart to order confirmation",
           },
         ],

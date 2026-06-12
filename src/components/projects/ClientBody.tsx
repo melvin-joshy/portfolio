@@ -26,7 +26,9 @@ function ProblemImage({ src }: { src: string }) {
       src={encodeURI(src)}
       alt=""
       onClick={() => lb?.open({ src })}
-      className="mx-auto mt-8 w-full max-w-[640px] cursor-zoom-in rounded-[4px] block"
+      data-cursor="ZOOM"
+      data-cursor-variant="zoom"
+      className="mx-auto mt-8 w-full max-w-[640px] cursor-none rounded-sm block"
       style={{ display: "block" }}
     />
   );
@@ -314,7 +316,9 @@ function Cover({ project }: { project: ClientProject }) {
         src={project.cover}
         alt={project.name}
         onClick={() => lb?.open({ src: project.cover! })}
-        className="w-full block cursor-zoom-in rounded-[4px]"
+        data-cursor="ZOOM"
+        data-cursor-variant="zoom"
+        className="w-full block cursor-none rounded-sm"
         style={{ aspectRatio: "16/10", objectFit: "cover" }}
       />
     );
@@ -509,10 +513,12 @@ function AnnotatedImage({ media }: { media: Media }) {
       {media.src ? (
         // eslint-disable-next-line @next/next/no-img-element
         <img
-          src={media.src}
+          src={encodeURI(media.src)}
           alt={media.caption ?? ""}
           onClick={() => lb?.open({ src: media.src, caption: media.caption })}
-          className="w-full block cursor-zoom-in rounded-[4px]"
+          data-cursor="ZOOM"
+          data-cursor-variant="zoom"
+          className="w-full block cursor-none rounded-sm"
           style={{
             objectFit: media.fit === "contain" ? "contain" : "cover",
           }}

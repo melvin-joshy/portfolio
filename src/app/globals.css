@@ -11,7 +11,7 @@
   --color-cream: #e8ddd0;
   --color-accent: #c4a882;
   --color-danger: #c0392b;
-  --color-ember: #e05555;
+  --color-ember: #c0392b;
   --focus-ring: 0 0 0 2px var(--color-ink), 0 0 0 4px var(--color-accent);
 }
 
@@ -107,12 +107,12 @@ button:active {
 }
 
 .ticker-btn:hover .ticker-name {
-  color: #e05555 !important;
+  color: #c0392b !important;
 }
 
 /* ── Ticker hover: thumb ring ── */
 .ticker-btn:hover .ticker-thumb {
-  box-shadow: 0 0 0 1px rgba(224, 85, 85, 0.5) !important;
+  box-shadow: 0 0 0 1px rgba(192, 57, 43, 0.5) !important;
 }
 
 .scrollbar-hide {

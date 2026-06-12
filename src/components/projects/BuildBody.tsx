@@ -91,10 +91,10 @@ export function BuildBody({ project }: { project: BuildProject }) {
           </p>
         </motion.header>
 
-        {/* 02 · Cover in soft card */}
-        <SoftImageCard className="mt-12">
+        {/* 02 · Cover — full-bleed, matches client / case-study templates */}
+        <div className="mt-12">
           <Cover project={project} />
-        </SoftImageCard>
+        </div>
       </article>
 
       {/* 03 · Meta strip — same width as body */}
@@ -153,13 +153,11 @@ export function BuildBody({ project }: { project: BuildProject }) {
         {project.gallery.length > 0 ? (
           <div className="flex flex-col gap-6">
             {project.gallery.map((m, i) => (
-              <SoftImageCard key={i}>
-                {m.src ? (
-                  <GalleryFullBleed media={m} />
-                ) : (
-                  <WireBox aspect={aspectKey(m.aspect)} label={m.label ?? `Screen ${i + 1}`} hint="add src to gallery[]" />
-                )}
-              </SoftImageCard>
+              m.src ? (
+                <GalleryFullBleed key={i} media={m} />
+              ) : (
+                <WireBox key={i} aspect={aspectKey(m.aspect)} label={m.label ?? `Screen ${i + 1}`} hint="add src to gallery[]" />
+              )
             ))}
           </div>
         ) : (
@@ -326,24 +324,25 @@ function SerifBody({ children }: { children: React.ReactNode }) {
 }
 
 function GalleryFullBleed({ media }: { media: Media }) {
+  const caption = media.caption ?? media.label;
   return (
     <figure>
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
-        src={media.src}
-        alt={media.caption ?? ""}
-        className="w-full"
+        src={encodeURI(media.src)}
+        alt={caption ?? ""}
+        className="w-full block rounded-sm"
         style={{
           aspectRatio: media.aspect === "tall" ? "3/4" : media.aspect === "square" ? "1/1" : "16/9",
           objectFit: "cover",
         }}
       />
-      {media.caption && (
+      {caption && (
         <figcaption
-          className="px-4 py-3 text-[12px] text-white/50"
+          className="mt-3 text-[12px] text-white/50"
           style={{ fontFamily: "var(--font-mono)" }}
         >
-          {media.caption}
+          {caption}
         </figcaption>
       )}
     </figure>

@@ -86,7 +86,11 @@ export default function RouteTransition({ children }: { children: React.ReactNod
                       const href = pendingRef.current;
                       pendingRef.current = "__pushed__";
                       if (href && href !== "__pushed__") router.push(href);
-                      capRef.current = setTimeout(reveal, 300);
+                      // The real reveal trigger is the pathname change (route mounted).
+                      // This is only a safety net for a genuinely stuck nav — keep it long
+                      // so a cold first-load route still commits before the iris opens,
+                      // otherwise the reveal fires over the old page and "cuts" on mount.
+                      capRef.current = setTimeout(reveal, 1800);
                     } else {
                       setPhase(null); // reveal done
                     }

@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { ScribbleUnderline } from "@/components/ScribbleUnderline";
 import { useRouteTransition } from "@/components/RouteTransition";
+import ContactCard from "@/components/ContactCard";
 
 function Clock() {
   const [t, setT] = useState("");
@@ -20,8 +21,9 @@ function Clock() {
 
 export function ProjectChrome({ children }: { children: React.ReactNode }) {
   const go = useRouteTransition();
+  const [contactOpen, setContactOpen] = useState(false);
   return (
-    <div className="min-h-screen bg-[#080808] text-white">
+    <div className="min-h-screen bg-[#0a0a0a] text-white">
       <nav
         className="min-h-11 shrink-0 grid grid-cols-[auto_1fr] md:grid-cols-3 items-center gap-3 px-4 py-2 md:px-8 md:py-0"
         style={{ borderBottom: "1px solid rgba(255,255,255,0.14)" }}
@@ -55,7 +57,7 @@ export function ProjectChrome({ children }: { children: React.ReactNode }) {
               onClick: undefined,
               href: "https://drive.google.com/file/d/1YRxY_9YcVx3SqbN-la49XKdes4CCp1xh/view?usp=sharing",
             },
-            { label: "Contact", onClick: undefined, href: "mailto:melvinjoshy5@gmail.com" },
+            { label: "Contact", onClick: () => setContactOpen(true), href: undefined },
           ].map(({ label, onClick, href }) => {
             const Tag = onClick ? "button" : "a";
             return (
@@ -86,8 +88,11 @@ export function ProjectChrome({ children }: { children: React.ReactNode }) {
         className="mt-32 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 px-6 py-6 md:justify-between md:px-12"
         style={{ borderTop: "1px solid rgba(255,255,255,0.05)" }}
       >
-        <p className="text-[8px] tracking-[0.2em] uppercase text-white/55">© 2025 Melvin Joshy</p>
-        <p className="text-[8px] tracking-[0.2em] uppercase text-white/40">Crafted with love</p>
+        <p className="text-[8px] tracking-[0.2em] uppercase text-white/55">© 2026 Melvin Joshy</p>
+        <p className="text-[8px] tracking-[0.2em] uppercase text-white/40">
+          Crafted with{" "}
+          <span style={{ color: "#c0392b", fontFamily: "var(--font-mono)", letterSpacing: "0", textTransform: "none" }}>:&gt;</span>
+        </p>
         <a
           href="mailto:melvinjoshy5@gmail.com"
           className="text-[8px] tracking-[0.2em] uppercase text-white/55 transition-colors duration-300 hover:text-white"
@@ -95,6 +100,8 @@ export function ProjectChrome({ children }: { children: React.ReactNode }) {
           melvinjoshy5@gmail.com
         </a>
       </footer>
+
+      <ContactCard open={contactOpen} onClose={() => setContactOpen(false)} />
     </div>
   );
 }

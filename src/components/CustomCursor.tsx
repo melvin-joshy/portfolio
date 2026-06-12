@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { usePathname } from "next/navigation";
 import { motion, useMotionValue, useSpring, AnimatePresence, useReducedMotion } from "framer-motion";
 
 function RunningLabel({ text }: { text: string }) {
@@ -24,6 +25,7 @@ function RunningLabel({ text }: { text: string }) {
 
 export default function CustomCursor() {
   const reducedMotion = useReducedMotion();
+  const pathname = usePathname();
   const [hasFinePointer, setHasFinePointer] = useState(false);
   const cursorX = useMotionValue(-200);
   const cursorY = useMotionValue(-200);
@@ -32,7 +34,6 @@ export default function CustomCursor() {
   const springY = useSpring(cursorY, { stiffness: 500, damping: 38, mass: 0.4 });
 
   const [label, setLabel] = useState<string | null>(null);
-  const [variant, setVariant] = useState<"default" | "zoom">("default");
   const labelRef = useRef<string | null>(null);
 
   useEffect(() => {
@@ -42,6 +43,13 @@ export default function CustomCursor() {
     media.addEventListener("change", syncPointer);
     return () => media.removeEventListener("change", syncPointer);
   }, []);
+
+  // Clear any lingering label on route change — when a link navigates, the hovered
+  // element unmounts before `mouseout` fires, so the label would otherwise stick.
+  useEffect(() => {
+    labelRef.current = null;
+    setLabel(null);
+  }, [pathname]);
 
   useEffect(() => {
     if (reducedMotion || !hasFinePointer) return;
@@ -54,10 +62,8 @@ export default function CustomCursor() {
       const el = (e.target as HTMLElement).closest("[data-cursor]") as HTMLElement | null;
       if (el) {
         const text = el.dataset.cursor ?? "view →";
-        const v = el.dataset.cursorVariant === "zoom" ? "zoom" : "default";
         labelRef.current = text;
         setLabel(text);
-        setVariant(v);
       }
     };
 
@@ -66,7 +72,6 @@ export default function CustomCursor() {
       if (el) {
         labelRef.current = null;
         setLabel(null);
-        setVariant("default");
       }
     };
 
@@ -101,28 +106,23 @@ export default function CustomCursor() {
         {label && (
           <motion.div
             key={label}
-            initial={{ opacity: 0, scale: 0.85 }}
+            initial={{ opacity: 0, scale: 0.72 }}
             animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.85 }}
-            transition={{ duration: 0.15, ease: [0.22, 1, 0.36, 1] }}
+            exit={{ opacity: 0, scale: 0.72 }}
+            transition={{ duration: 0.18, ease: [0.22, 1, 0.36, 1] }}
             style={{
-              background: variant === "zoom" ? "#1c1410" : "#f5f0e8",
-              color: variant === "zoom" ? "#ff3b30" : "#1c2235",
-              fontFamily: "var(--font-mono)",
-              fontSize: "11px",
-              fontWeight: 600,
-              letterSpacing: variant === "zoom" ? "0.22em" : "0.12em",
-              textTransform: variant === "zoom" ? "uppercase" : "none",
-              padding: "8px 16px",
-              borderRadius: "999px",
+              /* Bare red handwritten scrawl — matches the hero's cursor style */
+              fontFamily: "var(--font-caveat)",
+              fontSize: "24px",
+              color: "#c0392b",
+              lineHeight: 1,
+              letterSpacing: "0.02em",
               whiteSpace: "nowrap",
-              boxShadow: variant === "zoom"
-                ? "0 4px 20px rgba(255,59,48,0.25)"
-                : "0 4px 20px rgba(0,0,0,0.25)",
               userSelect: "none",
+              textShadow: "0 1px 8px rgba(0,0,0,0.45)",
             }}
           >
-            <RunningLabel text={label} />
+            <RunningLabel text={label.toLowerCase()} />
           </motion.div>
         )}
       </AnimatePresence>

@@ -3,20 +3,22 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import {
-  Archive,
   Bug,
   Compass,
   Eraser,
   Flashlight,
+  Gem,
   Music2,
   PawPrint,
   Paintbrush,
   Pencil,
+  Quote,
   X,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
 const STORAGE_KEY = "mj_artifacts_v2";
+const HINT_KEY = "mj_artifacts_hint_v2";  // bumped: v1 fired behind the intro & set the flag invisibly
 const TOTAL = 7;
 const RED   = "#c0392b";   // editorial red — matches --color-danger
 const AMBER = "#c4a882";   // warm amber — matches --color-accent
@@ -43,6 +45,10 @@ type ArtifactsProps = {
   onRaccoonSignal: () => void;
   onSpotlightSignal: () => void;
   onEasterEgg: () => void;
+  /** Fired once when all 7 artifacts are found — unlocks the reward in the nav */
+  onUnlock?: () => void;
+  /** Hero is revealed & interactive — gates the first-visit hint pulse */
+  heroVisible?: boolean;
 };
 
 const ARTIFACTS: ArtifactDef[] = [
@@ -50,7 +56,7 @@ const ARTIFACTS: ArtifactDef[] = [
   { id: "music-player", title: "MUSIC.PLAYER", sub: "local session", Icon: Music2, pos: { top: "32%", left: "12.5%" } },
   { id: "raccoon-signal", title: "RACCOON.AI", sub: "status: online", Icon: PawPrint, pos: { top: "56%", left: "7%" } },
   { id: "sketch-pen", title: "SKETCH.PEN", sub: "ideas.log", Icon: Pencil, pos: { bottom: "22%", left: "22%" } },
-  { id: "archive", title: "ARCHIVE_01", sub: "old files", Icon: Archive, pos: { top: "26%", right: "13.5%" } },
+  { id: "archive", title: "MANTRA.LOG", sub: "tap for one", Icon: Quote, pos: { top: "26%", right: "13.5%" } },
   { id: "origin-point", title: "ORIGIN.POINT", sub: "roots trace", Icon: Compass, pos: { top: "48%", right: "19%" } },
   { id: "easter-egg", title: "EASTER_EGG.EXE", sub: "do not click", Icon: Bug, pos: { top: "65%", right: "8.5%" } },
 ];
@@ -131,11 +137,13 @@ function ArtifactNode({
   def,
   collected,
   isPlaying,
+  hint,
   onTrigger,
 }: {
   def: ArtifactDef;
   collected: boolean;
   isPlaying?: boolean;
+  hint?: boolean;
   onTrigger: (id: ArtifactId) => void;
 }) {
   const [hovered, setHovered] = useState(false);
@@ -143,6 +151,7 @@ function ArtifactNode({
   const reducedMotion = useReducedMotion();
   const { Icon } = def;
   const active = hovered || pressed || isPlaying;
+  const hinting = hint && !active;  // hover overrides the hint instantly
 
   function handleClick(event: React.MouseEvent<HTMLButtonElement>) {
     event.stopPropagation();
@@ -191,23 +200,47 @@ function ArtifactNode({
           position: "relative",
           width: 44,
           height: 44,
-          border: `1px solid ${active ? "rgba(192,57,43,0.48)" : "rgba(255,255,255,0.10)"}`,
+          border: `1px solid ${active || hinting ? "rgba(192,57,43,0.48)" : "rgba(255,255,255,0.10)"}`,
           background: "rgba(0,0,0,0.24)",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          opacity: active ? 0.92 : collected ? 0.48 : 0.28,
+          opacity: active ? 0.92 : hinting ? 0.82 : collected ? 0.48 : 0.28,
           boxShadow: active ? "0 0 16px rgba(192,57,43,0.12)" : "none",
           transition: "opacity 160ms ease, border-color 160ms ease, box-shadow 160ms ease",
         }}
       >
-        <Corners color={active ? "rgba(192,57,43,0.60)" : "rgba(255,255,255,0.16)"} />
+        {/* First-visit hint: expanding red rings to draw the eye, then it stops for good */}
+        {hinting && (
+          <>
+            {[0, 0.9].map((delay, i) => (
+              <motion.span
+                key={i}
+                style={{
+                  position: "absolute",
+                  inset: 0,
+                  border: `1px solid ${RED}`,
+                  pointerEvents: "none",
+                }}
+                initial={{ opacity: 0.5, scale: 1 }}
+                animate={{ opacity: 0, scale: 1.85 }}
+                transition={{ duration: 1.8, repeat: Infinity, ease: "easeOut", delay }}
+              />
+            ))}
+            <motion.span
+              style={{ position: "absolute", inset: 0, boxShadow: `0 0 18px rgba(192,57,43,0.5)`, pointerEvents: "none" }}
+              animate={{ opacity: [0.25, 0.7, 0.25] }}
+              transition={{ duration: 1.6, repeat: Infinity, ease: "easeInOut" }}
+            />
+          </>
+        )}
+        <Corners color={active || hinting ? "rgba(192,57,43,0.60)" : "rgba(255,255,255,0.16)"} />
         <motion.span
           animate={isPlaying && !reducedMotion ? { rotate: 360, scale: [1, 1.08, 1] } : { rotate: 0, scale: 1 }}
           transition={isPlaying ? { rotate: { duration: 5, repeat: Infinity, ease: "linear" }, scale: { duration: 1.1, repeat: Infinity } } : { duration: 0.18 }}
           style={{ display: "flex" }}
         >
-          <Icon size={18} color={active ? RED : "rgba(255,255,255,0.70)"} strokeWidth={1.2} />
+          <Icon size={18} color={active || hinting ? RED : "rgba(255,255,255,0.70)"} strokeWidth={1.2} />
         </motion.span>
         <Waveform active={Boolean(isPlaying)} />
         {collected && (
@@ -231,86 +264,102 @@ function ArtifactNode({
 
 function Toast({ count }: { count: number }) {
   const pct = (count / TOTAL) * 100;
+  const done = count === TOTAL;
 
   return (
     <motion.div
       className="fixed left-1/2 z-[700] pointer-events-none"
-      style={{ top: 52, x: "-50%" }}
-      initial={{ opacity: 0, y: -10, scale: 0.96 }}
-      animate={{ opacity: 1, y: 0, scale: 1 }}
-      exit={{ opacity: 0, y: -8, scale: 0.97 }}
-      transition={{ duration: 0.22, ease: EASE }}
+      style={{ top: 56, x: "-50%", perspective: 800 }}
+      initial={{ opacity: 0, y: -14, rotateX: 18, scale: 0.94 }}
+      animate={{ opacity: 1, y: 0, rotateX: 0, scale: 1 }}
+      exit={{ opacity: 0, y: -10, scale: 0.96, transition: { duration: 0.18, ease: [0.4, 0, 1, 1] } }}
+      transition={{ type: "spring", duration: 0.5, bounce: 0.22 }}
     >
+      {/* ── Metallic ID-card shell (shares the ContactCard language) ── */}
       <div style={{
         position: "relative",
-        width: 300,
-        padding: "11px 16px 13px",
-        background: "rgba(4,4,12,0.97)",
-        border: "1px solid rgba(192,57,43,0.32)",
-        boxShadow: "0 0 48px rgba(192,57,43,0.10), 0 12px 40px rgba(0,0,0,0.55)",
+        width: 320,
+        borderRadius: 8,
         overflow: "hidden",
+        padding: "13px 16px 14px",
+        background: "linear-gradient(135deg, #1e1614 0%, #341616 26%, #221016 50%, #2c1010 74%, #140a0a 100%)",
+        boxShadow:
+          "0 24px 56px -14px rgba(0,0,0,0.9), " +
+          "0 0 0 1px rgba(255,255,255,0.08), " +
+          "0 0 38px rgba(192,57,43,0.14), " +
+          "inset 0 1px 0 rgba(255,255,255,0.12)",
       }}>
-        <Corners size={6} color="rgba(192,57,43,0.62)" />
-
-        {/* Animated scan line */}
+        {/* Red glow blob — bottom-left */}
+        <div style={{ position: "absolute", inset: 0, pointerEvents: "none", zIndex: 0, background: "radial-gradient(ellipse 65% 75% at 12% 100%, rgba(180,20,20,0.42) 0%, transparent 68%)" }} />
+        {/* Brushed-metal hairlines */}
+        <div style={{ position: "absolute", inset: 0, pointerEvents: "none", zIndex: 0, backgroundImage: "repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(255,255,255,0.022) 2px, rgba(255,255,255,0.022) 3px)" }} />
+        {/* Top-left specular glare */}
+        <div style={{ position: "absolute", inset: 0, pointerEvents: "none", zIndex: 0, background: "linear-gradient(140deg, rgba(255,255,255,0.10) 0%, transparent 34%)" }} />
+        {/* Travelling sheen */}
         <motion.div
-          style={{
-            position: "absolute", left: 0, right: 0, height: 1, top: 0,
-            background: "linear-gradient(to right, transparent 0%, rgba(232,221,208,0.22) 50%, transparent 100%)",
-            pointerEvents: "none",
-          }}
-          animate={{ top: ["0%", "100%"] }}
-          transition={{ duration: 1.8, repeat: Infinity, ease: "linear" }}
+          style={{ position: "absolute", top: 0, bottom: 0, width: "40%", pointerEvents: "none", zIndex: 1, background: "linear-gradient(105deg, transparent, rgba(255,255,255,0.07), transparent)", mixBlendMode: "screen" }}
+          initial={{ left: "-45%" }}
+          animate={{ left: "120%" }}
+          transition={{ duration: 1.4, ease: [0.22, 1, 0.36, 1], delay: 0.25 }}
         />
 
-        {/* Header row */}
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 9 }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-            <motion.span
-              style={{ width: 5, height: 5, borderRadius: "50%", background: RED, display: "inline-block" }}
-              animate={{ opacity: [1, 0.3, 1] }}
-              transition={{ duration: 0.9, repeat: Infinity, ease: "easeInOut" }}
-            />
-            <span style={{ fontFamily: "monospace", fontSize: 8, letterSpacing: "0.26em", color: RED, textTransform: "uppercase" }}>
-              Artifact Located
+        <div style={{ position: "relative", zIndex: 2 }}>
+          {/* Header row */}
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 11 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 9 }}>
+              {/* 3D-spinning gem — the "artifact" */}
+              <div style={{ width: 15, height: 15, perspective: 60, display: "flex", alignItems: "center", justifyContent: "center" }}>
+                <motion.div
+                  style={{ transformStyle: "preserve-3d", display: "flex", filter: `drop-shadow(0 0 5px ${RED})` }}
+                  animate={{ rotateY: 360 }}
+                  transition={{ duration: 2.4, repeat: Infinity, ease: "linear" }}
+                >
+                  <Gem size={14} color={RED} strokeWidth={1.6} />
+                </motion.div>
+              </div>
+              <span style={{ fontFamily: "var(--font-mono)", fontSize: 8.5, letterSpacing: "0.28em", color: "rgba(255,255,255,0.92)", textTransform: "uppercase" }}>
+                {done ? "Collection Complete" : "Artifact Located"}
+              </span>
+            </div>
+            {/* Count chip — subtle red-tinted, matches the shell */}
+            <span style={{
+              fontFamily: "var(--font-mono)", fontSize: 8, letterSpacing: "0.14em",
+              padding: "2.5px 8px", borderRadius: 5,
+              background: "rgba(0,0,0,0.32)",
+              border: "1px solid rgba(224,106,90,0.45)",
+              boxShadow: "inset 0 1px 0 rgba(255,255,255,0.05)",
+            }}>
+              {/* lighter red tint so the count clears AA on the near-black chip */}
+              <span style={{ color: "#ef8478" }}>{String(count).padStart(2, "0")}</span>
+              <span style={{ color: "rgba(255,255,255,0.5)" }}>&nbsp;/&nbsp;{String(TOTAL).padStart(2, "0")}</span>
             </span>
           </div>
-          <span style={{ fontFamily: "monospace", fontSize: 8, letterSpacing: "0.18em", color: "rgba(255,255,255,0.42)" }}>
-            {String(count).padStart(2, "0")}&nbsp;/&nbsp;{String(TOTAL).padStart(2, "0")}
-          </span>
-        </div>
 
-        {/* Progress track */}
-        <div style={{ position: "relative", height: 4, background: "rgba(255,255,255,0.07)", marginBottom: 8, borderRadius: 1 }}>
-          {/* Segment tick marks */}
-          {Array.from({ length: TOTAL - 1 }).map((_, i) => (
-            <div key={i} style={{
-              position: "absolute", top: 0, bottom: 0, width: 1,
-              left: `${((i + 1) / TOTAL) * 100}%`,
-              background: "rgba(0,0,0,0.7)", zIndex: 1,
-            }} />
-          ))}
-          {/* Fill */}
-          <motion.div
-            style={{ position: "absolute", left: 0, top: 0, bottom: 0, background: RED, borderRadius: 1, zIndex: 0 }}
-            initial={{ width: "0%" }}
-            animate={{ width: `${pct}%` }}
-            transition={{ duration: 0.55, ease: [0.16, 1, 0.3, 1], delay: 0.1 }}
-          />
-          {/* Glow on fill edge */}
-          <motion.div
-            style={{ position: "absolute", top: -2, bottom: -2, width: 6, background: `radial-gradient(ellipse, ${RED} 0%, transparent 100%)`, opacity: 0.7, zIndex: 2 }}
-            initial={{ left: "0%" }}
-            animate={{ left: `calc(${pct}% - 3px)` }}
-            transition={{ duration: 0.55, ease: [0.16, 1, 0.3, 1], delay: 0.1 }}
-          />
-        </div>
+          {/* Progress track */}
+          <div style={{ position: "relative", height: 5, background: "rgba(0,0,0,0.4)", marginBottom: 10, borderRadius: 999, overflow: "hidden", boxShadow: "inset 0 1px 2px rgba(0,0,0,0.6)" }}>
+            {/* Segment tick marks */}
+            {Array.from({ length: TOTAL - 1 }).map((_, i) => (
+              <div key={i} style={{
+                position: "absolute", top: 0, bottom: 0, width: 1,
+                left: `${((i + 1) / TOTAL) * 100}%`,
+                background: "rgba(255,255,255,0.10)", zIndex: 1,
+              }} />
+            ))}
+            {/* Fill */}
+            <motion.div
+              style={{ position: "absolute", left: 0, top: 0, bottom: 0, borderRadius: 999, zIndex: 0, background: `linear-gradient(90deg, #7d1f17, ${RED})`, boxShadow: `0 0 10px rgba(192,57,43,0.6)` }}
+              initial={{ width: "0%" }}
+              animate={{ width: `${pct}%` }}
+              transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1], delay: 0.12 }}
+            />
+          </div>
 
-        {/* Footer */}
-        <div style={{ fontFamily: "monospace", fontSize: 7, letterSpacing: "0.16em", color: "rgba(255,255,255,0.30)", textTransform: "uppercase" }}>
-          {count === TOTAL
-            ? "◈  all artifacts recovered — mission complete"
-            : `◈  ${TOTAL - count} artifact${TOTAL - count !== 1 ? "s" : ""} remaining — keep exploring`}
+          {/* Footer */}
+          <div style={{ fontFamily: "var(--font-mono)", fontSize: 7.5, letterSpacing: "0.14em", color: "rgba(255,255,255,0.58)", textTransform: "uppercase" }}>
+            {done
+              ? "All artifacts recovered — mission complete"
+              : `${TOTAL - count} artifact${TOTAL - count !== 1 ? "s" : ""} remaining — keep exploring`}
+          </div>
         </div>
       </div>
     </motion.div>
@@ -497,37 +546,105 @@ function SpotlightOverlay({ activeKey, reducedMotion }: { activeKey: number; red
   );
 }
 
-function ArchiveModal({ open, onClose }: { open: boolean; onClose: () => void }) {
+const MANTRAS: { line: string; tag: string }[] = [
+  { line: "Ship it, then make it good.", tag: "on momentum" },
+  { line: "If it needs a tooltip, it needs a redo.", tag: "on clarity" },
+  { line: "Reduce until it breaks. Then add one thing back.", tag: "on restraint" },
+  { line: "Taste is just attention paid over time.", tag: "on craft" },
+  { line: "The best interface is the one you never notice.", tag: "on invisibility" },
+  { line: "Every unnecessary click is friction. Friction costs time.", tag: "on speed" },
+  { line: "Design for the tired user at hour ten.", tag: "on empathy" },
+  { line: "Constraints are a gift. Spend them well.", tag: "on limits" },
+  { line: "Make it work, make it right, then make it delightful.", tag: "on order" },
+  { line: "Designers who ship beat designers who polish.", tag: "on shipping" },
+];
+
+function QuoteModal({ open, onClose }: { open: boolean; onClose: () => void }) {
+  const [i, setI] = useState(() => Math.floor(Math.random() * MANTRAS.length));
+  // Tap the card → a different random mantra.
+  const next = useCallback(() => setI(prev => {
+    if (MANTRAS.length < 2) return prev;
+    let n = prev;
+    while (n === prev) n = Math.floor(Math.random() * MANTRAS.length);
+    return n;
+  }), []);
+  const m = MANTRAS[i];
+
   return (
     <AnimatePresence>
       {open && (
         <motion.div
-          className="fixed inset-0 z-[720] flex items-center justify-center"
+          className="fixed inset-0 z-[720] flex items-center justify-center px-6"
+          style={{ perspective: 900, cursor: "default" }}
           onClick={onClose}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
         >
-          <div className="absolute inset-0 bg-black/20" />
+          <div className="absolute inset-0" style={{ background: "rgba(4,4,6,0.55)", backdropFilter: "blur(3px)" }} />
           <motion.div
-            onClick={event => event.stopPropagation()}
+            onClick={event => { event.stopPropagation(); next(); }}
             className="relative"
-            initial={{ opacity: 0, y: 8, scale: 0.98 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 4, scale: 0.98 }}
-            transition={{ duration: 0.18, ease: EASE }}
-            style={{ width: 240, padding: 14, background: "rgba(5,5,10,0.96)", border: "1px solid rgba(192,57,43,0.28)", boxShadow: "0 24px 80px rgba(0,0,0,0.45)" }}
+            initial={{ opacity: 0, y: 30, rotateX: 20, scale: 0.92 }}
+            animate={{ opacity: 1, y: 0, rotateX: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 20, scale: 0.95, transition: { duration: 0.18, ease: [0.4, 0, 1, 1] } }}
+            transition={{ type: "spring", duration: 0.55, bounce: 0.2 }}
+            style={{
+              width: "min(360px, 90vw)",
+              borderRadius: 10,
+              overflow: "hidden",
+              cursor: "pointer",
+              padding: "26px 24px 18px",
+              background: "linear-gradient(135deg, #1e1614 0%, #341616 26%, #221016 50%, #2c1010 74%, #140a0a 100%)",
+              boxShadow:
+                "0 28px 64px -16px rgba(0,0,0,0.9), 0 0 0 1px rgba(255,255,255,0.08), 0 0 40px rgba(192,57,43,0.14), inset 0 1px 0 rgba(255,255,255,0.12)",
+            }}
           >
-            <Corners color="rgba(192,57,43,0.42)" />
-            <div style={{ fontFamily: "monospace", fontSize: 7, letterSpacing: "0.22em", color: RED, textTransform: "uppercase", marginBottom: 10 }}>
-              Archive_01
-            </div>
-            {["Old sketches", "First Figma file", "Architecture notes"].map((item, i) => (
-              <div key={item} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", height: 30, borderTop: i === 0 ? "1px solid rgba(255,255,255,0.08)" : undefined, borderBottom: "1px solid rgba(255,255,255,0.08)" }}>
-                <span style={{ fontFamily: "monospace", fontSize: 9, letterSpacing: "0.08em", color: "rgba(255,255,255,0.58)" }}>{item}</span>
-                <span style={{ width: 4, height: 4, borderRadius: "50%", background: "rgba(192,57,43,0.55)" }} />
+            {/* Red glow + glare to match the card / toast language */}
+            <div style={{ position: "absolute", inset: 0, pointerEvents: "none", background: "radial-gradient(ellipse 70% 70% at 18% 100%, rgba(180,20,20,0.4) 0%, transparent 68%)" }} />
+            <div style={{ position: "absolute", inset: 0, pointerEvents: "none", background: "linear-gradient(140deg, rgba(255,255,255,0.09) 0%, transparent 32%)" }} />
+
+            <div style={{ position: "relative" }}>
+              {/* Eyebrow */}
+              <div style={{ display: "flex", alignItems: "center", gap: 7, marginBottom: 16 }}>
+                <Quote size={13} color={RED} strokeWidth={2} style={{ filter: `drop-shadow(0 0 5px ${RED})` }} />
+                <span style={{ fontFamily: "var(--font-mono)", fontSize: 8, letterSpacing: "0.26em", color: "rgba(255,255,255,0.55)", textTransform: "uppercase" }}>
+                  Mantra · {m.tag}
+                </span>
               </div>
-            ))}
+
+              {/* Quote — swaps with a soft crossfade */}
+              <div style={{ minHeight: 84 }}>
+                <AnimatePresence mode="wait">
+                  <motion.p
+                    key={i}
+                    initial={{ opacity: 0, y: 8, filter: "blur(3px)" }}
+                    animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+                    exit={{ opacity: 0, y: -6, filter: "blur(3px)" }}
+                    transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
+                    style={{
+                      fontFamily: "var(--font-serif)",
+                      fontStyle: "italic",
+                      fontWeight: 400,
+                      fontSize: 21,
+                      lineHeight: 1.4,
+                      letterSpacing: "-0.01em",
+                      color: "rgba(255,255,255,0.94)",
+                      margin: 0,
+                    }}
+                  >
+                    {m.line}
+                  </motion.p>
+                </AnimatePresence>
+              </div>
+
+              {/* Footer hint — the whole card is tappable */}
+              <div style={{ marginTop: 18, paddingTop: 12, borderTop: "1px solid rgba(255,255,255,0.08)", display: "flex", justifyContent: "center" }}>
+                <span style={{ fontFamily: "var(--font-mono)", fontSize: 8, letterSpacing: "0.22em", color: "rgba(255,255,255,0.42)", textTransform: "uppercase" }}>
+                  Tap for another&nbsp;&nbsp;<span style={{ color: RED }}>→</span>
+                </span>
+              </div>
+            </div>
           </motion.div>
         </motion.div>
       )}
@@ -610,6 +727,7 @@ function PaintModal({ open, onClose }: { open: boolean; onClose: () => void }) {
       {open && (
         <motion.div
           className="fixed inset-0 z-[730] flex items-center justify-center px-6"
+          style={{ cursor: "default" }}
           onClick={onClose}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -866,7 +984,7 @@ function PaintModal({ open, onClose }: { open: boolean; onClose: () => void }) {
   );
 }
 
-export default function Artifacts({ onRaccoonSignal, onSpotlightSignal, onEasterEgg }: ArtifactsProps) {
+export default function Artifacts({ onRaccoonSignal, onSpotlightSignal, onEasterEgg, onUnlock, heroVisible = true }: ArtifactsProps) {
   const { found, count, toastCount, collect } = useArtifacts();
   const reducedMotion = Boolean(useReducedMotion());
   const audioRef = useRef<HTMLAudioElement | null>(null);
@@ -875,6 +993,34 @@ export default function Artifacts({ onRaccoonSignal, onSpotlightSignal, onEaster
   const [originVisible, setOriginVisible] = useState(false);
   const [archiveOpen, setArchiveOpen] = useState(false);
   const [paintOpen, setPaintOpen] = useState(false);
+
+  // Notify the parent (MainStage) once all 7 are found, so it can unlock the
+  // "Reward" nav item and auto-open the certificate. Owning that lives up top.
+  const prevCountRef = useRef(0);
+  const onUnlockRef = useRef(onUnlock);
+  onUnlockRef.current = onUnlock;
+  useEffect(() => {
+    const wasComplete = prevCountRef.current >= TOTAL;
+    prevCountRef.current = count;
+    if (count >= TOTAL && !wasComplete) onUnlockRef.current?.();
+  }, [count]);
+
+  // First-visit discoverability: pulse the flashlight artifact once, ~4.5s, then never again.
+  // Must wait for `heroVisible` — otherwise the timer runs while the intro overlay still
+  // covers the screen, so the pulse plays invisibly and the "seen" flag gets set for nothing.
+  const [hintActive, setHintActive] = useState(false);
+  useEffect(() => {
+    if (reducedMotion || !heroVisible) return;
+    let seen = false;
+    try { seen = localStorage.getItem(HINT_KEY) === "1"; } catch {}
+    if (seen) return;
+    const start = window.setTimeout(() => setHintActive(true), 900);  // brief beat after the hero lands
+    const stop = window.setTimeout(() => {
+      setHintActive(false);
+      try { localStorage.setItem(HINT_KEY, "1"); } catch {}
+    }, 5500);  // 0.9s delay + ~4.6s pulse
+    return () => { clearTimeout(start); clearTimeout(stop); };
+  }, [reducedMotion, heroVisible]);
 
   const originTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -898,6 +1044,10 @@ export default function Artifacts({ onRaccoonSignal, onSpotlightSignal, onEaster
 
   const triggerAction = useCallback((id: ArtifactId) => {
     collect(id);
+
+    // Any interaction means they've found the mechanic — kill the hint for good.
+    setHintActive(false);
+    try { localStorage.setItem(HINT_KEY, "1"); } catch {}
 
     if (id === "theme-switch") {
       setSpotlightKey(key => key + 1);
@@ -962,14 +1112,14 @@ export default function Artifacts({ onRaccoonSignal, onSpotlightSignal, onEaster
 
         {ARTIFACTS.map(def => (
           <div key={def.id} style={{ pointerEvents: "auto" }}>
-            <ArtifactNode def={def} collected={found.has(def.id)} isPlaying={def.id === "music-player" && playing} onTrigger={triggerAction} />
+            <ArtifactNode def={def} collected={found.has(def.id)} isPlaying={def.id === "music-player" && playing} hint={hintActive && def.id === "theme-switch"} onTrigger={triggerAction} />
           </div>
         ))}
       </div>
 
       <SpotlightOverlay activeKey={spotlightKey} reducedMotion={reducedMotion} />
 
-      <ArchiveModal open={archiveOpen} onClose={() => setArchiveOpen(false)} />
+      <QuoteModal open={archiveOpen} onClose={() => setArchiveOpen(false)} />
       <PaintModal open={paintOpen} onClose={() => setPaintOpen(false)} />
 
       <AnimatePresence>

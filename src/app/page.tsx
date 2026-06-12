@@ -3,7 +3,6 @@
 import { useState, useCallback } from "react";
 import Intro from "@/components/Intro";
 import MainStage from "@/components/MainStage";
-import CustomCursor from "@/components/CustomCursor";
 
 export default function Home() {
   const played = () =>
@@ -24,7 +23,6 @@ export default function Home() {
 
   return (
     <>
-      <CustomCursor />
       <MainStage visible={heroLive} />
       {!introDone && (
         <Intro onRevealStart={handleRevealStart} onComplete={handleIntroDone} />
