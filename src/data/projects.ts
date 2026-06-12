@@ -179,36 +179,42 @@ export const projects: Project[] = [
         title: "Appointments, Venues & Rooms — the product catalog",
         body:
           "Every farm experience (Alpaca Encounter, Cooking Class, Barn Overnight Stay) is an image card with photography, pricing, duration, capacity, and tags. Publishing a card here creates the customer-facing listing automatically, replacing WordPress.\n\nI used cards instead of a data table deliberately. The team manages real experiences, not abstract records; seeing the product the way a guest sees it keeps decisions grounded.",
+        media: [{ src: "/Marysfarm-1.webp", label: "Experience cards — price, capacity, tags", aspect: "wide" }],
       },
       {
         index: "02",
         title: "Bookings Management — 235 bookings, one table",
         body:
           "235 bookings in a single table: reference, customer, experience, check-in, check-out, guests, status, balance due, and source.\n\nThe source column (Web or Admin) replaced manual Excel tracking of where bookings originated. Filters for check-in time, status, and type. Calendar view and Add Booking always one click away.",
+        media: [{ src: "/Marysfarm-2.webp", label: "235 bookings, one table — with Web/Admin source", aspect: "wide" }],
       },
       {
         index: "03",
         title: "Messaging — the feature that wasn't in scope",
         body:
           "The farm was running guest SMS through Wavelength. Every reply meant four context switches: read message, open Roller, find booking, come back to respond.\n\nBuilt two-way SMS into the platform with a guest profile panel alongside each conversation: booking reference, experience, date, and status visible without leaving the screen.\n\nNot in the original brief. Should have been.",
+        media: [{ src: "/Marysfarm-3.webp", label: "Messaging with live booking context alongside", aspect: "wide" }],
       },
       {
         index: "04",
         title: "Notification Templates — SendGrid made simple",
         body:
           "The team was running automated emails through SendGrid but couldn't manage templates without technical help. Broken formatting and wrong send timing were routine.\n\nBuilt a simplified editor: rich text, variable insertion, trigger rules (\"1 minute after checkout,\" \"24 hours before check-in\") with a live desktop/mobile preview. They went from filing a request to doing it themselves.",
+        media: [{ src: "/Marysfarm-4.webp", label: "Template editor — variables, triggers, live preview", aspect: "wide" }],
       },
       {
         index: "05",
         title: "Dashboard — one screen, whole business",
         body:
           "Revenue, bookings, average order value, 12-month trend, today's schedule, items needing attention — one screen.\n\nBefore this, assembling that picture meant opening Excel, Roller, and Google Calendar separately. Quick Actions surface the four most-used tasks. No buried navigation.",
+        media: [{ src: "/Marysfarm-5.webp", label: "Dashboard — the whole business, one screen", aspect: "wide" }],
       },
       {
         index: "06",
         title: "Role-Based Permissions — every worker sees only what they need",
         body:
           "Every role maps to a different view of the same platform. Check-in desk sees QR Scanner and Bookings. Activity hosts see Appointments and Messages. The owner sees Reports, Users, and Taxes.\n\nOne platform that feels purpose-built for whoever's using it.",
+        media: [{ src: "/Marysfarm-6.webp", label: "The owner's role — Reports & exports only they see", aspect: "wide" }],
       },
     ],
     outcome:
