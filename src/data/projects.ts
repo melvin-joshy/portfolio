@@ -53,6 +53,7 @@ export type ClientProject = Common & {
   scope: string[];
   overview?: string;
   problem: string;
+  problemImage?: string;
   goals?: string[];
   approach: string;
   solutionBlocks?: SolutionBlock[];
@@ -157,64 +158,67 @@ export const projects: Project[] = [
     description: "They came to replace one tool. They left with one platform that replaced seven.",
     bg: "linear-gradient(155deg, #2a3a1e 0%, #161f0f 55%, #080c06 100%)",
     accent: "#7c8f4a",
+    cover: "/Marysfarm -cover.webp",
+    heroImage: "/Marysfarm -cover.webp",
     client: "Mary's Land Farm",
     role: "Sole Designer",
     scope: ["End-to-end admin platform"],
     industry: "Farm Experiences · Hospitality",
     deliverables: ["Live · Tempo YC S23"],
     overview:
-      "Mary's Land Farm runs farm experiences across multiple locations — alpaca encounters, cooking classes, barn stays, weddings. The brief was to replace Roller, their booking backend.\n\nMapping how the team actually worked, I found seven tools doing the job of one, and no single view of the business. So I made the case to replace all seven with one platform.",
+      "Mary's Land Farm runs farm experiences across multiple locations: alpaca encounters, cooking classes, barn stays, weddings. The brief was to replace Roller, their booking backend.\n\nMapping how the team actually worked, I found seven tools doing the job of one, and no single view of the business. So I made the case to replace all seven with one platform.",
     problem:
-      "Each tool did its job; the problem was the gaps between them. A single guest message meant four context switches — read it in Wavelength, open Roller to find the booking, copy the details, switch back to reply.\n\nThe platform had to close those gaps, not compete with the tools.",
+      "Each tool did its job; the problem was the gaps between them. A single guest message meant four context switches: read it in Wavelength, open Roller to find the booking, copy the details, switch back to reply.\n\nThe platform had to close those gaps, not compete with the tools.",
+    problemImage: "/Marysfarm -problem.webp",
     goals: [
       "No context switching: every decision made without opening another tab.",
       "One source of truth: bookings, messages, experiences, and reports in one system.",
       "Role-based access: each employee sees exactly what they need, nothing more.",
     ],
     approach:
-      "One constraint drove every screen: the information to make a decision had to live where the work was happening — not a click away, not in another app. Every tool-switch the team used to make became a panel instead.",
+      "One constraint drove every screen: the information to make a decision had to live where the work was happening, not a click away, not in another app. Every tool-switch the team used to make became a panel instead.",
     solutionBlocks: [
       {
         index: "01",
-        title: "Appointments, Venues & Rooms — the product catalog",
+        title: "Appointments, Venues & Rooms",
         body:
-          "Every experience is an image card — photo, price, duration, capacity, tags. Publishing one auto-creates the customer-facing listing, replacing WordPress. Cards, not a data table: the team sees the product the way a guest does, which keeps decisions grounded.",
-        media: [{ src: "/Marysfarm-1.webp", label: "Experience cards — price, capacity, tags", aspect: "wide" }],
+          "Every experience is an image card: photo, price, duration, capacity, tags. Publishing one auto-creates the customer-facing listing, replacing WordPress. Cards, not a data table: the team sees the product the way a guest does, which keeps decisions grounded.",
+        media: [{ src: "/Marysfarm-1.webp", label: "Experience cards: price, capacity, tags", aspect: "wide" }],
       },
       {
         index: "02",
-        title: "Bookings Management — 235 bookings, one table",
+        title: "Bookings Management",
         body:
-          "235 bookings in one table — reference, customer, experience, check-in/out, guests, status, balance, source. The Source column (Web or Admin) replaced manual Excel tracking; filters, calendar view, and Add Booking are always one click away.",
-        media: [{ src: "/Marysfarm-2.webp", label: "235 bookings, one table — with Web/Admin source", aspect: "wide" }],
+          "235 bookings in one table: reference, customer, experience, check-in/out, guests, status, balance, source. The Source column (Web or Admin) replaced manual Excel tracking; filters, calendar view, and Add Booking are always one click away.",
+        media: [{ src: "/Marysfarm-2.webp", label: "235 bookings, one table with Web/Admin source", aspect: "wide" }],
       },
       {
         index: "03",
-        title: "Messaging — the feature that wasn't in scope",
+        title: "Messaging",
         body:
-          "Guest SMS lived in Wavelength, so every reply meant four context switches. I built two-way SMS into the platform, with a guest-profile panel — booking reference, experience, date, status — beside each conversation. Not in the original brief. Should have been.",
+          "Guest SMS lived in Wavelength, so every reply meant four context switches. I built two-way SMS into the platform, with a guest-profile panel showing booking reference, experience, date, and status beside each conversation. Not in the original brief. Should have been.",
         media: [{ src: "/Marysfarm-3.webp", label: "Messaging with live booking context alongside", aspect: "wide" }],
       },
       {
         index: "04",
-        title: "Notification Templates — SendGrid made simple",
+        title: "Notification Templates",
         body:
-          "The team ran automated emails through SendGrid but couldn't manage templates without technical help — broken formatting and wrong timing were routine. I built a simple editor: rich text, variable insertion, trigger rules (\"24 hours before check-in\"), and a live desktop/mobile preview. They went from filing a request to doing it themselves.",
-        media: [{ src: "/Marysfarm-4.webp", label: "Template editor — variables, triggers, live preview", aspect: "wide" }],
+          "The team ran automated emails through SendGrid but couldn't manage templates without technical help; broken formatting and wrong timing were routine. I built a simple editor: rich text, variable insertion, trigger rules (\"24 hours before check-in\"), and a live desktop/mobile preview. They went from filing a request to doing it themselves.",
+        media: [{ src: "/Marysfarm-4.webp", label: "Template editor: variables, triggers, live preview", aspect: "wide" }],
       },
       {
         index: "05",
-        title: "Dashboard — one screen, whole business",
+        title: "Dashboard",
         body:
-          "Revenue, bookings, average order value, 12-month trend, today's schedule — one screen. Before, assembling that picture meant opening Excel, Roller, and Google Calendar separately. Quick Actions surface the four most-used tasks; no buried navigation.",
-        media: [{ src: "/Marysfarm-5.webp", label: "Dashboard — the whole business, one screen", aspect: "wide" }],
+          "Revenue, bookings, average order value, 12-month trend, today's schedule: one screen. Before, assembling that picture meant opening Excel, Roller, and Google Calendar separately. Quick Actions surface the four most-used tasks; no buried navigation.",
+        media: [{ src: "/Marysfarm-5.webp", label: "Dashboard: the whole business, one screen", aspect: "wide" }],
       },
       {
         index: "06",
-        title: "Reports — build and export the numbers on demand",
+        title: "Reports",
         body:
-          "The team needed answers — revenue, bookings, payment status — without rebuilding spreadsheets by hand every month. I built a report builder: pick a type, set a date range, choose the fields you need, preview, then export. One place to answer \"how did we do?\" — no reconciliation, no spreadsheets.",
-        media: [{ src: "/Marysfarm-6.webp", label: "Report builder — sales summary, fields, live preview", aspect: "wide" }],
+          "The team needed answers about revenue, bookings, and payment status without rebuilding spreadsheets by hand every month. I built a report builder: pick a type, set a date range, choose the fields you need, preview, then export. One place to answer \"how did we do?\", no reconciliation, no spreadsheets.",
+        media: [{ src: "/Marysfarm-6.webp", label: "Report builder: sales summary, fields, live preview", aspect: "wide" }],
       },
     ],
     outcome:
@@ -225,7 +229,7 @@ export const projects: Project[] = [
       { value: "Live", label: "Used daily across farm locations" },
     ],
     reflection:
-      "The biggest decision wasn't a UI call — it was the scope conversation.\n\nThey asked for a Roller replacement. I mapped their actual workflow first, found seven tools doing the work of one, and made the case to consolidate. That decision changed what we built.\n\nThe messaging panel is where it shows most clearly: a farm host reads a guest message and sees the full booking context (experience, date, status, reference) without leaving the screen. That's the standard every feature gets measured against.",
+      "The biggest decision wasn't a UI call, it was the scope conversation.\n\nThey asked for a Roller replacement. I mapped their actual workflow first, found seven tools doing the work of one, and made the case to consolidate. That decision changed what we built.\n\nThe messaging panel is where it shows most clearly: a farm host reads a guest message and sees the full booking context (experience, date, status, reference) without leaving the screen. That's the standard every feature gets measured against.",
     gallery: [],
   },
   {
@@ -237,6 +241,8 @@ export const projects: Project[] = [
     description: "Making public transit readable at every zoom level.",
     bg: "linear-gradient(155deg, #3a2e18 0%, #201a0f 55%, #0c0906 100%)",
     accent: "#8f7a3a",
+    cover: "/ontra-cover.webp",
+    heroImage: "/ontra-cover.webp",
     client: "Ontra (YC)",
     role: "Product Designer",
     industry: "Transit Technology",
@@ -246,6 +252,7 @@ export const projects: Project[] = [
       "Ontra is a YC-backed platform helping cities build multimodal transit systems. The public trip planner lets riders plan journeys across bus, rail, and bike using live transit data.\n\nI joined with an existing product. The brief was to redesign the side panel. But redesigning how information is shown in the panel meant redesigning how it's reflected on the map. One component became a connected system.",
     problem:
       "Everything had equal visual weight. Every stop looked the same. Every route line had the same treatment. The map didn't react when you selected something in the panel.\n\nTwo things needed fixing: the side panel had no progressive disclosure, and the map was static with no visual connection to user actions.",
+    problemImage: "/ontra-problem.webp",
     goals: [
       "Progressive disclosure: a journey timeline riders can read at any depth, from summary to turn-by-turn.",
       "Map-panel sync: selecting a route in the panel should immediately reflect on the map.",
@@ -256,41 +263,41 @@ export const projects: Project[] = [
     solutionBlocks: [
       {
         index: "01",
-        title: "Journey Timeline — collapsible by depth",
+        title: "Journey Timeline",
         body: "A full journey timeline breaking every trip into readable segments. Summary at the top: mode icons, total time, visual progress bar. Below that, each segment is collapsible.\n\n\"6 mins, 5 stops\" has a Show Stops toggle. Walking directions collapse to \"Walk 2 mins\" until you need turn-by-turn. A daily commuter never expands. A tourist expands everything. Same interface, different depth.",
         media: [
-          { src: "", label: "Trip Plan · Collapsed", aspect: "tall" },
-          { src: "", label: "Trip Plan · Expanded with stops", aspect: "tall" },
+          { src: "/ontra-1.webp", label: "Trip Plan · Collapsed", aspect: "wide" },
+          { src: "/ontra-2.webp", label: "Trip Plan · Expanded with stops", aspect: "wide" },
         ],
       },
       {
         index: "02",
-        title: "The faded stop pattern — position without a legend",
+        title: "The faded stop pattern",
         body: "Past stops are faded. Current stop is highlighted. Future stops are full opacity.\n\nNo legend needed. Riders instinctively understand their position. The hierarchy comes from the rider's perspective, not the data's.",
-        media: [{ src: "", label: "Route detail · past / current / future stops", aspect: "wide" }],
+        media: [{ src: "/ontra-3.webp", label: "Route detail · past / current / future stops", aspect: "wide" }],
       },
       {
         index: "03",
-        title: "Map Iconography System — consistent across modes and zoom",
+        title: "Map Iconography System",
         body: "Bus stops as dark square icons. Current bus position in green, instantly scannable. Each route in its own color. Icons adapt across zoom levels.\n\nThe hardest part: multiple routes passing through shared stops. Tested outlines, color blocks, and split indicators. Final solution: individual colored lines maintaining identity through shared stops. You can trace any route with your finger across the entire map.",
         media: [
-          { src: "", label: "Map · Route lines and stops", aspect: "wide" },
+          { src: "/ontra-4.webp", label: "Map · Route lines and stops", aspect: "wide" },
         ],
       },
       {
         index: "04",
-        title: "Bike Stations — is it worth walking there?",
+        title: "Bike Stations",
         body: "A completely new layer. The badge answers one question at map level: is it worth walking here? Two numbers side by side: 12 manual, 2 electric. One glance, no tap required.\n\nTapping opens a compact detail: name, distance, counts, free spaces, and a direct deep link to unlock in the Lyft Bos app. Two interactions from \"should I bike?\" to unlocking one.",
         media: [
-          { src: "", label: "Bike station badges · map view", aspect: "wide" },
-          { src: "", label: "Bike station · detail panel", aspect: "wide" },
+          { src: "/ontra-5.webp", label: "Bike station badges · map view", aspect: "wide" },
+          { src: "/ontra-6.webp", label: "Bike station · detail panel", aspect: "wide" },
         ],
       },
       {
         index: "05",
-        title: "Map-Panel Sync — one system, not two surfaces",
+        title: "Map-Panel Sync",
         body: "Before: selecting a route changed nothing on the map. Panel and map were disconnected.\n\nNow: select a route in the panel, the map highlights it. Active route becomes prominent, others fade. Current bus position appears as a live marker. Walking segments trace in grey. Panel and map are one system.",
-        media: [{ src: "", label: "Trip plan · highlighted route on map", aspect: "wide" }],
+        media: [{ src: "/ontra-7.webp", label: "Trip plan · highlighted route on map", aspect: "wide" }],
       },
     ],
     outcome:
@@ -402,6 +409,7 @@ export const projects: Project[] = [
     kind: "case-study",
     id: "aura",
     heroAnimation: "/Aura.json",
+    heroImage: "/intro 2.webp",
     cover: "/over aura.webp",
     behanceUrl: "https://www.behance.net/gallery/202910085/AURA-Your-personal-mental-health-partner",
     name: "AURA",
@@ -483,6 +491,7 @@ export const projects: Project[] = [
     kind: "case-study",
     id: "deco-ar",
     heroAnimation: "/deco AR.json",
+    heroImage: "/intro 1.webp",
     cover: "/deco cover.jpg",
     behanceUrl: "https://www.behance.net/gallery/205109665/DecoAR-Reimagining-Home-Design-with-AR",
     name: "DECO AR",
@@ -564,6 +573,7 @@ export const projects: Project[] = [
     description: "5+ products shipped. AI-native design tooling for the next generation of builders.",
     bg: "linear-gradient(155deg, #0f1a2e 0%, #090f1a 55%, #040609 100%)",
     accent: "#4a7abf",
+    heroImage: "/intro 4.webp",
     externalUrl: "https://www.tempo.new/",
     client: "Tempo",
     role: "Design Lead",

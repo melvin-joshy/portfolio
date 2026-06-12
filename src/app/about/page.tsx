@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { motion, AnimatePresence, useMotionValue, useSpring } from "framer-motion";
 import { useRouteTransition } from "@/components/RouteTransition";
 import { ScribbleUnderline } from "@/components/ScribbleUnderline";
+import ContactCard from "@/components/ContactCard";
 
 function Clock() {
   const [t, setT] = useState("");
@@ -42,6 +43,7 @@ function Eyebrow({ label, hovered }: { label: string; hovered: boolean }) {
 
 export default function AboutPage() {
   const go = useRouteTransition();
+  const [contactOpen, setContactOpen] = useState(false);
   const [stampVisible, setStampVisible] = useState(false);
   const rawX = useMotionValue(0);
   const rawY = useMotionValue(0);
@@ -170,7 +172,7 @@ export default function AboutPage() {
             {[
               { label: "Work", onClick: () => go("/"), href: undefined as string | undefined },
               { label: "Resume", onClick: undefined, href: "https://drive.google.com/file/d/1YRxY_9YcVx3SqbN-la49XKdes4CCp1xh/view?usp=sharing" },
-              { label: "Contact", onClick: undefined, href: "mailto:melvinjoshy5@gmail.com" },
+              { label: "Contact", onClick: () => setContactOpen(true), href: undefined },
             ].map(({ label, onClick, href }) => {
               const commonStyle = {
                 fontSize: 10, letterSpacing: "0.25em", textTransform: "uppercase" as const,
@@ -529,6 +531,8 @@ export default function AboutPage() {
         </div>
 
       </motion.div>
+
+      <ContactCard open={contactOpen} onClose={() => setContactOpen(false)} />
     </div>
   );
 }

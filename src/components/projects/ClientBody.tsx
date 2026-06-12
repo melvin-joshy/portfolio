@@ -6,6 +6,7 @@ import type { ClientProject, Media, SolutionBlock } from "@/data/projects";
 import { MetaStrip } from "./MetaStrip";
 import { ChapterTOC, type TOCItem } from "./ChapterTOC";
 import { WireBox, WireNote, WireText } from "./Wireframe";
+import { LightboxProvider, useLightbox } from "./Lightbox";
 
 function aspectKey(a?: string): "16/9" | "16/10" | "4/3" | "3/4" | "1/1" {
   if (a === "tall") return "3/4";
@@ -14,6 +15,22 @@ function aspectKey(a?: string): "16/9" | "16/10" | "4/3" | "3/4" | "1/1" {
 }
 
 const EASE = [0.22, 1, 0.36, 1] as const;
+
+/* ───────────────── Problem image — inline, zoomable ───────────────── */
+
+function ProblemImage({ src }: { src: string }) {
+  const lb = useLightbox();
+  return (
+    // eslint-disable-next-line @next/next/no-img-element
+    <img
+      src={encodeURI(src)}
+      alt=""
+      onClick={() => lb?.open({ src })}
+      className="mx-auto mt-8 w-full max-w-[640px] cursor-zoom-in rounded-[4px] block"
+      style={{ display: "block" }}
+    />
+  );
+}
 
 /* ───────────────── ClientBody ─────────────────
  * Reference: robertkan.com/projects/clubsneu
@@ -24,16 +41,22 @@ const EASE = [0.22, 1, 0.36, 1] as const;
 export function ClientBody({ project }: { project: ClientProject }) {
   const tocItems: TOCItem[] = [
     { id: "overview", label: "Overview" },
-    { id: "challenge", label: "The Challenge" },
+    { id: "challenge", label: "The Problem" },
     { id: "goals", label: "Goals" },
     { id: "approach", label: "Approach" },
-    { id: "solution", label: "The Solution" },
+    ...(project.solutionBlocks
+      ? project.solutionBlocks.map((b, i) => ({
+          id: `solution-${b.index ?? String(i + 1).padStart(2, "0")}`,
+          label: b.title,
+        }))
+      : [{ id: "solution", label: "The Solution" }]),
     ...(project.gallery.length > 0 ? [{ id: "final-designs", label: "Final Designs" }] : []),
     { id: "impact", label: "Impact" },
     { id: "reflection", label: "Reflection" },
   ];
 
   return (
+    <LightboxProvider>
     <div className="px-6 pb-32 pt-12 md:px-10">
       <ChapterTOC title={`${project.name} — ${project.client}`} items={tocItems} />
       {/* ── Narrow editorial column ── */}
@@ -83,10 +106,10 @@ export function ClientBody({ project }: { project: ClientProject }) {
           )}
         </motion.header>
 
-        {/* 02 · Cover in soft paper card */}
-        <SoftImageCard className="mt-12">
+        {/* 02 · Cover */}
+        <div className="mt-12">
           <Cover project={project} />
-        </SoftImageCard>
+        </div>
       </article>
 
       {/* 03 · Meta strip — same narrow column as body */}
@@ -153,18 +176,20 @@ export function ClientBody({ project }: { project: ClientProject }) {
       <SectionColumn id="challenge">
         <Eyebrow>Problem</Eyebrow>
         <SerifHeading>{project.problem.split(".")[0]}</SerifHeading>
-        <div>{paragraphs(project.problem, true)}</div>
+        <div>{paragraphs(project.problem.slice(project.problem.indexOf(".") + 1).trim(), true)}</div>
       </SectionColumn>
+
+      {/* 06b · Problem image — inline, full-bleed, zoomable */}
+      {project.problemImage && <ProblemImage src={project.problemImage} />}
 
       {/* 07 · Approach */}
       <SectionColumn id="approach">
         <Eyebrow>Solution</Eyebrow>
         <SerifHeading>{project.approach.split(".")[0]}</SerifHeading>
-        <SerifBody>{project.approach}</SerifBody>
+        <div>{paragraphs(project.approach.slice(project.approach.indexOf(".") + 1).trim(), true)}</div>
       </SectionColumn>
 
-      {/* 08 · Solution blocks — each in its own SoftImageCard with body + image */}
-      <div id="solution" className="scroll-mt-24" />
+      {/* 08 · Solution blocks — each section carries its own id for TOC anchoring */}
       <SolutionBlocks project={project} />
 
       {/* 09 · Final Designs gallery — only when populated */}
@@ -178,9 +203,7 @@ export function ClientBody({ project }: { project: ClientProject }) {
           <div className="mx-auto mt-2 max-w-[640px]">
             <div className="flex flex-col gap-8">
               {project.gallery.map((m, i) => (
-                <SoftImageCard key={i}>
-                  <AnnotatedImage media={m} />
-                </SoftImageCard>
+                <AnnotatedImage key={i} media={m} />
               ))}
             </div>
           </div>
@@ -276,18 +299,24 @@ export function ClientBody({ project }: { project: ClientProject }) {
         )}
       </article>
     </div>
+    </LightboxProvider>
   );
 }
 
 /* ───────────────── Primitives ───────────────── */
 
 function Cover({ project }: { project: ClientProject }) {
+  const lb = useLightbox();
   if (project.cover) {
     return (
-      <>
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={project.cover} alt={project.name} className="w-full" style={{ aspectRatio: "16/10", objectFit: "cover" }} />
-      </>
+      // eslint-disable-next-line @next/next/no-img-element
+      <img
+        src={project.cover}
+        alt={project.name}
+        onClick={() => lb?.open({ src: project.cover! })}
+        className="w-full block cursor-zoom-in rounded-[4px]"
+        style={{ aspectRatio: "16/10", objectFit: "cover" }}
+      />
     );
   }
   return (
@@ -435,7 +464,7 @@ function SolutionBlockView({
   const idx = block.index ?? String(fallbackIndex + 1).padStart(2, "0");
   return (
     <>
-      <SectionColumn>
+      <SectionColumn id={`solution-${idx}`}>
         <Eyebrow>Decision · {idx}</Eyebrow>
         <SerifHeading>{block.title}</SerifHeading>
         {block.body ? (
@@ -450,17 +479,11 @@ function SolutionBlockView({
         {block.media && block.media.length > 0 ? (
           <div className="flex flex-col gap-6">
             {block.media.map((m, i) => (
-              <SoftImageCard key={i}>
-                <AnnotatedImage media={m} />
-              </SoftImageCard>
+              <AnnotatedImage key={i} media={m} />
             ))}
           </div>
         ) : (
-          <div>
-            <SoftImageCard>
-              <WireBox aspect="16/10" label={`${idx} · ${block.title}`} hint="screenshot goes here" />
-            </SoftImageCard>
-          </div>
+          <WireBox aspect="16/10" label={`${idx} · ${block.title}`} hint="screenshot goes here" />
         )}
       </div>
     </>
@@ -468,14 +491,15 @@ function SolutionBlockView({
 }
 
 function AnnotatedImage({ media }: { media: Media }) {
+  const lb = useLightbox();
   return (
     <figure className="relative">
       {media.label && (
-        <div className="flex items-center gap-2 px-4 pb-2 pt-3">
+        <div className="flex items-center gap-2 pb-2 pt-1">
           {media.status === "iteration" && <StatusDot color="#c0392b" symbol="✕" />}
           {media.status === "final" && <StatusDot color="#3a8f62" symbol="✓" />}
           <p
-            className="text-[10px] tracking-[0.22em] uppercase text-white/55"
+            className="text-[10px] tracking-[0.22em] uppercase text-white/45"
             style={{ fontFamily: "var(--font-mono)" }}
           >
             {media.label}
@@ -487,10 +511,10 @@ function AnnotatedImage({ media }: { media: Media }) {
         <img
           src={media.src}
           alt={media.caption ?? ""}
-          className="w-full"
+          onClick={() => lb?.open({ src: media.src, caption: media.caption })}
+          className="w-full block cursor-zoom-in rounded-[4px]"
           style={{
-            aspectRatio: media.aspect === "tall" ? "3/4" : media.aspect === "square" ? "1/1" : "16/10",
-            objectFit: "cover",
+            objectFit: media.fit === "contain" ? "contain" : "cover",
           }}
         />
       ) : (

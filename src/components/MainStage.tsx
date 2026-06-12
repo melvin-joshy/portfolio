@@ -14,6 +14,7 @@ import { ArrowLeft, ArrowRight, ArrowUpRight, ArrowDown } from "lucide-react";
 import Lottie from "lottie-react";
 import { ScribbleUnderline } from "@/components/ScribbleUnderline";
 import Artifacts from "@/components/Artifacts";
+import ContactCard from "@/components/ContactCard";
 import { projects as allProjects } from "@/data/projects";
 
 /* ─────────────── Data ─────────────── */
@@ -459,14 +460,14 @@ function TickerItem({
       onClick={onPick}
       onMouseEnter={handleEnter}
       onMouseLeave={() => setHovered(false)}
-      className="ticker-btn flex items-center gap-4 px-8 h-full shrink-0 relative"
+      className="ticker-btn flex items-center justify-center h-full shrink-0 relative px-6"
       data-active={isActive ? "true" : "false"}
       style={{
         width: itemW,
         border: "none",
         background: "transparent",
         cursor: "pointer",
-        opacity: isActive ? 1 : 0.4,
+        opacity: isActive ? 1 : 0.35,
         transition: "opacity 0.15s ease",
       }}
     >
@@ -478,76 +479,33 @@ function TickerItem({
         zIndex: 1, userSelect: "none", pointerEvents: "none",
       }}>✱</div>
 
-      {/* Thumbnail with scribble overlay */}
-      <div
-        className="relative shrink-0 rounded-[2px]"
-        style={{ width: 76, height: 48, background: p.bg, flexShrink: 0, transform: `scale(${isActive ? 1 : 0.94})` }}
-      >
-        <AnimatePresence>
-          {hovered && (
-            <motion.svg
-              key={thumbIdx}
-              className="absolute inset-0 w-full h-full pointer-events-none"
-              viewBox="0 0 100 100"
-              preserveAspectRatio="none"
-              style={{ overflow: "visible" }}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0, transition: { duration: 0.15 } }}
-            >
-              <motion.path
-                d={THUMB_SCRIBBLES[thumbIdx]}
-                fill="none"
-                stroke="#c0392b"
-                strokeWidth="3"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                initial={{ pathLength: 0 }}
-                animate={{ pathLength: 1 }}
-                transition={{ duration: 0.42, ease: [0.16, 1, 0.3, 1] }}
-              />
-            </motion.svg>
-          )}
-        </AnimatePresence>
-      </div>
-
-      <div className="text-left leading-none min-w-0">
-        <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-          <p
-            className="ticker-name"
+      <div style={{ display: "flex", alignItems: "center", gap: 5 }}>
+        <p
+          className="ticker-name"
+          style={{
+            fontFamily: "var(--font-bebas)",
+            fontSize: isActive ? 22 : 17,
+            letterSpacing: "0.1em",
+            lineHeight: 1,
+            whiteSpace: "nowrap",
+            color: nameColor,
+            transition: "color 0.15s ease, font-size 0.15s ease",
+          }}
+        >
+          {p.name}
+        </p>
+        {isActive && (
+          <span
             style={{
-              fontFamily: "var(--font-bebas)",
-              fontSize: isActive ? 19 : 16,
-              letterSpacing: "0.08em",
-              lineHeight: 1,
-              whiteSpace: "nowrap",
-              color: nameColor,
-              transition: "color 0.15s ease",
+              display: "inline-flex",
+              color: hovered ? "#e05555" : theme === "light" ? "rgba(0,0,0,0.45)" : "rgba(255,255,255,0.5)",
+              transition: "color 0.15s ease, transform 0.15s ease",
+              transform: hovered ? "translate(1px,-1px)" : "none",
             }}
           >
-            {p.name}
-          </p>
-          {/* Open hint — only on the centred item, signals "click to open" */}
-          {isActive && (
-            <span
-              style={{
-                display: "inline-flex",
-                color: hovered ? "#e05555" : theme === "light" ? "rgba(0,0,0,0.45)" : "rgba(255,255,255,0.5)",
-                transition: "color 0.15s ease, transform 0.15s ease",
-                transform: hovered ? "translate(1px,-1px)" : "none",
-              }}
-            >
-              <ArrowUpRight size={12} strokeWidth={1.6} />
-            </span>
-          )}
-        </div>
-        <p style={{
-          fontSize: 8, letterSpacing: "0.18em", textTransform: "uppercase",
-          color: theme === "light" ? "rgba(0,0,0,0.62)" : "rgba(255,255,255,0.60)",
-          marginTop: 5, whiteSpace: "nowrap",
-        }}>
-          {p.tag}
-        </p>
+            <ArrowUpRight size={13} strokeWidth={1.6} />
+          </span>
+        )}
       </div>
     </button>
   );
@@ -560,11 +518,12 @@ export default function MainStage({ visible }: { visible: boolean }) {
   const [dir, setDir] = useState(1);
   const [cursorMode, setCursorMode] = useState<CursorMode>("default");
   const [cardHover, setCardHover] = useState(false);
-  const [raccoonFrame, setRaccoonFrame] = useState<1 | 2 | 3 | "hi">(1);
+  const [raccoonFrame, setRaccoonFrame] = useState<1 | 2 | 3 | "hi" | "handsup">(1);
   const [raccoonDir, setRaccoonDir] = useState<1 | -1>(1);
   const [theme, setTheme] = useState<"dark" | "light">("dark");
   const [artifactTouch, setArtifactTouch] = useState(false);
   const [easterEggActive, setEasterEggActive] = useState(false);
+  const [contactOpen, setContactOpen] = useState(false);
   const raccoonTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const artifactTouchTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const easterEggTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -574,7 +533,7 @@ export default function MainStage({ visible }: { visible: boolean }) {
 
   /* ── Endless ticker ── */
   const COPIES   = 13;                           // large pool — never runs out
-  const ITEM_W   = 360;
+  const ITEM_W   = 220;
   const MID_COPY = 6;                            // center copy index (0-based)
   const tickerItems = useMemo(() => Array.from({ length: COPIES }, () => projects).flat(), []);
   const vIdxRef  = useRef(MID_COPY * N);         // start: middle of 13-copy array
@@ -629,6 +588,14 @@ export default function MainStage({ visible }: { visible: boolean }) {
     setArtifactTouch(true);
     if (artifactTouchTimer.current) clearTimeout(artifactTouchTimer.current);
     artifactTouchTimer.current = setTimeout(() => setArtifactTouch(false), 520);
+  }, []);
+
+  // Spotlight artifact — raccoon freezes in "hands up" for the duration of the sweep (~4.8s)
+  const triggerSpotlightRaccoon = useCallback(() => {
+    if (raccoonTimer.current) clearTimeout(raccoonTimer.current);
+    setRaccoonDir(1);
+    setRaccoonFrame("handsup");
+    raccoonTimer.current = setTimeout(() => setRaccoonFrame(1), 4800);
   }, []);
 
   const triggerEasterEgg = useCallback(() => {
@@ -744,6 +711,7 @@ export default function MainStage({ visible }: { visible: boolean }) {
         {/* Artifact layer — collectible HUD nodes, z-index 1 */}
         <Artifacts
           onRaccoonSignal={triggerArtifactRaccoon}
+          onSpotlightSignal={triggerSpotlightRaccoon}
           onEasterEgg={triggerEasterEgg}
         />
 
@@ -776,7 +744,7 @@ export default function MainStage({ visible }: { visible: boolean }) {
             {[
               { label: "About", onClick: () => go("/about"), href: undefined },
               { label: "Resume", onClick: undefined, href: "https://drive.google.com/file/d/1YRxY_9YcVx3SqbN-la49XKdes4CCp1xh/view?usp=sharing" },
-              { label: "Contact", onClick: undefined, href: "mailto:melvinjoshy5@gmail.com" },
+              { label: "Contact", onClick: () => setContactOpen(true), href: undefined },
             ].map(({ label, onClick, href }) => {
               const Tag = onClick ? "button" : "a";
               return (
@@ -909,17 +877,46 @@ export default function MainStage({ visible }: { visible: boolean }) {
                 className="absolute pointer-events-none select-none"
                 style={{ bottom: "calc(100% - 44px)", right: "-8px", zIndex: 20 }}
                 animate={{
-                  x: raccoonFrame === 3 ? raccoonDir * 14 : 0,
-                  scaleX: raccoonDir === -1 ? -1 : 1,
+                  // Hardware-accelerated full transform string instead of FM shorthand x/scaleX
+                  transform: `translateX(${raccoonFrame === 3 ? raccoonDir * 14 : 0}px) scaleX(${raccoonDir === -1 ? -1 : 1})`,
+                  // Subtle vertical bob on mid-walk frame — like a real walk cycle
+                  y: raccoonFrame === "handsup" ? -28 : raccoonFrame === 2 ? -2 : 0,
                 }}
-                transition={{ duration: 0.18, ease: [0.22, 1, 0.36, 1] }}
+                transition={{
+                  transform: raccoonFrame === 3
+                    ? { duration: 0.13, ease: [0.22, 1, 0.36, 1] }   // nudge out: snappy ease-out
+                    : { duration: 0.24, ease: [0.77, 0, 0.175, 1] },  // return: rubber-band ease-in-out
+                  y: raccoonFrame === "handsup"
+                    ? { type: "spring", duration: 0.38, bounce: 0.18 }
+                    : { duration: 0.12, ease: [0.22, 1, 0.36, 1] },
+                }}
               >
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={raccoonFrame === "hi" ? "/racoon hi.webp" : `/racoon ${raccoonFrame}.webp`}
-                  alt=""
-                  style={{ width: "clamp(140px, 18vw, 220px)", height: "auto", display: "block" }}
-                />
+                <AnimatePresence mode="popLayout">
+                  {(raccoonFrame === "hi" || raccoonFrame === "handsup") ? (
+                    /* Special poses pop in with a spring jump */
+                    <motion.img
+                      key={raccoonFrame}
+                      src={raccoonFrame === "hi" ? "/racoon hi.webp" : "/racoon handsup.webp"}
+                      alt=""
+                      initial={{ y: -10, opacity: 0, scale: 0.92 }}
+                      animate={{ y: 0, opacity: 1, scale: 1 }}
+                      exit={{ y: -6, opacity: 0, scale: 0.95 }}
+                      transition={{ type: "spring", duration: 0.38, bounce: 0.32 }}
+                      style={{ width: "clamp(140px, 18vw, 220px)", height: "auto", display: "block" }}
+                    />
+                  ) : (
+                    /* Walk frames: fast opacity crossfade + blur masks hard swap */
+                    <motion.img
+                      key={raccoonFrame}
+                      src={`/racoon ${raccoonFrame}.webp`}
+                      alt=""
+                      initial={{ opacity: 0.6, filter: "blur(1px)" }}
+                      animate={{ opacity: 1, filter: "blur(0px)" }}
+                      transition={{ duration: 0.06, ease: "easeOut" }}
+                      style={{ width: "clamp(140px, 18vw, 220px)", height: "auto", display: "block" }}
+                    />
+                  )}
+                </AnimatePresence>
               </motion.div>
               {/* Back card — fans out on entrance, spreads further on hover */}
               <motion.div
@@ -957,7 +954,12 @@ export default function MainStage({ visible }: { visible: boolean }) {
                   onClick={() => openProject(cur)}
                   key={`card-${active}`}
                   className="absolute inset-0 rounded-[6px] overflow-hidden border border-white/[0.07] text-left"
-                  style={{ background: cur.bg, zIndex: 3 }}
+                  style={{
+                    background: cur.heroImage
+                      ? `url(${encodeURI(cur.heroImage)}) center/cover no-repeat, ${cur.bg}`
+                      : cur.bg,
+                    zIndex: 3,
+                  }}
                   custom={dir}
                   /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
                   initial={((d: number) => ({ x: d * 64, opacity: 0, scale: 0.97, y: 0 })) as any}
@@ -974,6 +976,17 @@ export default function MainStage({ visible }: { visible: boolean }) {
                     : { duration: 0.44, ease: SLIDE_EASE }
                   }
                 >
+                  {/* Hero image — sits below all overlays */}
+                  {cur.heroImage && (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={encodeURI(cur.heroImage)}
+                      alt=""
+                      className="absolute inset-0 w-full h-full pointer-events-none"
+                      style={{ objectFit: "cover", zIndex: 0 }}
+                    />
+                  )}
+
                   {/* Lottie animation — sits below all overlays */}
                   {cur.heroAnimation && (
                     <div className="absolute inset-0 overflow-hidden" style={{ zIndex: 0 }}>
@@ -1161,6 +1174,9 @@ export default function MainStage({ visible }: { visible: boolean }) {
 
         </div>{/* end content layer */}
       </motion.div>
+
+      {/* Contact card overlay */}
+      <ContactCard open={contactOpen} onClose={() => setContactOpen(false)} />
     </>
   );
 }

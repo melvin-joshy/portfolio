@@ -20,6 +20,8 @@ const OUTER_PHOTOS = [
   "/intro 9.webp",
   "/intro 10.webp",
   "/intro 11.webp",
+  "/intro 12.webp",
+  "/ontra-cover.webp",
 ].map(encodeURI);
 
 /* Center tile uses its own dedicated set; always settles on center 3 */

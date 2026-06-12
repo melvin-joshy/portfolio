@@ -24,33 +24,50 @@ export function NextProjectCards({ nexts }: { nexts: Project[] }) {
 }
 
 function NextCard({ project }: { project: Project }) {
+  const tag = project.tag.replace(/\s*·\s*\d{4}[–\-]?(?:Present|\d{4})?$/i, "");
   return (
     <Link
       href={`/projects/${project.id}`}
       data-cursor="view →"
-      className="group relative block cursor-none overflow-hidden rounded-sm border p-8 transition-colors duration-300 md:p-10"
-      style={{
-        borderColor: "rgba(255,255,255,0.08)",
-        background: project.bg,
-      }}
+      className="group block cursor-none"
     >
-      <p
-        className="text-[10px] tracking-[0.3em] uppercase text-white/55"
-        style={{ fontFamily: "var(--font-mono)" }}
+      {/* Image / colour block — fixed aspect ratio */}
+      <div
+        className="relative w-full overflow-hidden rounded-sm"
+        style={{ aspectRatio: "16/9", background: project.bg }}
       >
-        {project.tag} · {project.year}
-      </p>
-      <h3
-        className="mt-3 font-bebas text-[clamp(34px,4vw,56px)] leading-none tracking-wider text-white"
-      >
-        {project.name}
-      </h3>
-      <p className="mt-5 text-[14px] leading-[1.6] text-white/55">
-        {project.description}
-      </p>
-      <ArrowRight
-        className="absolute right-6 top-1/2 h-5 w-5 -translate-y-1/2 text-white/60 transition-transform duration-300 group-hover:translate-x-1 md:right-8"
-      />
+        {project.heroImage && (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={encodeURI(project.heroImage)}
+            alt=""
+            aria-hidden
+            className="absolute inset-0 h-full w-full pointer-events-none transition-transform duration-700 group-hover:scale-[1.03]"
+            style={{ objectFit: "cover" }}
+          />
+        )}
+        {/* Subtle dark vignette so arrow stays readable */}
+        <div className="absolute inset-0" style={{ background: "linear-gradient(to bottom, transparent 50%, rgba(0,0,0,0.45) 100%)" }} />
+        <ArrowRight
+          className="absolute right-5 bottom-5 h-5 w-5 text-white/70 transition-transform duration-300 group-hover:translate-x-1"
+        />
+      </div>
+
+      {/* Text below — editorial */}
+      <div className="mt-4 px-1">
+        <p
+          className="text-[10px] tracking-[0.3em] uppercase text-white/40"
+          style={{ fontFamily: "var(--font-mono)" }}
+        >
+          {tag}
+        </p>
+        <h3 className="mt-1 font-bebas text-[clamp(28px,3.5vw,48px)] leading-none tracking-wider text-white">
+          {project.name}
+        </h3>
+        <p className="mt-2 text-[13px] leading-[1.6] text-white/45">
+          {project.description}
+        </p>
+      </div>
     </Link>
   );
 }

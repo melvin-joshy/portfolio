@@ -41,6 +41,7 @@ type ArtifactDef = {
 
 type ArtifactsProps = {
   onRaccoonSignal: () => void;
+  onSpotlightSignal: () => void;
   onEasterEgg: () => void;
 };
 
@@ -646,6 +647,15 @@ function PaintModal({ open, onClose }: { open: boolean; onClose: () => void }) {
                 inset -1px -1px 0 #404040,
                 inset 2px 2px 0 #dfdfdf,
                 inset -2px -2px 0 #808080;
+              outline: none;
+            }
+            .win95-button:hover {
+              background: #c0c0c0;
+              outline: none;
+            }
+            .win95-button:focus,
+            .win95-button:focus-visible {
+              outline: none;
             }
             .win95-button:active,
             .win95-button[data-pressed="true"] {
@@ -856,7 +866,7 @@ function PaintModal({ open, onClose }: { open: boolean; onClose: () => void }) {
   );
 }
 
-export default function Artifacts({ onRaccoonSignal, onEasterEgg }: ArtifactsProps) {
+export default function Artifacts({ onRaccoonSignal, onSpotlightSignal, onEasterEgg }: ArtifactsProps) {
   const { found, count, toastCount, collect } = useArtifacts();
   const reducedMotion = Boolean(useReducedMotion());
   const audioRef = useRef<HTMLAudioElement | null>(null);
@@ -891,6 +901,7 @@ export default function Artifacts({ onRaccoonSignal, onEasterEgg }: ArtifactsPro
 
     if (id === "theme-switch") {
       setSpotlightKey(key => key + 1);
+      onSpotlightSignal();
       return;
     }
 
