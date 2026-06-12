@@ -211,10 +211,10 @@ export const projects: Project[] = [
       },
       {
         index: "06",
-        title: "Role-Based Permissions — every worker sees only what they need",
+        title: "Reports — build and export the numbers on demand",
         body:
-          "Every role maps to a different view of the same platform. Check-in desk sees QR Scanner and Bookings. Activity hosts see Appointments and Messages. The owner sees Reports, Users, and Taxes.\n\nOne platform that feels purpose-built for whoever's using it.",
-        media: [{ src: "/Marysfarm-6.webp", label: "The owner's role — Reports & exports only they see", aspect: "wide" }],
+          "The team needed answers — revenue, bookings, payment status — without exporting raw data and rebuilding spreadsheets by hand every month.\n\nBuilt a report builder: pick a type (sales summary, bookings, attendance, revenue breakdown), set a date range, choose exactly the fields you need (customer, booking, financials, payment), and preview before exporting.\n\nOne place to answer \"how did we do?\" — no reconciliation, no spreadsheets.",
+        media: [{ src: "/Marysfarm-6.webp", label: "Report builder — sales summary, fields, live preview", aspect: "wide" }],
       },
     ],
     outcome:
