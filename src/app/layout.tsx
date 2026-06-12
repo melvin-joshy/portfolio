@@ -20,15 +20,29 @@ const spectral = Spectral({
 const fontVars = `${bebas.variable} ${caveat.variable} ${pixelify.variable} ${spectral.variable}`;
 
 export const metadata: Metadata = {
-  title: "Melvin Joshy — Product Designer",
+  // Resolves relative OG/icon/canonical URLs to absolute — without this,
+  // social cards and the opengraph-image resolve against localhost in prod.
+  metadataBase: new URL("https://melvinjoshy.com"),
+  title: {
+    default: "Melvin Joshy — Product Designer",
+    template: "%s — Melvin Joshy",
+  },
   description:
-    "Founding-level product designer. 5 shipped AI-native products, solo. Zero to one, repeatedly.",
+    "Founding-level product designer. 5+ shipped AI-native products, solo. Zero to one, repeatedly.",
   openGraph: {
     title: "Melvin Joshy — Product Designer",
     description:
-      "Founding-level product designer. 5 shipped AI-native products, solo.",
+      "Founding-level product designer. 5+ shipped AI-native products, solo.",
     url: "https://melvinjoshy.com",
     siteName: "Melvin Joshy",
+    type: "website",
+    locale: "en_US",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Melvin Joshy — Product Designer",
+    description:
+      "Founding-level product designer. 5+ shipped AI-native products, solo.",
   },
 };
 

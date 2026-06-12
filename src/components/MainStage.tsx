@@ -9,14 +9,19 @@ import {
   useSpring,
 } from "framer-motion";
 import { useRouter } from "next/navigation";
+import dynamic from "next/dynamic";
 import { useRouteTransition } from "@/components/RouteTransition";
 import { ArrowLeft, ArrowRight, ArrowUpRight, ArrowDown } from "lucide-react";
-import Lottie from "lottie-react";
 import { ScribbleUnderline } from "@/components/ScribbleUnderline";
 import Artifacts from "@/components/Artifacts";
-import ContactCard from "@/components/ContactCard";
-import CertificateCard from "@/components/CertificateCard";
 import { projects as allProjects } from "@/data/projects";
+
+// Code-split: lottie-react is heavy and only some cards use a Lottie face; the
+// two modals are hidden until opened. Splitting them out keeps the home route's
+// First Load JS lean without any visible pop-in (they mount post-hydration).
+const Lottie = dynamic(() => import("lottie-react"), { ssr: false });
+const ContactCard = dynamic(() => import("@/components/ContactCard"), { ssr: false });
+const CertificateCard = dynamic(() => import("@/components/CertificateCard"), { ssr: false });
 
 /* ─────────────── Data ─────────────── */
 

@@ -62,7 +62,7 @@ function NextCard({ project }: { project: Project }) {
         <h3 className="mt-1 font-bebas text-[clamp(28px,3.5vw,48px)] leading-none tracking-wider text-white">
           {project.name}
         </h3>
-        <p className="mt-2 text-[13px] leading-[1.6] text-white/45">
+        <p className="mt-2 text-[13px] leading-[1.6] text-white/58">
           {project.description}
         </p>
       </div>

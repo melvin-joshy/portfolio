@@ -10,8 +10,10 @@
   --color-paper: #ede7d8;
   --color-cream: #e8ddd0;
   --color-accent: #c4a882;
-  --color-danger: #c0392b;
-  --color-ember: #c0392b;
+  /* Brand reds — intentionally distinct shades (see src/lib/brand.ts) */
+  --color-danger: #c0392b;  /* primary UI/brand red */
+  --color-logo: #ef2626;    /* logo "J" stroke — brighter */
+  --color-oxblood: #79291f; /* route-transition wash — deeper */
   --focus-ring: 0 0 0 2px var(--color-ink), 0 0 0 4px var(--color-accent);
 }
 

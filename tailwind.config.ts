@@ -18,6 +18,7 @@ const config: Config = {
         cream: "#e8ddd0",
         muted: "#8a8a8a",
         accent: "#c4a882",
+        danger: "#c0392b",
         border: "#1c1c1c",
       },
     },

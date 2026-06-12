@@ -310,7 +310,7 @@ export const projects: Project[] = [
       {
         index: "03",
         title: "Map Iconography System",
-        body: "Bus stops as dark square icons. Current bus position in green, instantly scannable. Each route in its own color. Icons adapt across zoom levels.\n\nThe hardest part: multiple routes passing through shared stops. Tested outlines, color blocks, and split indicators. Final solution: individual colored lines maintaining identity through shared stops. You can trace any route with your finger across the entire map.",
+        body: "Bus stops as dark square icons. Current bus position in green, instantly scannable. Each route in its own colour. Icons adapt across zoom levels.\n\nThe hardest part: multiple routes passing through shared stops. Tested outlines, colour blocks, and split indicators. Final solution: individual coloured lines maintaining identity through shared stops. You can trace any route with your finger across the entire map.",
         media: [
           { src: "/ontra-4.webp", label: "Map · Route lines and stops", aspect: "wide" },
         ],
@@ -318,7 +318,7 @@ export const projects: Project[] = [
       {
         index: "04",
         title: "Bike Stations",
-        body: "A completely new layer. The badge answers one question at map level: is it worth walking here? Two numbers side by side: 12 manual, 2 electric. One glance, no tap required.\n\nTapping opens a compact detail: name, distance, counts, free spaces, and a direct deep link to unlock in the Lyft Bos app. Two interactions from \"should I bike?\" to unlocking one.",
+        body: "A completely new layer. The badge answers one question at map level: is it worth walking here? Two numbers side by side: 12 manual, 2 electric. One glance, no tap required.\n\nTapping opens a compact detail: name, distance, counts, free spaces, and a direct deep link to unlock in the Lyft app. Two interactions from \"should I bike?\" to unlocking one.",
         media: [
           { src: "/ontra-5.webp", label: "Bike station badges · map view", aspect: "wide" },
           { src: "/ontra-6.webp", label: "Bike station · detail panel", aspect: "wide" },
@@ -375,36 +375,36 @@ export const projects: Project[] = [
         index: "01",
         title: "Map Overview",
         body:
-          "The command center. Live driver positions on the map. Left panel shows all drivers with color-coded status. Persistent pill filter bar at the top, one click to isolate Available, On the way, or Arrived drivers. No dropdowns. No nested menus.",
-        media: [{ src: "/Crewslink -1.webp", label: "Map Overview — live positions, status pills", aspect: "wide" }],
+          "The command centre. Live driver positions on the map. Left panel shows all drivers with colour-coded status. Persistent pill filter bar at the top, one click to isolate Available, On the way, or Arrived drivers. No dropdowns. No nested menus.",
+        media: [{ src: "/Crewslink -1.webp", label: "Map Overview: live positions, status pills", aspect: "wide" }],
       },
       {
         index: "02",
         title: "New Booking",
         body:
           "Trip details and passenger info side by side. Live trip summary updates as fields are filled. Map visible throughout, so dispatchers confirm pickup and dropoff visually without switching screens.",
-        media: [{ src: "/crewslink -2.webp", label: "New Booking — details, summary, map in one view", aspect: "wide" }],
+        media: [{ src: "/crewslink -2.webp", label: "New Booking: details, summary, map in one view", aspect: "wide" }],
       },
       {
         index: "03",
         title: "Trip Management",
         body:
           "65 trips in one view. The Flight Connected column tells dispatchers instantly which bookings auto-update with flight data and which need manual attention. Active and Closed trips separated by a single toggle.",
-        media: [{ src: "/crewslink -3.webp", label: "Trip Management — 65 trips, Flight Connected column", aspect: "wide" }],
+        media: [{ src: "/crewslink -3.webp", label: "Trip Management: 65 trips, Flight Connected column", aspect: "wide" }],
       },
       {
         index: "04",
         title: "Contract & Billing Management",
         body:
           "Airlines operate on complex contracts per airport, route, and vehicle type. The contract table surfaces expiring contracts proactively. Billing consolidates Client, Vendor, and Driver pay into one place, with no reconciliation across systems.",
-        media: [{ src: "/crewslink -4.webp", label: "Contract & Billing — one consolidated view", aspect: "wide" }],
+        media: [{ src: "/crewslink -4.webp", label: "Contract & Billing: one consolidated view", aspect: "wide" }],
       },
       {
         index: "05",
         title: "Permissions",
         body:
           "Role-based access across every module. Dispatchers, vendor admins, drivers, and airline clients each see only what they need. New users onboarded with one template click.",
-        media: [{ src: "/crewslink -5.webp", label: "Permissions — role-based access, template onboarding", aspect: "wide" }],
+        media: [{ src: "/crewslink -5.webp", label: "Permissions: role-based access, template onboarding", aspect: "wide" }],
       },
     ],
     outcome:
@@ -415,7 +415,7 @@ export const projects: Project[] = [
       { value: "37+", label: "Airports · 3 airlines" },
     ],
     reflection:
-      "Designing for dispatchers means designing for hour ten of a ten-hour shift. The benchmark isn't \"does this look good?\" It's \"can someone exhausted still get it right at 2 a.m.?\" That question quietly rewrote every layout decision.\n\nWestJet · Air Canada · SkyWest · 37+ airports. The full platform is live.",
+      "Designing for dispatchers means designing for hour 10 of a 10-hour shift. The benchmark isn't \"does this look good?\" It's \"can someone exhausted still get it right at 2 a.m.?\" That question quietly rewrote every layout decision.\n\nWestJet · Air Canada · SkyWest · 37+ airports. The full platform is live.",
     gallery: [],
   },
   {
@@ -442,7 +442,7 @@ export const projects: Project[] = [
       "Frame Studio was built to showcase Clarity. Then I used Frame Studio to showcase Frame Studio. Then I used both to build my portfolio.\n\nA tool that builds itself into the story of everything else I've made.",
     gallery: [
       { src: "/Framestudio -1.webp", label: "Frame Studio · app loaded in a device frame", aspect: "wide" },
-      { src: "/Framestudio -3.webp", label: "Background presets — gradients, grid, dots", aspect: "wide" },
+      { src: "/Framestudio -3.webp", label: "Background presets: gradients, grid, dots", aspect: "wide" },
       { src: "/Framestudio -3-1.webp", label: "Export & shareable link", aspect: "wide" },
     ],
   },
@@ -587,11 +587,11 @@ export const projects: Project[] = [
       {
         eyebrow: "What I Designed",
         title: "From inspiration to purchase inside AR",
-        body: "Home & Style Discovery opens with curated lookbooks and style guides, with AR entry one tap from any product page. Guided onboarding removes calibration confusion; placement is true-to-scale, with real dimensions, materials, and textures. Advanced controls handle color, dimensions, and lighting, saved rooms enable sharing, and checkout happens inside the AR view.",
+        body: "Home & Style Discovery opens with curated lookbooks and style guides, with AR entry one tap from any product page. Guided onboarding removes calibration confusion; placement is true-to-scale, with real dimensions, materials, and textures. Advanced controls handle colour, dimensions, and lighting, saved rooms enable sharing, and checkout happens inside the AR view.",
         media: [
           {
             src: "/Deco AR 3.webp",
-            caption: "AR controls · color, dimensions, lighting",
+            caption: "AR controls · colour, dimensions, lighting",
           },
           {
             src: "/Deco AR 4.webp",

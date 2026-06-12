@@ -249,7 +249,7 @@ export default function AboutPage() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.35, ease: EASE, delay: 0.1 }}
             >
-              Melvin — your friendly neighbourhood{" "}
+              Melvin, your friendly neighbourhood{" "}
               <em
                 style={{ color: "#c0392b", fontStyle: "normal", cursor: "default" }}
                 onMouseEnter={() => setStampVisible(true)}
@@ -282,6 +282,8 @@ export default function AboutPage() {
               <img
                 src="/stamp image.webp"
                 alt="Melvin Joshy"
+                loading="lazy"
+                decoding="async"
                 style={{ width: 180, height: "auto", display: "block", filter: "drop-shadow(0 12px 32px rgba(0,0,0,0.22))" }}
               />
             </motion.div>
@@ -333,7 +335,7 @@ export default function AboutPage() {
               initial={{ opacity: 0, x: -20 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true, margin: "-60px" }} transition={{ duration: 0.65, ease: EASE }}
             >
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src="/graduation.webp" alt="" className="about-card-image" style={{
+              <img src="/graduation.webp" alt="" loading="lazy" decoding="async" className="about-card-image" style={{
                 position: "absolute", left: 20, top: "50%", transform: "translateY(-50%)",
                 width: 260, height: "auto", display: "block",
                 filter: hoveredCard === "academic" ? "none" : "invert(1)",
@@ -342,7 +344,7 @@ export default function AboutPage() {
               <div style={{ textAlign: "right", maxWidth: 380 }}>
                 <Eyebrow label="Background" hovered={hoveredCard === "academic"} />
                 <p style={cardText("academic")}>
-                  Swapped my ruler for a degree. B.Arch from the College of Engineering, Trivandrum — five years of learning to think in systems before I ever touched a screen.
+                  Swapped my ruler for a degree. B.Arch from the College of Engineering, Trivandrum: five years of learning to think in systems before I ever touched a screen.
                 </p>
               </div>
             </motion.div>
@@ -360,7 +362,7 @@ export default function AboutPage() {
               initial={{ opacity: 0, x: -20 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true, margin: "-60px" }} transition={{ duration: 0.65, ease: EASE, delay: 0.1 }}
             >
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src="/4 patterbs.webp" alt="" className="about-card-image" style={{
+              <img src="/4 patterbs.webp" alt="" loading="lazy" decoding="async" className="about-card-image" style={{
                 position: "absolute", left: 20, top: "50%", transform: "translateY(-50%)",
                 width: 260, height: "auto", display: "block",
                 filter: hoveredCard === "design" ? "none" : "invert(1)",
@@ -369,7 +371,7 @@ export default function AboutPage() {
               <div style={{ textAlign: "right", maxWidth: 380 }}>
                 <Eyebrow label="Philosophy" hovered={hoveredCard === "design"} />
                 <p style={cardText("design")}>
-                  Finding the pattern underneath the problem — then making something people feel rather than just use. That&apos;s been the constant across everything I&apos;ve shipped.
+                  Finding the pattern underneath the problem, then making something people feel rather than just use. That&apos;s been the constant across everything I&apos;ve shipped.
                 </p>
               </div>
             </motion.div>
@@ -393,11 +395,11 @@ export default function AboutPage() {
               <div style={{ maxWidth: 380 }}>
                 <Eyebrow label="Currently" hovered={hoveredCard === "opportunities"} />
                 <p style={cardText("opportunities")}>
-                  Two years in, five products shipped — transit tech, deal sourcing, AI tooling. Now looking for the next great problem. Something with real users, real stakes, and room to build right.
+                  Two years in, 5+ products shipped: transit tech, deal sourcing, AI tooling. Now looking for the next great problem. Something with real users, real stakes, and room to build right.
                 </p>
               </div>
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src="/racoon 1.webp" alt="" className="about-card-image" style={{
+              <img src="/racoon 1.webp" alt="" loading="lazy" decoding="async" className="about-card-image" style={{
                 position: "absolute", right: 20, top: "50%", transform: "translateY(-50%)",
                 width: 260, height: "auto", display: "block",
                 filter: hoveredCard === "opportunities" ? "none" : "invert(1)",
@@ -420,11 +422,11 @@ export default function AboutPage() {
               <div style={{ maxWidth: 380 }}>
                 <Eyebrow label="Soundtrack" hovered={hoveredCard === "soundtracks"} />
                 <p style={cardText("soundtracks")}>
-                  Music is the background to everything. Nodding along to catchy beats, lost in rhythm and melody — it&apos;s where the best ideas arrive uninvited.
+                  Music is the background to everything. Nodding along to catchy beats, lost in rhythm and melody. It&apos;s where the best ideas arrive uninvited.
                 </p>
               </div>
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src="/racoon 2.webp" alt="" className="about-card-image" style={{
+              <img src="/racoon 2.webp" alt="" loading="lazy" decoding="async" className="about-card-image" style={{
                 position: "absolute", right: 20, top: "50%", transform: "translateY(-50%)",
                 width: 260, height: "auto", display: "block",
                 filter: hoveredCard === "soundtracks" ? "none" : "invert(1)",
@@ -460,7 +462,7 @@ export default function AboutPage() {
               initial={{ opacity: 0, x: -20 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true, margin: "-60px" }} transition={{ duration: 0.65, ease: EASE }}
             >
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src="/racoon 3.webp" alt="" className="about-card-image" style={{
+              <img src="/racoon 3.webp" alt="" loading="lazy" decoding="async" className="about-card-image" style={{
                 position: "absolute", left: 20, top: "50%", transform: "translateY(-50%)",
                 width: 260, height: "auto", display: "block",
                 filter: hoveredCard === "screentime" ? "none" : "invert(1)",
@@ -487,7 +489,7 @@ export default function AboutPage() {
               initial={{ opacity: 0, x: -20 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true, margin: "-60px" }} transition={{ duration: 0.65, ease: EASE, delay: 0.1 }}
             >
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src="/2 tt.webp" alt="" className="about-card-image" style={{
+              <img src="/2 tt.webp" alt="" loading="lazy" decoding="async" className="about-card-image" style={{
                 position: "absolute", left: 20, top: "50%", transform: "translateY(-50%)",
                 width: 260, height: "auto", display: "block",
                 filter: hoveredCard === "beyondtable" ? "none" : "invert(1)",
@@ -496,7 +498,7 @@ export default function AboutPage() {
               <div style={{ textAlign: "right", maxWidth: 380 }}>
                 <Eyebrow label="Outside Work" hovered={hoveredCard === "beyondtable"} />
                 <p style={cardText("beyondtable")}>
-                  Table tennis. Not a metaphor — actually playing. Champion in the making, one serve at a time.
+                  Table tennis. Not a metaphor, actually playing. Champion in the making, one serve at a time.
                 </p>
               </div>
             </motion.div>
@@ -524,7 +526,7 @@ export default function AboutPage() {
                 </p>
               </div>
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src="/3-chai.webp" alt="" className="about-card-image" style={{
+              <img src="/3-chai.webp" alt="" loading="lazy" decoding="async" className="about-card-image" style={{
                 position: "absolute", right: 20, top: "50%", transform: "translateY(-50%)",
                 width: 260, height: "auto", display: "block",
                 filter: hoveredCard === "teatime" ? "none" : "invert(1)",

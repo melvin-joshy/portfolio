@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState, useCallback } from "react";
 import { motion, useReducedMotion } from "framer-motion";
+import { BRAND } from "@/lib/brand";
 
 interface Props {
   onRevealStart: () => void; // hole begins opening — fire the hero's entrance now
@@ -59,8 +60,8 @@ type Phase = "logo" | "grid" | "settle" | "collapse" | "red" | "reveal";
 const EASE_IN_OUT = [0.76, 0, 0.24, 1] as const; // on-screen movement / morph
 const EASE_OUT = [0.16, 1, 0.3, 1] as const;      // entrances / reveals
 const CENTER = 4; // middle cell of a 3×3 grid
-const RED = "#c0392b";        // brand red — logo J
-const REVEAL_RED = "#79291f"; // deep, matte oxblood for the full-screen reveal wash
+const RED = BRAND.red;        // brand red — logo J
+const REVEAL_RED = BRAND.oxblood; // deep, matte oxblood for the full-screen reveal wash
 
 /* The centre aperture starts small (4:3, never squished) and becomes the hole */
 const HOLE_W = "min(17vmin, 152px)";

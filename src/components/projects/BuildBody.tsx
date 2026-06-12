@@ -72,7 +72,7 @@ export function BuildBody({ project }: { project: BuildProject }) {
           transition={{ duration: 0.7, ease: EASE }}
         >
           <p
-            className="text-[11px] tracking-[0.22em] uppercase text-white/45"
+            className="text-[11px] tracking-[0.22em] uppercase text-white/58"
             style={{ fontFamily: "var(--font-mono)", fontWeight: 500 }}
           >
             Experiment · {project.year}
@@ -293,7 +293,7 @@ function SectionColumn({ id, children }: { id?: string; children: React.ReactNod
 function Eyebrow({ children }: { children: React.ReactNode }) {
   return (
     <p
-      className="text-[11px] tracking-[0.22em] uppercase text-white/45"
+      className="text-[11px] tracking-[0.22em] uppercase text-white/58"
       style={{ fontFamily: "var(--font-mono)", fontWeight: 500 }}
     >
       {children}
@@ -309,17 +309,6 @@ function SerifHeading({ children }: { children: React.ReactNode }) {
     >
       {children}
     </h2>
-  );
-}
-
-function SerifBody({ children }: { children: React.ReactNode }) {
-  return (
-    <p
-      className="mt-5 text-[17px] leading-[1.7] text-white/68"
-      style={{ fontFamily: "var(--font-serif)", fontWeight: 300 }}
-    >
-      {children}
-    </p>
   );
 }
 
@@ -339,7 +328,7 @@ function GalleryFullBleed({ media }: { media: Media }) {
       />
       {caption && (
         <figcaption
-          className="mt-3 text-[12px] text-white/50"
+          className="mt-3 text-[12px] text-white/62"
           style={{ fontFamily: "var(--font-mono)" }}
         >
           {caption}

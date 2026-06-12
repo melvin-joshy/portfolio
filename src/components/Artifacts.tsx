@@ -1,7 +1,8 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import { BRAND } from "@/lib/brand";
 import {
   Bug,
   Compass,
@@ -20,8 +21,7 @@ import type { LucideIcon } from "lucide-react";
 const STORAGE_KEY = "mj_artifacts_v2";
 const HINT_KEY = "mj_artifacts_hint_v2";  // bumped: v1 fired behind the intro & set the flag invisibly
 const TOTAL = 7;
-const RED   = "#c0392b";   // editorial red — matches --color-danger
-const AMBER = "#c4a882";   // warm amber — matches --color-accent
+const RED   = BRAND.red;   // editorial red — matches --color-danger
 const EASE = [0.16, 1, 0.3, 1] as const;
 
 type ArtifactId =
@@ -1088,7 +1088,7 @@ export default function Artifacts({ onRaccoonSignal, onSpotlightSignal, onEaster
     }
 
     onEasterEgg();
-  }, [collect, onEasterEgg, onRaccoonSignal, runTimed]);
+  }, [collect, onEasterEgg, onRaccoonSignal, onSpotlightSignal, runTimed]);
 
   useEffect(() => {
     return () => {

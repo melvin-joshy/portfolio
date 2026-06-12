@@ -85,7 +85,7 @@ export function Chapter({ chapter, index, id }: { chapter: ChapterT; index: numb
       style={{ borderColor: "rgba(255,255,255,0.06)" }}
     >
       <p
-        className="text-[11px] tracking-[0.22em] uppercase text-white/45"
+        className="text-[11px] tracking-[0.22em] uppercase text-white/58"
         style={{ fontFamily: "var(--font-mono)", fontWeight: 500 }}
       >
         {chapter.eyebrow ?? `Chapter ${String(index + 1).padStart(2, "0")}`}
@@ -154,10 +154,10 @@ function DualPhoneTray({ items }: { items: Media[] }) {
               <LazyVideo src={m.src} onClick={() => lb?.open(m)} style={dims} />
             ) : (
               // eslint-disable-next-line @next/next/no-img-element
-              <img src={encodeURI(m.src)} alt={m.caption ?? ""} onClick={() => lb?.open(m)} data-cursor="ZOOM" data-cursor-variant="zoom" style={dims} />
+              <img src={encodeURI(m.src)} alt={m.caption ?? ""} onClick={() => lb?.open(m)} loading="lazy" decoding="async" data-cursor="ZOOM" data-cursor-variant="zoom" style={dims} />
             )}
             {m.caption && (
-              <p className="mt-1 text-[10px] sm:text-[12px] text-black/45 text-center" style={{ fontFamily: "var(--font-mono)" }}>
+              <p className="mt-1 text-[10px] sm:text-[12px] text-black/55 text-center" style={{ fontFamily: "var(--font-mono)" }}>
                 {m.caption}
               </p>
             )}
@@ -184,6 +184,8 @@ function ImageTile({ media }: { media: Media }) {
           src={encodeURI(media.src)}
           alt={media.caption ?? ""}
           onClick={() => lb?.open(media)}
+          loading="lazy"
+          decoding="async"
           data-cursor="ZOOM"
           data-cursor-variant="zoom"
           className="h-auto block rounded-sm mx-auto cursor-none"
@@ -191,7 +193,7 @@ function ImageTile({ media }: { media: Media }) {
         />
         {media.caption && (
           <figcaption
-            className="mt-3 text-[12px] text-white/50 text-center"
+            className="mt-3 text-[12px] text-white/62 text-center"
             style={{ fontFamily: "var(--font-mono)" }}
           >
             {media.caption}
@@ -215,6 +217,8 @@ function ImageTile({ media }: { media: Media }) {
           src={encodeURI(media.src)}
           alt={media.caption ?? ""}
           onClick={() => lb?.open(media)}
+          loading="lazy"
+          decoding="async"
           data-cursor="ZOOM"
           data-cursor-variant="zoom"
           className="w-full h-full cursor-none"
@@ -223,7 +227,7 @@ function ImageTile({ media }: { media: Media }) {
       </div>
       {media.caption && (
         <figcaption
-          className="mt-3 text-[12px] text-white/50"
+          className="mt-3 text-[12px] text-white/62"
           style={{ fontFamily: "var(--font-mono)" }}
         >
           {media.caption}
@@ -326,7 +330,7 @@ function PhoneVideoTile({ media }: { media: Media }) {
 
       {media.caption && (
         <figcaption
-          className="mt-3 text-[12px] text-white/50 text-center"
+          className="mt-3 text-[12px] text-white/62 text-center"
           style={{ fontFamily: "var(--font-mono)" }}
         >
           {media.caption}
@@ -364,7 +368,7 @@ function VideoTile({ media }: { media: Media }) {
       </div>
       {media.caption && (
         <figcaption
-          className="mt-3 text-[12px] text-white/50"
+          className="mt-3 text-[12px] text-white/62"
           style={{ fontFamily: "var(--font-mono)" }}
         >
           {media.caption}

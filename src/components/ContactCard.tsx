@@ -3,8 +3,6 @@
 import { useEffect, useRef, useCallback, useState } from "react";
 import { motion, AnimatePresence, useMotionValue, useSpring, useTransform, type Variants } from "framer-motion";
 
-const EASE = [0.22, 1, 0.36, 1] as const;
-
 /* Content stagger — rows populate after the card lands */
 const rowVariants: Variants = {
   hidden: { opacity: 0, y: 6 },
@@ -54,7 +52,7 @@ export default function ContactCard({ open, onClose }: Props) {
             }}
             style={{ perspective: 1200 }}
           >
-            <Card onClose={onClose} />
+            <Card />
           </motion.div>
         </motion.div>
       )}
@@ -63,7 +61,7 @@ export default function ContactCard({ open, onClose }: Props) {
 }
 
 /* ─── GlareCard implementation (React Bits pattern) ─── */
-function Card({ onClose }: { onClose: () => void }) {
+function Card() {
   const cardRef = useRef<HTMLDivElement>(null);
   const [glarePos, setGlarePos] = useState({ x: 50, y: 50 });
   const [isHovered, setIsHovered] = useState(false);

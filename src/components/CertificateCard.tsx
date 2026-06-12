@@ -3,8 +3,9 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence, useMotionValue, useSpring, useTransform } from "framer-motion";
 import { ScribbleUnderline } from "@/components/ScribbleUnderline";
+import { BRAND } from "@/lib/brand";
 
-const RED = "#c0392b";
+const RED = BRAND.red;
 const REWARD = "/reward.webp";
 
 type Props = { open: boolean; onClose: () => void };
@@ -292,7 +293,7 @@ export default function CertificateCard({ open, onClose }: Props) {
                 style={{ cursor: "pointer", fontFamily: "var(--font-mono)", color: "rgba(255,255,255,0.85)", opacity: downloading ? 0.5 : 1 }}
               >
                 <DownloadIcon />
-                <ScribbleUnderline color="#c0392b" strokeWidth={1.6} offsetY={3}>
+                <ScribbleUnderline color={RED} strokeWidth={1.6} offsetY={3}>
                   {downloading ? "Rendering…" : "Download"}
                 </ScribbleUnderline>
               </button>
@@ -302,7 +303,7 @@ export default function CertificateCard({ open, onClose }: Props) {
                 className="inline-flex cursor-pointer items-center text-[10px] uppercase tracking-[0.25em]"
                 style={{ cursor: "pointer", fontFamily: "var(--font-mono)", color: "rgba(255,255,255,0.55)" }}
               >
-                <ScribbleUnderline color="#c0392b" strokeWidth={1.6} offsetY={3}>
+                <ScribbleUnderline color={RED} strokeWidth={1.6} offsetY={3}>
                   Close
                 </ScribbleUnderline>
               </button>

@@ -10,9 +10,10 @@ import {
 } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { motion, useReducedMotion } from "framer-motion";
+import { BRAND } from "@/lib/brand";
 
 /* Deep matte oxblood — matches the intro reveal wash */
-const RED = "#79291f";
+const RED = BRAND.oxblood;
 const EASE_IN_OUT = [0.77, 0, 0.175, 1] as const; // hole moving on screen
 const EASE_OUT = [0.22, 1, 0.36, 1] as const;     // page entering on reveal
 

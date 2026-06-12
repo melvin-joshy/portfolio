@@ -61,7 +61,7 @@ function CaseStudyBodyInner({ project }: { project: CaseStudyProject }) {
           transition={{ duration: 0.7, ease: EASE }}
         >
           <p
-            className="text-[11px] tracking-[0.22em] uppercase text-white/45"
+            className="text-[11px] tracking-[0.22em] uppercase text-white/58"
             style={{ fontFamily: "var(--font-mono)", fontWeight: 500 }}
           >
             {project.tag}
@@ -140,7 +140,7 @@ function CaseStudyBodyInner({ project }: { project: CaseStudyProject }) {
             style={{ borderColor: "rgba(255,255,255,0.06)" }}
           >
             <p
-              className="text-[11px] tracking-[0.22em] uppercase text-white/45"
+              className="text-[11px] tracking-[0.22em] uppercase text-white/58"
               style={{ fontFamily: "var(--font-mono)", fontWeight: 500 }}
             >
               Reflection
@@ -185,7 +185,7 @@ function CaseStudyBodyInner({ project }: { project: CaseStudyProject }) {
                 />
               )}
               <p
-                className="text-[11px] tracking-[0.22em] uppercase text-white/45"
+                className="text-[11px] tracking-[0.22em] uppercase text-white/58"
                 style={{ fontFamily: "var(--font-mono)", fontWeight: 500 }}
               >
                 Outcome

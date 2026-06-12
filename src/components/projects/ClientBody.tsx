@@ -7,6 +7,7 @@ import { MetaStrip } from "./MetaStrip";
 import { ChapterTOC, type TOCItem } from "./ChapterTOC";
 import { WireBox, WireNote, WireText } from "./Wireframe";
 import { LightboxProvider, useLightbox } from "./Lightbox";
+import { BRAND } from "@/lib/brand";
 
 function aspectKey(a?: string): "16/9" | "16/10" | "4/3" | "3/4" | "1/1" {
   if (a === "tall") return "3/4";
@@ -148,7 +149,7 @@ export function ClientBody({ project }: { project: ClientProject }) {
                 className="flex gap-4 text-[16px] leading-[1.7] text-white/72"
                 style={{ fontFamily: "var(--font-serif)", fontWeight: 300 }}
               >
-                <span className="mt-[10px] inline-block h-[5px] w-[5px] shrink-0 rounded-full bg-[#c0392b]" />
+                <span className="mt-[10px] inline-block h-[5px] w-[5px] shrink-0 rounded-full bg-danger" />
                 <span>{g}</span>
               </li>
             ))}
@@ -338,23 +339,6 @@ function Cover({ project }: { project: ClientProject }) {
   );
 }
 
-function SoftImageCard({ children, className = "" }: { children: React.ReactNode; className?: string }) {
-  return (
-    <div
-      className={`overflow-hidden rounded-[10px] p-3 md:p-5 ${className}`}
-      style={{
-        background: "rgba(255,255,255,0.035)",
-        border: "1px solid rgba(255,255,255,0.06)",
-        boxShadow: "inset 0 1px 0 rgba(255,255,255,0.03)",
-      }}
-    >
-      <div className="overflow-hidden rounded-[6px]" style={{ background: "rgba(0,0,0,0.25)" }}>
-        {children}
-      </div>
-    </div>
-  );
-}
-
 function SectionColumn({ id, children }: { id?: string; children: React.ReactNode }) {
   return (
     <motion.section
@@ -373,7 +357,7 @@ function SectionColumn({ id, children }: { id?: string; children: React.ReactNod
 function Eyebrow({ children }: { children: React.ReactNode }) {
   return (
     <p
-      className="text-[11px] tracking-[0.22em] uppercase text-white/45"
+      className="text-[11px] tracking-[0.22em] uppercase text-white/58"
       style={{ fontFamily: "var(--font-mono)", fontWeight: 500 }}
     >
       {children}
@@ -400,21 +384,6 @@ function SerifBody({ children }: { children: React.ReactNode }) {
     >
       {children}
     </p>
-  );
-}
-
-function Pill({ children, mono }: { children: React.ReactNode; mono?: boolean }) {
-  return (
-    <span
-      className="rounded-[6px] border px-3 py-1.5 text-[11px] tracking-[0.18em] uppercase text-white/72"
-      style={{
-        fontFamily: mono ? "var(--font-mono)" : "var(--font-inter)",
-        borderColor: "rgba(255,255,255,0.14)",
-        background: "rgba(255,255,255,0.025)",
-      }}
-    >
-      {children}
-    </span>
   );
 }
 
@@ -500,10 +469,10 @@ function AnnotatedImage({ media }: { media: Media }) {
     <figure className="relative">
       {media.label && (
         <div className="flex items-center gap-2 pb-2 pt-1">
-          {media.status === "iteration" && <StatusDot color="#c0392b" symbol="✕" />}
+          {media.status === "iteration" && <StatusDot color={BRAND.red} symbol="✕" />}
           {media.status === "final" && <StatusDot color="#3a8f62" symbol="✓" />}
           <p
-            className="text-[10px] tracking-[0.22em] uppercase text-white/45"
+            className="text-[10px] tracking-[0.22em] uppercase text-white/58"
             style={{ fontFamily: "var(--font-mono)" }}
           >
             {media.label}
@@ -532,7 +501,7 @@ function AnnotatedImage({ media }: { media: Media }) {
             <li key={a.n} className="flex items-center gap-3 text-[12px] text-white/65">
               <span
                 className="inline-flex h-5 w-5 items-center justify-center rounded-sm text-[10px] text-white"
-                style={{ background: "#c0392b" }}
+                style={{ background: BRAND.red }}
               >
                 {a.n}
               </span>
@@ -543,7 +512,7 @@ function AnnotatedImage({ media }: { media: Media }) {
       )}
       {media.caption && !media.label && (
         <figcaption
-          className="px-4 py-3 text-[12px] text-white/50"
+          className="px-4 py-3 text-[12px] text-white/62"
           style={{ fontFamily: "var(--font-mono)" }}
         >
           {media.caption}
