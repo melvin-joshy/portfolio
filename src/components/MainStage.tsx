@@ -604,7 +604,7 @@ export default function MainStage({ visible }: { visible: boolean }) {
   const tickerContainerRef = useRef<HTMLDivElement>(null);
   const tickerMX = useMotionValue(0);
   const tickerX  = useSpring(tickerMX, { stiffness: 280, damping: 32, mass: 0.7 });
-  const dragRef = useRef({ active: false, startX: 0, startMX: 0, moved: false });
+  const dragRef = useRef({ active: false, startX: 0, startMX: 0, moved: false, captured: false });
   const justDraggedRef = useRef(false);
 
   const centerTicker = useCallback((vIdx: number) => {
@@ -738,24 +738,34 @@ export default function MainStage({ visible }: { visible: boolean }) {
 
   /* ── Swipe / drag the ticker (mobile-first) — 1:1 follow, snap to nearest on release ── */
   const onTickerPointerDown = useCallback((e: React.PointerEvent) => {
-    dragRef.current = { active: true, startX: e.clientX, startMX: tickerMX.get(), moved: false };
-    try { (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId); } catch {}
+    dragRef.current = { active: true, startX: e.clientX, startMX: tickerMX.get(), moved: false, captured: false };
   }, [tickerMX]);
 
   const onTickerPointerMove = useCallback((e: React.PointerEvent) => {
     const d = dragRef.current;
     if (!d.active) return;
     const dx = e.clientX - d.startX;
-    if (Math.abs(dx) > 4) d.moved = true;
+    if (!d.moved) {
+      if (Math.abs(dx) <= 4) return;
+      d.moved = true;
+      try {
+        (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
+        d.captured = true;
+      } catch {}
+    }
     const nx = d.startMX + dx;
     tickerMX.jump(nx);  // bypass spring during drag for a 1:1 grab feel
     tickerX.jump(nx);
   }, [tickerMX, tickerX]);
 
-  const onTickerPointerUp = useCallback(() => {
+  const onTickerPointerUp = useCallback((e: React.PointerEvent) => {
     const d = dragRef.current;
     if (!d.active) return;
     d.active = false;
+    if (d.captured) {
+      try { (e.currentTarget as HTMLElement).releasePointerCapture(e.pointerId); } catch {}
+      d.captured = false;
+    }
     if (!d.moved) return; // no movement → let the TickerItem click handle it
     justDraggedRef.current = true;
     setTimeout(() => { justDraggedRef.current = false; }, 60);
