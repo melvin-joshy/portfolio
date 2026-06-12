@@ -28,7 +28,7 @@ export function ClientBody({ project }: { project: ClientProject }) {
     { id: "goals", label: "Goals" },
     { id: "approach", label: "Approach" },
     { id: "solution", label: "The Solution" },
-    { id: "final-designs", label: "Final Designs" },
+    ...(project.gallery.length > 0 ? [{ id: "final-designs", label: "Final Designs" }] : []),
     { id: "impact", label: "Impact" },
     { id: "reflection", label: "Reflection" },
   ];
@@ -167,38 +167,25 @@ export function ClientBody({ project }: { project: ClientProject }) {
       <div id="solution" className="scroll-mt-24" />
       <SolutionBlocks project={project} />
 
-      {/* 09 · Final Designs gallery */}
-      <SectionColumn id="final-designs">
-        <Eyebrow>Final Designs</Eyebrow>
-        <SerifHeading>The shipped work</SerifHeading>
-        <p className="sr-only">Final design gallery</p>
-      </SectionColumn>
-      <div className="mx-auto mt-2 max-w-[640px]">
-        {project.gallery.length > 0 ? (
-          <div className="flex flex-col gap-8">
-            {project.gallery.map((m, i) => (
-              <SoftImageCard key={i}>
-                <AnnotatedImage media={m} />
-              </SoftImageCard>
-            ))}
-          </div>
-        ) : (
-          <>
+      {/* 09 · Final Designs gallery — only when populated */}
+      {project.gallery.length > 0 && (
+        <>
+          <SectionColumn id="final-designs">
+            <Eyebrow>Final Designs</Eyebrow>
+            <SerifHeading>The shipped work</SerifHeading>
+            <p className="sr-only">Final design gallery</p>
+          </SectionColumn>
+          <div className="mx-auto mt-2 max-w-[640px]">
             <div className="flex flex-col gap-8">
-              <SoftImageCard>
-                <WireBox aspect="4/3" label="Final · Home" hint="full product shot" />
-              </SoftImageCard>
-              <SoftImageCard>
-                <WireBox aspect="4/3" label="Final · Detail" hint="a key flow / interaction" />
-              </SoftImageCard>
-              <SoftImageCard>
-                <WireBox aspect="3/4" label="Final · Mobile" hint="responsive view" />
-              </SoftImageCard>
+              {project.gallery.map((m, i) => (
+                <SoftImageCard key={i}>
+                  <AnnotatedImage media={m} />
+                </SoftImageCard>
+              ))}
             </div>
-            <WireNote>add screenshots to <code>gallery[]</code></WireNote>
-          </>
-        )}
-      </div>
+          </div>
+        </>
+      )}
 
       {/* 10 · Impact / Outcome */}
       <SectionColumn id="impact">
