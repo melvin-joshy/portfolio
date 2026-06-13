@@ -131,29 +131,35 @@ function Card() {
         <div style={{ position: "absolute", inset: 0, pointerEvents: "none", zIndex: 1, background: "linear-gradient(135deg, rgba(255,255,255,0.08) 0%, transparent 35%, transparent 65%, rgba(255,255,255,0.04) 100%)" }} />
       </div>
 
-      {/* ── Raccoon — bottom-right, half off card ── */}
-      <motion.img
-        src="/racoon%20for%20contact%20card.webp"
-        alt=""
-        aria-hidden
-        initial={{ opacity: 0, y: 12, scale: 0.92 }}
-        animate={{ opacity: 1, y: 0, scale: 1 }}
-        transition={{ type: "spring", duration: 0.55, bounce: 0.25, delay: 0.55 }}
-        style={{
-          position: "absolute",
-          bottom: "-22%",
-          right: "-4%",
-          width: "48%",
-          height: "auto",
-          zIndex: 20,
-          pointerEvents: "none",
-          userSelect: "none",
-          /* Edged: dark shadow + red rim light from below */
-          filter: "drop-shadow(0 -6px 24px rgba(180,20,20,0.5)) drop-shadow(0 12px 32px rgba(0,0,0,0.85))",
-          /* Subtle desaturate to blend with dark card palette */
-          mixBlendMode: "normal",
-        }}
-      />
+      {/* ── Raccoon — bottom-right, clipped to the card so it never crosses the border.
+          The clip wrapper mirrors the shell's rounded rect (inset 0 + same radius),
+          so anything that extends past the card edge is hidden against a clean silhouette. ── */}
+      <div style={{
+        position: "absolute", inset: 0,
+        borderRadius: 18,
+        overflow: "hidden",
+        zIndex: 20,
+        pointerEvents: "none",
+      }}>
+        <motion.img
+          src="/racoon%20for%20contact%20card.webp"
+          alt=""
+          aria-hidden
+          initial={{ opacity: 0, y: 12, scale: 0.92 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          transition={{ type: "spring", duration: 0.55, bounce: 0.25, delay: 0.55 }}
+          style={{
+            position: "absolute",
+            bottom: "-22%",
+            right: "-4%",
+            width: "48%",
+            height: "auto",
+            userSelect: "none",
+            /* Edged: dark shadow + red rim light from below */
+            filter: "drop-shadow(0 -6px 24px rgba(180,20,20,0.5)) drop-shadow(0 12px 32px rgba(0,0,0,0.85))",
+          }}
+        />
+      </div>
 
       {/* ── Card content — sits above shell, below raccoon ── */}
       <div style={{
