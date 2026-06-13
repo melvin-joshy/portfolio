@@ -707,15 +707,17 @@ export default function MainStage({ visible }: { visible: boolean }) {
     triggerRaccoon(1);
     vIdxRef.current += 1;
     centerTicker(vIdxRef.current);
+    normalizeTicker();   // rebase to the middle copy so the pool never runs out
     pick((active + 1) % N, 1);
-  }, [active, pick, triggerRaccoon, centerTicker]);
+  }, [active, pick, triggerRaccoon, centerTicker, normalizeTicker]);
 
   const prev = useCallback(() => {
     triggerRaccoon(-1);
     vIdxRef.current -= 1;
     centerTicker(vIdxRef.current);
+    normalizeTicker();   // rebase to the middle copy so the pool never runs out
     pick((active - 1 + N) % N, -1);
-  }, [active, pick, triggerRaccoon, centerTicker]);
+  }, [active, pick, triggerRaccoon, centerTicker, normalizeTicker]);
 
   /* Direct ticker click — shortest-path delta */
   const openProject = useCallback((p: typeof projects[0]) => {
@@ -792,12 +794,13 @@ export default function MainStage({ visible }: { visible: boolean }) {
       if (dragRef.current.active) return; // don't fight a live swipe
       vIdxRef.current += 1;
       centerTicker(vIdxRef.current);
+      normalizeTicker();   // rebase to the middle copy so the pool never runs out
       setDir(1);
       setActive(p => (p + 1) % N);
       triggerRaccoon(1);
     }, 6000);
     return () => clearInterval(id);
-  }, [visible, reducedMotion, triggerRaccoon, centerTicker]);
+  }, [visible, reducedMotion, triggerRaccoon, centerTicker, normalizeTicker]);
 
   /* Init ticker position before first paint */
   useLayoutEffect(() => {
