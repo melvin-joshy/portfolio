@@ -53,9 +53,9 @@ export default function AboutPage() {
 
   /* Shared card text style — serif, mixed-case, readable */
   const cardText = (card: string) => ({
-    fontSize: 15,
+    fontSize: 18,
     letterSpacing: "0.01em",
-    lineHeight: 1.75,
+    lineHeight: 1.7,
     fontFamily: "var(--font-serif)" as const,
     fontWeight: 300,
     color: hoveredCard === card ? "rgba(0,0,0,0.78)" : "rgba(255,255,255,0.82)",
@@ -118,7 +118,7 @@ export default function AboutPage() {
           }
 
           .about-card p {
-            font-size: 14px !important;
+            font-size: 16px !important;
             text-align: left !important;
           }
 
