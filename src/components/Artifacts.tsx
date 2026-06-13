@@ -1101,13 +1101,6 @@ export default function Artifacts({ onRaccoonSignal, onSpotlightSignal, onEaster
   return (
     <>
       <div className="hidden md:block" style={{ position: "absolute", inset: 0, zIndex: 3, pointerEvents: "none" }}>
-        <div style={{ position: "absolute", top: 13, right: 20, display: "flex", alignItems: "center", gap: 5, opacity: 0.56, pointerEvents: "none" }}>
-          <span style={{ width: 4, height: 4, borderRadius: "50%", background: RED }} />
-          <span style={{ fontFamily: "monospace", fontSize: 6.5, letterSpacing: "0.2em", color: RED, textTransform: "uppercase" }}>
-            {count}/{TOTAL} found
-          </span>
-        </div>
-
         <OriginTrace visible={originVisible} reducedMotion={reducedMotion} />
 
         {ARTIFACTS.map(def => (
