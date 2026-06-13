@@ -383,22 +383,6 @@ function Divider({ delay = 0, right = false, theme = "dark" }: { delay?: number;
 
 /* ─────────────── Grid background ─────────────── */
 
-function KeyCap({ children, theme }: { children: React.ReactNode; theme: "dark" | "light" }) {
-  return (
-    <div style={{
-      width: 26, height: 26,
-      background: theme === "light" ? "rgba(0,0,0,0.06)" : "rgba(255,255,255,0.08)",
-      border: `1px solid ${theme === "light" ? "rgba(0,0,0,0.18)" : "rgba(255,255,255,0.18)"}`,
-      borderBottom: `2.5px solid ${theme === "light" ? "rgba(0,0,0,0.22)" : "rgba(255,255,255,0.22)"}`,
-      borderRadius: 5,
-      display: "flex", alignItems: "center", justifyContent: "center",
-      color: theme === "light" ? "rgba(0,0,0,0.65)" : "rgba(255,255,255,0.65)",
-    }}>
-      {children}
-    </div>
-  );
-}
-
 function GridBackground({ theme }: { theme: "dark" | "light" }) {
   const dark = theme === "dark";
 
@@ -898,6 +882,7 @@ export default function MainStage({ visible }: { visible: boolean }) {
                     color="#c0392b"
                     strokeWidth={1.6}
                     offsetY={2}
+                    underlineOnly
                   >
                     {label}
                   </ScribbleUnderline>
@@ -1012,11 +997,24 @@ export default function MainStage({ visible }: { visible: boolean }) {
               onMouseLeave={() => { setCursorMode("default"); setCardHover(false); }}
               onMouseEnter={() => setCardHover(true)}
             >
-              {/* Raccoon mascot — sits above the card top edge */}
+              {/* Raccoon mascot — peeks over the card top edge.
+                  The mask lives on this PLAIN wrapper, kept separate from the animated
+                  transforms below: a mask on an element that also animates `transform` does
+                  not reliably clip in some browsers. The wrapper's bottom sits 44px onto the
+                  card, so cutting the bottom 44px hides the body below the card's top edge —
+                  the raccoon reads as tucked behind the card. */}
+              <div
+                className="absolute pointer-events-none select-none"
+                style={{
+                  bottom: "calc(100% - 10px)",
+                  right: "-8px",
+                  zIndex: 20,
+                  WebkitMaskImage: "linear-gradient(to bottom, #000 calc(100% - 10px), transparent calc(100% - 10px))",
+                  maskImage: "linear-gradient(to bottom, #000 calc(100% - 10px), transparent calc(100% - 10px))",
+                }}
+              >
               {/* Outer: horizontal nudge + flip — separate from vertical so they don't conflict */}
               <motion.div
-                className="absolute pointer-events-none select-none"
-                style={{ bottom: "calc(100% - 44px)", right: "-8px", zIndex: 20 }}
                 animate={{
                   transform: `translateX(${raccoonFrame === 3 ? raccoonDir * 14 : 0}px) scaleX(${raccoonDir === -1 ? -1 : 1})`,
                 }}
@@ -1068,7 +1066,11 @@ export default function MainStage({ visible }: { visible: boolean }) {
                         transition={{ type: "spring", duration: 0.38, bounce: 0.32 }}
                         style={{
                           position: "absolute",
-                          inset: 0,
+                          // Bottom-anchored (not inset:0) so the taller hi/handsup
+                          // frames raise their arms UPWARD instead of pushing the
+                          // body down past the walk frame onto the card.
+                          left: 0,
+                          bottom: 0,
                           width: "clamp(140px, 18vw, 220px)",
                           height: "auto",
                           display: "block",
@@ -1078,6 +1080,7 @@ export default function MainStage({ visible }: { visible: boolean }) {
                   </AnimatePresence>
                 </motion.div>
               </motion.div>
+              </div>
               {/* Next card (active + 1) — the single peek the front slides away to reveal */}
               <motion.div
                 className="absolute inset-0 rounded-[6px] overflow-hidden"
@@ -1207,16 +1210,6 @@ export default function MainStage({ visible }: { visible: boolean }) {
               </AnimatePresence>
             </div>
 
-            {/* Keyboard hint — desktop only (no keyboard on touch) */}
-            <motion.div
-              className="absolute bottom-3 hidden lg:flex items-center gap-1.5"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: visible ? 1 : 0 }}
-              transition={{ duration: 0.3, delay: 0.4 }}
-            >
-              <KeyCap theme={theme}><ArrowLeft className="w-3 h-3" /></KeyCap>
-              <KeyCap theme={theme}><ArrowRight className="w-3 h-3" /></KeyCap>
-            </motion.div>
           </div>
 
           {/* ── RIGHT column ── */}
@@ -1305,21 +1298,48 @@ export default function MainStage({ visible }: { visible: boolean }) {
           </motion.div>
         </div>
 
-        {/* ── Copyright bar ── */}
+        {/* ── Footer bar ── */}
         <div
-          className="min-h-7 shrink-0 flex flex-wrap items-center justify-center gap-x-4 gap-y-1 px-4 py-2 md:justify-between md:px-8 md:py-0"
+          className="min-h-9 shrink-0 flex flex-wrap items-center justify-center gap-x-4 gap-y-2 px-4 py-2 md:grid md:grid-cols-3 md:items-center md:px-8 md:py-0"
           style={{ borderTop: `1px solid ${theme === "light" ? "rgba(0,0,0,0.06)" : "rgba(255,255,255,0.05)"}` }}
         >
-          <p className="text-[8px] tracking-[0.2em] uppercase" style={{ color: theme === "light" ? "rgba(0,0,0,0.68)" : "rgba(255,255,255,0.62)" }}>
-            © 2026 Melvin Joshy
-          </p>
-          <p className="text-[8px] tracking-[0.2em] uppercase" style={{ color: theme === "light" ? "rgba(0,0,0,0.55)" : "rgba(255,255,255,0.50)" }}>
-            Crafted with{" "}
-            <span style={{ color: "#c0392b", fontFamily: "var(--font-mono)", letterSpacing: 0, textTransform: "none" }}>:&gt;</span>
-          </p>
+          {/* Left: copyright + crafted-with */}
+          <div className="flex items-center gap-3 text-[8px] tracking-[0.2em] uppercase md:justify-self-start"
+            style={{ color: theme === "light" ? "rgba(0,0,0,0.68)" : "rgba(255,255,255,0.62)" }}>
+            <span>© 2026 Melvin Joshy</span>
+            <span aria-hidden style={{ color: theme === "light" ? "rgba(0,0,0,0.25)" : "rgba(255,255,255,0.22)" }}>·</span>
+            <span style={{ color: theme === "light" ? "rgba(0,0,0,0.55)" : "rgba(255,255,255,0.50)" }}>
+              Crafted with{" "}
+              <span style={{ color: "#c0392b", fontFamily: "var(--font-mono)", letterSpacing: 0, textTransform: "none" }}>:&gt;</span>
+            </span>
+          </div>
+
+          {/* Center: carousel prev/next — bare icons, dead-centered. Also the only step controls on touch. */}
+          <div className="flex items-center justify-center gap-5 md:justify-self-center" onMouseEnter={() => setCursorMode("default")}>
+            {([
+              { label: "Previous project", onClick: prev, Icon: ArrowLeft },
+              { label: "Next project", onClick: next, Icon: ArrowRight },
+            ] as const).map(({ label, onClick, Icon }) => (
+              <motion.button
+                key={label}
+                type="button"
+                onClick={onClick}
+                aria-label={label}
+                className="inline-flex items-center justify-center p-1.5"
+                style={{ color: theme === "light" ? "rgba(0,0,0,0.5)" : "rgba(255,255,255,0.5)" }}
+                whileHover={{ scale: 1.18, color: "#c0392b" }}
+                whileTap={{ scale: 0.85 }}
+                transition={{ duration: 0.15 }}
+              >
+                <Icon className="w-4 h-4" strokeWidth={1.6} />
+              </motion.button>
+            ))}
+          </div>
+
+          {/* Right: email */}
           <motion.a
             href="mailto:melvinjoshy5@gmail.com"
-            className="text-[8px] tracking-[0.2em] uppercase transition-colors duration-300"
+            className="text-[8px] tracking-[0.2em] uppercase transition-colors duration-300 md:justify-self-end"
             style={{ color: theme === "light" ? "rgba(0,0,0,0.68)" : "rgba(255,255,255,0.62)" }}
             onMouseEnter={() => setCursorMode("view")}
             onMouseLeave={() => setCursorMode("default")}

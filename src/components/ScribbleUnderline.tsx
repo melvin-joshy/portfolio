@@ -150,12 +150,20 @@ const SCRIBBLES: ScribbleDef[] = [
   },
 ];
 
+/* Index pools — "wrap" doodles loop around the word (arcing above it), which can
+   poke past a tight container's top edge. `underlineOnly` restricts to the
+   below-text squiggles for places like the nav where that arc looks stray. */
+const ALL_IDX = SCRIBBLES.map((_, i) => i);
+const UNDER_IDX = SCRIBBLES.map((s, i) => (s.type === "under" ? i : -1)).filter((i) => i >= 0);
+
 interface ScribbleUnderlineProps {
   children: React.ReactNode;
   className?: string;
   color?: string;
   strokeWidth?: number;
   offsetY?: number;
+  /** Restrict to under-text squiggles (no wrap-around doodles). */
+  underlineOnly?: boolean;
 }
 
 export function ScribbleUnderline({
@@ -164,14 +172,16 @@ export function ScribbleUnderline({
   color = "#c0392b",
   strokeWidth = 1.8,
   offsetY = 3,
+  underlineOnly = false,
 }: ScribbleUnderlineProps) {
+  const pool = underlineOnly ? UNDER_IDX : ALL_IDX;
   const [hovered, setHovered] = useState(false);
-  const [idx, setIdx] = useState(() => Math.floor(Math.random() * SCRIBBLES.length));
+  const [idx, setIdx] = useState(() => pool[Math.floor(Math.random() * pool.length)]);
   const lastRef = useRef(idx);
 
   function handleEnter() {
-    let next = Math.floor(Math.random() * SCRIBBLES.length);
-    while (next === lastRef.current) next = Math.floor(Math.random() * SCRIBBLES.length);
+    let next = pool[Math.floor(Math.random() * pool.length)];
+    while (next === lastRef.current && pool.length > 1) next = pool[Math.floor(Math.random() * pool.length)];
     lastRef.current = next;
     setIdx(next);
     setHovered(true);
