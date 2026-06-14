@@ -997,24 +997,11 @@ export default function MainStage({ visible }: { visible: boolean }) {
               onMouseLeave={() => { setCursorMode("default"); setCardHover(false); }}
               onMouseEnter={() => setCardHover(true)}
             >
-              {/* Raccoon mascot — peeks over the card top edge.
-                  The mask lives on this PLAIN wrapper, kept separate from the animated
-                  transforms below: a mask on an element that also animates `transform` does
-                  not reliably clip in some browsers. The wrapper's bottom sits 44px onto the
-                  card, so cutting the bottom 44px hides the body below the card's top edge —
-                  the raccoon reads as tucked behind the card. */}
-              <div
-                className="absolute pointer-events-none select-none"
-                style={{
-                  bottom: "calc(100% - 10px)",
-                  right: "-8px",
-                  zIndex: 20,
-                  WebkitMaskImage: "linear-gradient(to bottom, #000 calc(100% - 10px), transparent calc(100% - 10px))",
-                  maskImage: "linear-gradient(to bottom, #000 calc(100% - 10px), transparent calc(100% - 10px))",
-                }}
-              >
+              {/* Raccoon mascot — sits above the card top edge */}
               {/* Outer: horizontal nudge + flip — separate from vertical so they don't conflict */}
               <motion.div
+                className="absolute pointer-events-none select-none"
+                style={{ bottom: "calc(100% - 44px)", right: "-8px", zIndex: 20 }}
                 animate={{
                   transform: `translateX(${raccoonFrame === 3 ? raccoonDir * 14 : 0}px) scaleX(${raccoonDir === -1 ? -1 : 1})`,
                 }}
@@ -1066,11 +1053,7 @@ export default function MainStage({ visible }: { visible: boolean }) {
                         transition={{ type: "spring", duration: 0.38, bounce: 0.32 }}
                         style={{
                           position: "absolute",
-                          // Bottom-anchored (not inset:0) so the taller hi/handsup
-                          // frames raise their arms UPWARD instead of pushing the
-                          // body down past the walk frame onto the card.
-                          left: 0,
-                          bottom: 0,
+                          inset: 0,
                           width: "clamp(140px, 18vw, 220px)",
                           height: "auto",
                           display: "block",
@@ -1080,7 +1063,6 @@ export default function MainStage({ visible }: { visible: boolean }) {
                   </AnimatePresence>
                 </motion.div>
               </motion.div>
-              </div>
               {/* Next card (active + 1) — the single peek the front slides away to reveal */}
               <motion.div
                 className="absolute inset-0 rounded-[6px] overflow-hidden"
