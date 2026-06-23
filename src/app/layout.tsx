@@ -24,13 +24,13 @@ export const metadata: Metadata = {
   // social cards and the opengraph-image resolve against localhost in prod.
   metadataBase: new URL("https://melvinjoshy.com"),
   title: {
-    default: "Melvin Joshy — Product Designer",
-    template: "%s — Melvin Joshy",
+    default: "Melvin Joshy · Product Designer",
+    template: "%s · Melvin Joshy",
   },
   description:
     "Founding-level product designer. 5+ shipped AI-native products, solo. Zero to one, repeatedly.",
   openGraph: {
-    title: "Melvin Joshy — Product Designer",
+    title: "Melvin Joshy · Product Designer",
     description:
       "Founding-level product designer. 5+ shipped AI-native products, solo.",
     url: "https://melvinjoshy.com",
@@ -40,7 +40,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Melvin Joshy — Product Designer",
+    title: "Melvin Joshy · Product Designer",
     description:
       "Founding-level product designer. 5+ shipped AI-native products, solo.",
   },

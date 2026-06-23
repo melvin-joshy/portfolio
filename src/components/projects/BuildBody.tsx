@@ -46,7 +46,7 @@ export function BuildBody({ project }: { project: BuildProject }) {
 
   return (
     <div className="px-6 pb-32 pt-12 md:px-10">
-      <ChapterTOC title={`${project.name} — Experiment`} items={tocItems} />
+      <ChapterTOC title={`${project.name} · Experiment`} items={tocItems} />
       <article className="mx-auto max-w-[640px]">
         {/* Back to work */}
         <motion.div

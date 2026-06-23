@@ -34,7 +34,7 @@ function CaseStudyBodyInner({ project }: { project: CaseStudyProject }) {
   return (
     <div className="px-6 pb-32 pt-12 md:px-10">
       {/* Right-edge TOC — collapses to dash markers, expands on hover (desktop only) */}
-      <ChapterTOC title={`${project.name} — Case Study`} items={tocItems} />
+      <ChapterTOC title={`${project.name} · Case Study`} items={tocItems} />
 
       <article className="mx-auto max-w-[640px]">
         {/* Back to work */}

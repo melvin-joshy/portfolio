@@ -461,7 +461,9 @@ function TickerItem({
   onPick: () => void;
 }) {
   const [hovered, setHovered] = useState(false);
-  const [thumbIdx, setThumbIdx] = useState(() => Math.floor(Math.random() * THUMB_SCRIBBLES.length));
+  // Deterministic initial (avoids SSR/client hydration mismatch); handleEnter
+  // randomises the thumb scribble on hover.
+  const [thumbIdx, setThumbIdx] = useState(0);
   const lastThumbRef = useRef(thumbIdx);
 
   const nameColor = hovered
@@ -1016,7 +1018,7 @@ export default function MainStage({ visible }: { visible: boolean }) {
                   style={{ position: "relative" }}
                   animate={{
                     transform: `translateY(${
-                      raccoonFrame === "handsup" ? -2 :
+                      raccoonFrame === "handsup" ? -18 :
                       raccoonFrame === "hi" ? -22 :
                       raccoonFrame === 2 ? -2 : 0
                     }px)`,
@@ -1318,18 +1320,9 @@ export default function MainStage({ visible }: { visible: boolean }) {
             ))}
           </div>
 
-          {/* Right: email */}
-          <motion.a
-            href="mailto:melvinjoshy5@gmail.com"
-            className="text-[8px] tracking-[0.2em] uppercase transition-colors duration-300 md:justify-self-end"
-            style={{ color: theme === "light" ? "rgba(0,0,0,0.68)" : "rgba(255,255,255,0.62)" }}
-            onMouseEnter={() => setCursorMode("view")}
-            onMouseLeave={() => setCursorMode("default")}
-          >
-            <ScribbleUnderline color="#c0392b" strokeWidth={1.6} offsetY={2}>
-              melvinjoshy5@gmail.com
-            </ScribbleUnderline>
-          </motion.a>
+          {/* Right column intentionally empty — email lives in the Contact card
+              and Melvin AI; the launcher FAB sits in this corner. */}
+          <div className="hidden md:block" aria-hidden />
         </div>
 
         </div>{/* end content layer */}
