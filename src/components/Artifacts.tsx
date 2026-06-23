@@ -560,7 +560,10 @@ const MANTRAS: { line: string; tag: string }[] = [
 ];
 
 function QuoteModal({ open, onClose }: { open: boolean; onClose: () => void }) {
-  const [i, setI] = useState(() => Math.floor(Math.random() * MANTRAS.length));
+  // Deterministic initial so SSR and first client render match; pick a random
+  // mantra after mount (client-only) to keep it feeling fresh.
+  const [i, setI] = useState(0);
+  useEffect(() => { setI(Math.floor(Math.random() * MANTRAS.length)); }, []);
   // Tap the card → a different random mantra.
   const next = useCallback(() => setI(prev => {
     if (MANTRAS.length < 2) return prev;

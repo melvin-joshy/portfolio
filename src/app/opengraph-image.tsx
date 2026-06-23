@@ -2,7 +2,7 @@ import { ImageResponse } from "next/og";
 
 // Static social card (1200×630). Code-generated so there's no binary asset to
 // maintain — Next auto-wires this as the default og:image / twitter:image.
-export const alt = "Melvin Joshy — Product Designer";
+export const alt = "Melvin Joshy · Product Designer";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 

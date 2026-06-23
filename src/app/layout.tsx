@@ -3,6 +3,7 @@ import { Bebas_Neue, Caveat, Pixelify_Sans, Spectral } from "next/font/google";
 import "./globals.css";
 import RouteTransition from "@/components/RouteTransition";
 import CustomCursor from "@/components/CustomCursor";
+import MelvinAI from "@/components/MelvinAI";
 
 // Self-hosted via next/font — no render-blocking @import, no extra round-trips,
 // no layout shift. Variables match the names used across globals.css/components.
@@ -24,13 +25,13 @@ export const metadata: Metadata = {
   // social cards and the opengraph-image resolve against localhost in prod.
   metadataBase: new URL("https://melvinjoshy.com"),
   title: {
-    default: "Melvin Joshy — Product Designer",
-    template: "%s — Melvin Joshy",
+    default: "Melvin Joshy · Product Designer",
+    template: "%s · Melvin Joshy",
   },
   description:
     "Founding-level product designer. 5+ shipped AI-native products, solo. Zero to one, repeatedly.",
   openGraph: {
-    title: "Melvin Joshy — Product Designer",
+    title: "Melvin Joshy · Product Designer",
     description:
       "Founding-level product designer. 5+ shipped AI-native products, solo.",
     url: "https://melvinjoshy.com",
@@ -40,7 +41,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Melvin Joshy — Product Designer",
+    title: "Melvin Joshy · Product Designer",
     description:
       "Founding-level product designer. 5+ shipped AI-native products, solo.",
   },
@@ -56,6 +57,7 @@ export default function RootLayout({
       <body className="antialiased">
         <CustomCursor />
         <RouteTransition>{children}</RouteTransition>
+        <MelvinAI />
       </body>
     </html>
   );

@@ -61,7 +61,7 @@ export function ClientBody({ project }: { project: ClientProject }) {
   return (
     <LightboxProvider>
     <div className="px-6 pb-32 pt-12 md:px-10">
-      <ChapterTOC title={`${project.name} — ${project.client}`} items={tocItems} />
+      <ChapterTOC title={`${project.name} · ${project.client}`} items={tocItems} />
       {/* ── Narrow editorial column ── */}
       <article className="mx-auto max-w-[640px]">
         {/* Back to work — above headline */}

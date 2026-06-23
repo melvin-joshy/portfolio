@@ -179,7 +179,7 @@ function Card() {
           <div>
             <p style={{
               fontFamily: "var(--font-mono, monospace)",
-              fontSize: 9, letterSpacing: "0.32em",
+              fontSize: 11, letterSpacing: "0.32em",
               color: "rgba(255,255,255,0.75)",
               textTransform: "uppercase", lineHeight: 1, margin: 0,
             }}>
@@ -187,9 +187,9 @@ function Card() {
             </p>
             <p style={{
               fontFamily: "var(--font-mono, monospace)",
-              fontSize: 7.5, letterSpacing: "0.22em",
+              fontSize: 9, letterSpacing: "0.22em",
               color: "rgba(255,255,255,0.45)",
-              textTransform: "uppercase", margin: "4px 0 0",
+              textTransform: "uppercase", margin: "5px 0 0",
             }}>
               ID · 2023–Present
             </p>
@@ -215,7 +215,7 @@ function Card() {
         </motion.div>
 
         {/* Contact links — stagger 2, 3, 4 individually */}
-        <div style={{ display: "flex", flexDirection: "column", gap: 7 }}>
+        <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
           {([
             { icon: <EmailIcon />, label: "melvinjoshy5@gmail.com", href: "mailto:melvinjoshy5@gmail.com" },
             { icon: <LinkedInIcon />, label: "linkedin.com/in/melvin-joshy", href: "https://www.linkedin.com/in/melvin-joshy/" },
@@ -265,7 +265,7 @@ function ContactRow({ icon, label, href }: { icon: React.ReactNode; label: strin
       </span>
       <span style={{
         fontFamily: "var(--font-mono, monospace)",
-        fontSize: 10, letterSpacing: "0.1em",
+        fontSize: 13, letterSpacing: "0.08em",
         color: hovered ? "rgba(255,255,255,1)" : "rgba(255,255,255,0.82)",
         transition: "color 0.18s",
         textDecoration: hovered ? "underline" : "none",
@@ -328,7 +328,7 @@ function Barcode() {
       </div>
       <p style={{
         fontFamily: "var(--font-mono, monospace)",
-        fontSize: 6.5, letterSpacing: "0.2em",
+        fontSize: 8, letterSpacing: "0.2em",
         color: "rgba(255,255,255,0.25)",
         textAlign: "center", margin: 0,
       }}>
@@ -340,7 +340,7 @@ function Barcode() {
 
 function EmailIcon() {
   return (
-    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
       <rect x="2" y="4" width="20" height="16" rx="2" />
       <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
     </svg>
@@ -349,7 +349,7 @@ function EmailIcon() {
 
 function LinkedInIcon() {
   return (
-    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
       <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z" />
       <rect width="4" height="12" x="2" y="9" />
       <circle cx="4" cy="4" r="2" />
@@ -359,7 +359,7 @@ function LinkedInIcon() {
 
 function XIcon() {
   return (
-    <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
       <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.746l7.73-8.835L1.254 2.25H8.08l4.253 5.622 5.911-5.622Zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
     </svg>
   );

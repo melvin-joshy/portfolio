@@ -176,7 +176,10 @@ export function ScribbleUnderline({
 }: ScribbleUnderlineProps) {
   const pool = underlineOnly ? UNDER_IDX : ALL_IDX;
   const [hovered, setHovered] = useState(false);
-  const [idx, setIdx] = useState(() => pool[Math.floor(Math.random() * pool.length)]);
+  // Deterministic initial index so server and client render the same path (no
+  // hydration mismatch). The underline is invisible until hover, and handleEnter
+  // randomises the scribble on each hover, so variety is preserved.
+  const [idx, setIdx] = useState(pool[0]);
   const lastRef = useRef(idx);
 
   function handleEnter() {
