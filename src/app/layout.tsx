@@ -3,6 +3,7 @@ import { Bebas_Neue, Caveat, Pixelify_Sans, Spectral } from "next/font/google";
 import "./globals.css";
 import RouteTransition from "@/components/RouteTransition";
 import CustomCursor from "@/components/CustomCursor";
+import MelvinAI from "@/components/MelvinAI";
 
 // Self-hosted via next/font — no render-blocking @import, no extra round-trips,
 // no layout shift. Variables match the names used across globals.css/components.
@@ -55,7 +56,11 @@ export default function RootLayout({
     <html lang="en" className={fontVars}>
       <body className="antialiased">
         <CustomCursor />
-        <RouteTransition>{children}</RouteTransition>
+        {/* Site shell — shifts left when the Melvin AI panel is docked (see .mj-shell). */}
+        <div id="mj-shell" className="mj-shell">
+          <RouteTransition>{children}</RouteTransition>
+        </div>
+        <MelvinAI />
       </body>
     </html>
   );

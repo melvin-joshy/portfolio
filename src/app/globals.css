@@ -65,6 +65,19 @@ button:active {
   min-height: 620px;
 }
 
+/* ── Melvin AI docked side panel ──
+   When the panel is expanded it docks to the right and pushes the page
+   instead of covering it. Only on wide screens — below lg the panel falls
+   back to a full-width overlay so the page isn't crushed. */
+.mj-shell {
+  transition: margin-right 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+@media (min-width: 1600px) {
+  html.mj-docked .mj-shell {
+    margin-right: var(--mj-panel-w, 460px);
+  }
+}
+
 .mj-icon-button {
   min-width: 44px;
   min-height: 44px;
