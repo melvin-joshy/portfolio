@@ -56,7 +56,10 @@ export default function RootLayout({
     <html lang="en" className={fontVars}>
       <body className="antialiased">
         <CustomCursor />
-        <RouteTransition>{children}</RouteTransition>
+        {/* Site shell — shifts left when the Melvin AI panel is docked (see .mj-shell). */}
+        <div id="mj-shell" className="mj-shell">
+          <RouteTransition>{children}</RouteTransition>
+        </div>
         <MelvinAI />
       </body>
     </html>

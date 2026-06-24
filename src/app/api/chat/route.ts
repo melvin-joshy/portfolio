@@ -6,8 +6,9 @@ import { SYSTEM_PROMPT } from "@/lib/melvin-ai";
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-// Free-tier Gemini Flash — plenty for a grounded Q&A bot, $0 within limits.
-const MODEL = "gemini-2.0-flash";
+// Free-tier Gemini Flash-Lite — highest free quota of the flash family, plenty
+// for a grounded Q&A bot. (2.0-flash and 2.5-flash hit free-quota caps fast.)
+const MODEL = "gemini-2.5-flash-lite";
 
 type ChatMessage = { role: "user" | "assistant"; content: string };
 
@@ -105,31 +106,79 @@ export async function POST(req: Request) {
   }
 
   const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+  const MAX_TRIES = 3;
+  const errStatus = (err: unknown): number =>
+    (err as { status?: number })?.status ??
+    (err as { error?: { code?: number } })?.error?.code ?? 0;
 
+  // Open the stream BEFORE returning, pulling the first chunk so transient
+  // failures (503 busy / 429 limit) can be retried and surfaced as a real
+  // error status — which the widget turns into a "Try again" affordance.
+  let iterator: AsyncIterator<{ text?: string }> | null = null;
+  let firstText = "";
+  let lastStatus = 0;
+
+  for (let attempt = 1; attempt <= MAX_TRIES; attempt++) {
+    try {
+      const result = await ai.models.generateContentStream({
+        model: MODEL,
+        contents,
+        config: {
+          systemInstruction: SYSTEM_PROMPT,
+          maxOutputTokens: MAX_OUTPUT_TOKENS,
+          temperature: 0.7,
+          // Disable 2.5-flash "thinking" — fast grounded Q&A, no thinking tokens.
+          thinkingConfig: { thinkingBudget: 0 },
+        },
+      });
+      const it = result[Symbol.asyncIterator]();
+      const first = await it.next(); // transient errors usually surface here
+      iterator = it;
+      if (!first.done) firstText = first.value?.text ?? "";
+      break;
+    } catch (err) {
+      lastStatus = errStatus(err);
+      console.error(`[chat] gemini attempt ${attempt}/${MAX_TRIES} failed (status ${lastStatus}):`,
+        (err as Error)?.message ?? err);
+      // Retry only genuine server hiccups. Do NOT retry 429 (rate limit / quota) —
+      // retrying just burns more quota and makes the limit worse.
+      const transient = lastStatus === 503 || lastStatus === 500 || lastStatus === 0;
+      if (transient && attempt < MAX_TRIES) {
+        await new Promise((r) => setTimeout(r, 500 * attempt));
+        continue;
+      }
+      const msg = lastStatus === 429
+        ? "Melvin AI is fielding a lot of questions right now. Give it a few seconds and try again."
+        : "Melvin AI is briefly unavailable. Please try again, or reach Melvin at melvinjoshy5@gmail.com.";
+      return Response.json({ error: msg }, { status: lastStatus === 429 ? 429 : 503 });
+    }
+  }
+
+  if (!iterator) {
+    return Response.json({ error: "Melvin AI hit a snag. Please try again." }, { status: 503 });
+  }
+
+  const it = iterator;
   const encoder = new TextEncoder();
   const stream = new ReadableStream<Uint8Array>({
     async start(controller) {
       try {
-        const result = await ai.models.generateContentStream({
-          model: MODEL,
-          contents,
-          config: {
-            systemInstruction: SYSTEM_PROMPT,
-            maxOutputTokens: MAX_OUTPUT_TOKENS,
-            temperature: 0.7,
-          },
-        });
-
-        for await (const chunk of result) {
-          const text = chunk.text;
+        if (firstText) controller.enqueue(encoder.encode(firstText));
+        for (;;) {
+          const { done, value } = await it.next();
+          if (done) break;
+          // The `.text` getter can throw on a blocked/empty chunk — treat that
+          // as a mid-stream failure rather than a silent end.
+          let text: string | undefined;
+          try { text = value?.text; } catch { text = undefined; }
           if (text) controller.enqueue(encoder.encode(text));
         }
         controller.close();
-      } catch {
-        controller.enqueue(
-          encoder.encode("Melvin AI hit a snag. Please try again in a moment.")
-        );
-        controller.close();
+      } catch (err) {
+        // Surface the failure as a stream error so the widget shows "Try again"
+        // instead of presenting a silently truncated fragment as a finished reply.
+        console.error("[chat] mid-stream error:", (err as Error)?.message ?? err);
+        controller.error(err);
       }
     },
   });

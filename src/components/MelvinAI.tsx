@@ -6,6 +6,14 @@ import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 type Msg = { role: "user" | "assistant"; content: string; error?: boolean };
 
 const RED = "var(--color-danger, #c0392b)"; // brand token, falls back to hex
+
+// Safety net for the plain-text rule: strip markdown bold/italic markers the
+// model occasionally emits, so "**Clarity**" never shows literal asterisks.
+const stripMd = (s: string): string =>
+  s
+    .replace(/\*\*([^*]+)\*\*/g, "$1")
+    .replace(/__([^_]+)__/g, "$1")
+    .replace(/\*\*/g, "");
 const SUGGESTIONS = [
   "What does Melvin do?",
   "Tell me about Tempo",
@@ -21,6 +29,7 @@ export default function MelvinAI() {
   const [messages, setMessages] = useState<Msg[]>([]);
   const [copiedIdx, setCopiedIdx] = useState<number | null>(null);
   const [launcherHover, setLauncherHover] = useState(false);
+  const [expanded, setExpanded] = useState(false); // compact floating vs full-height side drawer
   const [coarse, setCoarse] = useState(false); // touch devices -> no hover to pause the marquee
   const scrollRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
@@ -37,7 +46,46 @@ export default function MelvinAI() {
     return () => mq.removeEventListener("change", sync);
   }, []);
 
+  // Below lg (tablet + mobile): the panel opens as a full-screen overlay
+  // regardless of compact/expanded — read after mount to avoid hydration mismatch.
+  const [fullScreen, setFullScreen] = useState(false);
+  useEffect(() => {
+    const mq = window.matchMedia("(max-width: 1023px)");
+    const sync = () => setFullScreen(mq.matches);
+    sync();
+    mq.addEventListener("change", sync);
+    return () => mq.removeEventListener("change", sync);
+  }, []);
+
+  // Only dock (push the page) on screens wide enough that the remaining space
+  // still comfortably holds the full-width layout. Below this, the expanded panel
+  // floats as a right-side overlay with a backdrop instead of squeezing the page.
+  const [wide, setWide] = useState(false);
+  useEffect(() => {
+    const mq = window.matchMedia("(min-width: 1600px)");
+    const sync = () => setWide(mq.matches);
+    sync();
+    mq.addEventListener("change", sync);
+    return () => mq.removeEventListener("change", sync);
+  }, []);
+
+  // The panel covers the whole viewport when full-screen OR explicitly expanded.
+  // Drives the close affordance (header ✕ instead of the bottom orb FAB).
+  const covers = fullScreen || expanded;
+  // Expanded but NOT docked and NOT full-screen -> right-side overlay (needs backdrop).
+  const overlayPanel = open && expanded && !fullScreen && !wide;
+
   const staticChips = !!reducedMotion || coarse; // static, tappable suggestions
+
+  // Dock the page when expanded: push the site shell left (wide screens only,
+  // handled in CSS) instead of covering it. Class is the single source of truth.
+  useEffect(() => {
+    const docked = open && expanded && !fullScreen && wide;
+    const root = document.documentElement;
+    root.style.setProperty("--mj-panel-w", "min(460px, 100vw)");
+    root.classList.toggle("mj-docked", docked);
+    return () => root.classList.remove("mj-docked");
+  }, [open, expanded, fullScreen, wide]);
 
   // Keep the transcript pinned to the latest message.
   useEffect(() => {
@@ -48,7 +96,7 @@ export default function MelvinAI() {
   const wasOpen = useRef(false);
   useEffect(() => {
     if (open) inputRef.current?.focus();
-    else if (wasOpen.current) launcherRef.current?.focus();
+    else { if (wasOpen.current) launcherRef.current?.focus(); setExpanded(false); }
     wasOpen.current = open;
   }, [open]);
 
@@ -111,7 +159,7 @@ export default function MelvinAI() {
         const { done, value } = await reader.read();
         if (done) break;
         acc += decoder.decode(value, { stream: true });
-        setMessages((m) => { const c = [...m]; c[c.length - 1] = { role: "assistant", content: acc }; return c; });
+        setMessages((m) => { const c = [...m]; c[c.length - 1] = { role: "assistant", content: stripMd(acc) }; return c; });
       }
     } catch (err) {
       if ((err as Error)?.name === "AbortError") {
@@ -161,10 +209,14 @@ export default function MelvinAI() {
       {/* ── Launcher — round dot-matrix orb FAB. Hidden while the panel is open
             so the header ✕ is the single close control (no duplicate). ── */}
       <motion.div
-        className="group fixed bottom-5 right-5 z-[700] flex items-center gap-3"
+        className="group fixed bottom-5 right-5 z-[720] flex items-center gap-3"
         initial={{ opacity: 0, y: 16, scale: 0.8 }}
-        animate={{ opacity: 1, y: 0, scale: 1 }}
+        // Hidden whenever the panel covers the viewport (docked drawer or full-screen
+        // overlay) — close lives in the header there, so it can't collide with the
+        // composer's send button.
+        animate={{ opacity: open && covers ? 0 : 1, y: 0, scale: open && covers ? 0.6 : 1 }}
         transition={{ duration: 0.28, ease: [0.16, 1, 0.3, 1] }}
+        style={{ pointerEvents: open && covers ? "none" : "auto" }}
         onMouseEnter={() => setLauncherHover(true)}
         onMouseLeave={() => setLauncherHover(false)}
       >
@@ -187,6 +239,7 @@ export default function MelvinAI() {
           type="button"
           aria-label={open ? "Close Melvin AI" : "Open Melvin AI chat"}
           aria-expanded={open}
+          tabIndex={open && covers ? -1 : 0}
           onClick={() => setOpen((o) => !o)}
           className="relative h-[58px] w-[58px] shrink-0 cursor-pointer rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/50 focus-visible:ring-offset-2 focus-visible:ring-offset-black"
         >
@@ -234,6 +287,24 @@ export default function MelvinAI() {
         </button>
       </motion.div>
 
+      {/* Backdrop — only for the right-side overlay panel (mid-size desktop, not
+          docked and not full-screen). Makes the overlap read as intentional and
+          gives a click-away close. */}
+      <AnimatePresence>
+        {overlayPanel && (
+          <motion.div
+            className="fixed inset-0 z-[690]"
+            style={{ background: "rgba(0,0,0,0.5)", backdropFilter: "blur(1px)" }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.25 }}
+            onClick={() => setOpen(false)}
+            aria-hidden
+          />
+        )}
+      </AnimatePresence>
+
       {/* ── Panel ── */}
       <AnimatePresence>
         {open && (
@@ -242,13 +313,28 @@ export default function MelvinAI() {
             role="dialog"
             aria-modal="true"
             aria-label="Melvin AI chat"
-            className="fixed bottom-24 right-5 z-[700] flex w-[calc(100vw-2.5rem)] max-w-[380px] flex-col overflow-hidden rounded-[26px]"
+            className="fixed z-[700] flex flex-col overflow-hidden"
             style={{
-              height: "min(560px, calc(100vh - 7rem))",
-              // Sits on the site's #0a0a0a ink, with only a hair of lift at the top.
+              // Geometry switches between the compact floating panel and a full-height
+              // side drawer; CSS-transitioned so the expand/collapse animates smoothly.
+              ...(fullScreen
+                ? { top: 0, right: 0, bottom: 0, left: 0, width: "100vw", height: "100dvh", borderRadius: 0 }
+                : expanded
+                ? { right: 0, bottom: 0, width: "min(460px, 100vw)", height: "100dvh", borderRadius: 0 }
+                : {
+                    right: 20,
+                    bottom: 96,
+                    width: "min(380px, calc(100vw - 40px))",
+                    height: "min(560px, calc(100vh - 7rem))",
+                    borderRadius: 26,
+                  }),
               background: "linear-gradient(180deg, #0d0d0d 0%, #090909 60%, #070707 100%)",
-              border: "1px solid rgba(255,255,255,0.08)",
-              boxShadow: "0 40px 100px -20px rgba(0,0,0,0.95), inset 0 1px 0 rgba(255,255,255,0.06)",
+              border: "1px solid rgba(255,255,255,0.12)",
+              boxShadow: expanded
+                ? "-24px 0 80px -24px rgba(0,0,0,0.85)"
+                : "0 40px 100px -20px rgba(0,0,0,0.95), inset 0 1px 0 rgba(255,255,255,0.06)",
+              transition:
+                "width 0.35s cubic-bezier(0.16,1,0.3,1), height 0.35s cubic-bezier(0.16,1,0.3,1), right 0.35s cubic-bezier(0.16,1,0.3,1), bottom 0.35s cubic-bezier(0.16,1,0.3,1), border-radius 0.35s cubic-bezier(0.16,1,0.3,1)",
             }}
             initial={{ opacity: 0, y: 24, scale: 0.96 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -256,10 +342,7 @@ export default function MelvinAI() {
             transition={{ duration: 0.32, ease: [0.16, 1, 0.3, 1] }}
           >
             {/* Header */}
-            <div
-              className="flex items-center justify-between px-5 py-3.5"
-              style={{ borderBottom: "1px solid rgba(255,255,255,0.08)" }}
-            >
+            <div className="flex items-center justify-between px-5 py-3.5">
               <div className="flex items-center gap-2.5">
                 <Orb size={28} cols={14} decor={false} maskSrc="/racoon%20hi.webp" still={!!reducedMotion} />
                 <div className="leading-tight">
@@ -274,7 +357,43 @@ export default function MelvinAI() {
                   </p>
                 </div>
               </div>
-              {/* Close lives in the bottom orb FAB (it morphs to ✕ when open). */}
+              {/* Right controls: expand/collapse (hidden on full-screen, where it's
+                  moot), plus a close ✕ whenever the panel covers the viewport
+                  (the bottom orb FAB is hidden then, so this is the only close). */}
+              <div className="flex items-center gap-0.5">
+                {!fullScreen && (
+                  <button
+                    type="button"
+                    aria-label={expanded ? "Collapse chat" : "Expand chat to side drawer"}
+                    title={expanded ? "Collapse" : "Expand"}
+                    onClick={() => setExpanded((e) => !e)}
+                    className="flex h-8 w-8 items-center justify-center rounded-full text-white/45 transition-colors hover:bg-white/5 hover:text-white cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40"
+                  >
+                    {expanded ? (
+                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                        <path d="M8 3v3a2 2 0 0 1-2 2H3M21 8h-3a2 2 0 0 1-2-2V3M16 21v-3a2 2 0 0 1 2-2h3M3 16h3a2 2 0 0 1 2 2v3" />
+                      </svg>
+                    ) : (
+                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                        <path d="M8 3H5a2 2 0 0 0-2 2v3M21 8V5a2 2 0 0 0-2-2h-3M16 21h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3" />
+                      </svg>
+                    )}
+                  </button>
+                )}
+                {covers && (
+                  <button
+                    type="button"
+                    aria-label="Close Melvin AI"
+                    title="Close"
+                    onClick={() => setOpen(false)}
+                    className="flex h-8 w-8 items-center justify-center rounded-full text-white/45 transition-colors hover:bg-white/5 hover:text-white cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40"
+                  >
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" aria-hidden>
+                      <path d="M18 6 6 18M6 6l12 12" />
+                    </svg>
+                  </button>
+                )}
+              </div>
             </div>
 
             {/* Body */}
@@ -337,7 +456,19 @@ export default function MelvinAI() {
                   {messages.map((m, i) => {
                     const isUser = m.role === "user";
                     const isLast = i === messages.length - 1;
+                    const isLoading = !isUser && !m.content && busy && isLast;
                     const showTools = !isUser && !!m.content && !(busy && isLast);
+
+                    // Loading: bare pixel-wave + a rotating witty subtext, no bubble.
+                    if (isLoading) {
+                      return (
+                        <div key={i} className="flex items-center gap-3 py-1 pl-1.5">
+                          <Dots still={!!reducedMotion} />
+                          <LoadingHint still={!!reducedMotion} />
+                        </div>
+                      );
+                    }
+
                     return (
                       <div key={i} className={`group flex flex-col ${isUser ? "items-end" : "items-start"}`}>
                         <div
@@ -353,18 +484,28 @@ export default function MelvinAI() {
                                 }
                           }
                         >
-                          {m.content || (busy && isLast ? <Dots /> : "")}
+                          {m.content}
                         </div>
 
                         {showTools && (
                           <div className="mt-0.5 flex items-center gap-1 pl-1">
                             <button
                               type="button"
-                              aria-label="Copy reply"
+                              aria-label={copiedIdx === i ? "Copied" : "Copy reply"}
+                              title={copiedIdx === i ? "Copied" : "Copy"}
                               onClick={() => copyMsg(i, m.content)}
-                              className="inline-flex min-h-[32px] items-center px-1.5 py-1 text-[10px] uppercase tracking-[0.18em] text-white/35 transition-colors hover:text-white/80 cursor-pointer focus-visible:outline-none focus-visible:text-white/80"
+                              className="inline-flex h-8 w-8 items-center justify-center text-white/35 transition-colors hover:text-white/80 cursor-pointer focus-visible:outline-none focus-visible:text-white/80"
                             >
-                              {copiedIdx === i ? "Copied" : "Copy"}
+                              {copiedIdx === i ? (
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                                  <path d="M20 6 9 17l-5-5" />
+                                </svg>
+                              ) : (
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                                  <rect x="9" y="9" width="12" height="12" rx="2" />
+                                  <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+                                </svg>
+                              )}
                             </button>
                             {m.error && !busy && (
                               <button
@@ -388,7 +529,7 @@ export default function MelvinAI() {
             {/* Composer */}
             <form
               onSubmit={(e) => { e.preventDefault(); send(input); }}
-              className="px-3 pb-3 pt-2"
+              className="px-3 pb-3 pt-3"
             >
               {/* Concentric radius: panel 26px − 12px padding = 14px inner. */}
               <div
@@ -616,16 +757,83 @@ function Sep() {
   return <span aria-hidden className="select-none text-[10px] text-white/20">✱</span>;
 }
 
-function Dots() {
+// Small witty subtexts that cycle while a reply is loading. On-brand
+// (raccoon, pixels, design, transit) — British spelling, no em dashes.
+const LOADING_HINTS = [
+  "Consulting the raccoon",
+  "Digging through case studies",
+  "Pixel-pushing an answer",
+  "Rifling through the archives",
+  "Rummaging for the good bits",
+  "Checking Melvin's notes",
+  "Warming up the dot matrix",
+  "Tracing the route lines",
+  "Brewing a proper answer",
+  "Finding the pattern underneath",
+];
+
+function LoadingHint({ still = false }: { still?: boolean }) {
+  const [i, setI] = useState(0);
+  useEffect(() => {
+    setI(Math.floor(Math.random() * LOADING_HINTS.length)); // fresh start each load
+    if (still) return;
+    const id = setInterval(() => setI((p) => (p + 1) % LOADING_HINTS.length), 1900);
+    return () => clearInterval(id);
+  }, [still]);
+
   return (
-    <span className="inline-flex gap-1 py-1" aria-label="Melvin AI is typing">
-      {[0, 1, 2].map((i) => (
-        <motion.span
-          key={i}
-          className="h-1.5 w-1.5 rounded-full bg-white/50"
-          animate={{ opacity: [0.3, 1, 0.3] }}
-          transition={{ duration: 1, repeat: Infinity, delay: i * 0.18 }}
-        />
+    <AnimatePresence mode="wait">
+      <motion.span
+        key={i}
+        className="select-none text-[9px] uppercase tracking-[0.22em] text-white/30"
+        style={{ fontFamily: "var(--font-mono, monospace)" }}
+        initial={{ opacity: 0, y: 3 }}
+        animate={{ opacity: 1, y: 0 }}
+        exit={{ opacity: 0, y: -3 }}
+        transition={{ duration: 0.25 }}
+      >
+        {LOADING_HINTS[i]}…
+      </motion.span>
+    </AnimatePresence>
+  );
+}
+
+// Typing indicator: a 2x6 grid of red pixel dots flickering on/off in an
+// organic (seeded-random) wave. Seeded so it's stable across renders.
+const DOTS_COLS = 6, DOTS_ROWS = 2;
+const dotsRand = (() => {
+  let s = 0x9e3779b9; // fixed seed -> deterministic, no hydration drift
+  return () => {
+    s = Math.imul(s ^ (s >>> 15), s | 1);
+    s ^= s + Math.imul(s ^ (s >>> 7), s | 61);
+    return ((s ^ (s >>> 14)) >>> 0) / 4294967296;
+  };
+})();
+const DOTS_WAVE = Array.from({ length: DOTS_ROWS * DOTS_COLS }, (_, k) => ({
+  // a faint left-to-right lean + a big random scatter, so it reads as a wave
+  // but never marches in lockstep
+  delay: ((k % DOTS_COLS) * 0.05) + dotsRand() * 1.4,
+  dur: 0.8 + dotsRand() * 0.9,
+  min: 0.06 + dotsRand() * 0.12,
+}));
+
+function Dots({ still = false }: { still?: boolean }) {
+  return (
+    <span className="inline-flex flex-col gap-[5px]" role="status" aria-label="Melvin AI is typing">
+      {Array.from({ length: DOTS_ROWS }, (_, r) => (
+        <span key={r} className="flex gap-[5px]">
+          {Array.from({ length: DOTS_COLS }, (_, c) => {
+            const w = DOTS_WAVE[r * DOTS_COLS + c];
+            return (
+              <motion.span
+                key={c}
+                style={{ width: 5, height: 5, background: "#ef2626", boxShadow: "0 0 5px rgba(239,38,38,0.6)" }}
+                animate={still ? { opacity: 0.55 } : { opacity: [w.min, 1, w.min] }}
+                transition={still ? undefined : { duration: w.dur, repeat: Infinity, ease: "easeInOut", delay: w.delay }}
+              />
+            );
+          })}
+        </span>
       ))}
     </span>
   );
