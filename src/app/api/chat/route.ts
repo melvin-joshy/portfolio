@@ -6,9 +6,15 @@ import { SYSTEM_PROMPT } from "@/lib/melvin-ai";
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-// Free-tier Gemini Flash-Lite — highest free quota of the flash family, plenty
-// for a grounded Q&A bot. (2.0-flash and 2.5-flash hit free-quota caps fast.)
-const MODEL = "gemini-2.5-flash-lite";
+// Free-tier Gemini fallback chain. Each model has its OWN quota bucket, so when
+// one is rate-limited (429) or overloaded (503) we fall through to the next.
+// This keeps the bot answering even when a single model is exhausted/busy.
+const MODELS = [
+  "gemini-2.5-flash-lite", // highest free quota — primary
+  "gemini-2.5-flash",      // reliable fallback
+  "gemini-2.0-flash",      // separate bucket
+  "gemini-flash-latest",   // last resort
+];
 
 type ChatMessage = { role: "user" | "assistant"; content: string };
 
@@ -106,56 +112,63 @@ export async function POST(req: Request) {
   }
 
   const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
-  const MAX_TRIES = 3;
   const errStatus = (err: unknown): number =>
     (err as { status?: number })?.status ??
     (err as { error?: { code?: number } })?.error?.code ?? 0;
 
-  // Open the stream BEFORE returning, pulling the first chunk so transient
-  // failures (503 busy / 429 limit) can be retried and surfaced as a real
-  // error status — which the widget turns into a "Try again" affordance.
+  // thinkingConfig only applies to 2.5 "thinking" models; sending it to others
+  // can be rejected, so build the config per model.
+  const configFor = (model: string) => ({
+    systemInstruction: SYSTEM_PROMPT,
+    maxOutputTokens: MAX_OUTPUT_TOKENS,
+    temperature: 0.7,
+    ...(model.includes("2.5") ? { thinkingConfig: { thinkingBudget: 0 } } : {}),
+  });
+
+  // Open the stream BEFORE returning, pulling the first chunk so failures surface
+  // here (as a real error status the widget turns into "Try again"). Walk the
+  // model fallback chain: retry the SAME model only on a transient hiccup
+  // (503/500/network); on 429 (quota) move straight to the next model's bucket.
   let iterator: AsyncIterator<{ text?: string }> | null = null;
   let firstText = "";
   let lastStatus = 0;
+  const RETRY_TRANSIENT = 1; // extra same-model retries for a pure 503/500
 
-  for (let attempt = 1; attempt <= MAX_TRIES; attempt++) {
-    try {
-      const result = await ai.models.generateContentStream({
-        model: MODEL,
-        contents,
-        config: {
-          systemInstruction: SYSTEM_PROMPT,
-          maxOutputTokens: MAX_OUTPUT_TOKENS,
-          temperature: 0.7,
-          // Disable 2.5-flash "thinking" — fast grounded Q&A, no thinking tokens.
-          thinkingConfig: { thinkingBudget: 0 },
-        },
-      });
-      const it = result[Symbol.asyncIterator]();
-      const first = await it.next(); // transient errors usually surface here
-      iterator = it;
-      if (!first.done) firstText = first.value?.text ?? "";
-      break;
-    } catch (err) {
-      lastStatus = errStatus(err);
-      console.error(`[chat] gemini attempt ${attempt}/${MAX_TRIES} failed (status ${lastStatus}):`,
-        (err as Error)?.message ?? err);
-      // Retry only genuine server hiccups. Do NOT retry 429 (rate limit / quota) —
-      // retrying just burns more quota and makes the limit worse.
-      const transient = lastStatus === 503 || lastStatus === 500 || lastStatus === 0;
-      if (transient && attempt < MAX_TRIES) {
-        await new Promise((r) => setTimeout(r, 500 * attempt));
-        continue;
+  outer:
+  for (const model of MODELS) {
+    for (let attempt = 0; attempt <= RETRY_TRANSIENT; attempt++) {
+      try {
+        const result = await ai.models.generateContentStream({
+          model,
+          contents,
+          config: configFor(model),
+        });
+        const it = result[Symbol.asyncIterator]();
+        const first = await it.next(); // transient errors usually surface here
+        iterator = it;
+        if (!first.done) firstText = first.value?.text ?? "";
+        break outer;
+      } catch (err) {
+        lastStatus = errStatus(err);
+        console.error(`[chat] ${model} failed (status ${lastStatus}):`,
+          (err as Error)?.message ?? err);
+        // Retry the same model once for a pure overload/hiccup; otherwise (incl.
+        // 429 quota) fall through to the next model in the chain.
+        const transient = lastStatus === 503 || lastStatus === 500 || lastStatus === 0;
+        if (transient && attempt < RETRY_TRANSIENT) {
+          await new Promise((r) => setTimeout(r, 400));
+          continue;
+        }
+        break; // next model
       }
-      const msg = lastStatus === 429
-        ? "Melvin AI is fielding a lot of questions right now. Give it a few seconds and try again."
-        : "Melvin AI is briefly unavailable. Please try again, or reach Melvin at melvinjoshy5@gmail.com.";
-      return Response.json({ error: msg }, { status: lastStatus === 429 ? 429 : 503 });
     }
   }
 
   if (!iterator) {
-    return Response.json({ error: "Melvin AI hit a snag. Please try again." }, { status: 503 });
+    const msg = lastStatus === 429
+      ? "Melvin AI is fielding a lot of questions right now. Give it a few seconds and try again."
+      : "Melvin AI is briefly unavailable. Please try again, or reach Melvin at melvinjoshy5@gmail.com.";
+    return Response.json({ error: msg }, { status: lastStatus === 429 ? 429 : 503 });
   }
 
   const it = iterator;
