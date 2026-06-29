@@ -69,6 +69,17 @@ export default function MelvinAI() {
     return () => mq.removeEventListener("change", sync);
   }, []);
 
+  // Hide the launcher while the home intro animation is playing (page.tsx
+  // broadcasts this). The intro only renders on the home route, so elsewhere
+  // the flag stays false and the launcher shows normally.
+  const [introActive, setIntroActive] = useState(false);
+  useEffect(() => {
+    if ((window as Window & { __mjIntroActive?: boolean }).__mjIntroActive) setIntroActive(true);
+    const onIntro = (e: Event) => setIntroActive(!!(e as CustomEvent).detail?.active);
+    window.addEventListener("mj:intro", onIntro as EventListener);
+    return () => window.removeEventListener("mj:intro", onIntro as EventListener);
+  }, []);
+
   // The panel covers the whole viewport when full-screen OR explicitly expanded.
   // Drives the close affordance (header ✕ instead of the bottom orb FAB).
   const covers = fullScreen || expanded;
@@ -207,7 +218,8 @@ export default function MelvinAI() {
   return (
     <>
       {/* ── Launcher — round dot-matrix orb FAB. Hidden while the panel is open
-            so the header ✕ is the single close control (no duplicate). ── */}
+            (header ✕ is the single close control) and while the home intro plays. ── */}
+      {!introActive && (
       <motion.div
         className="group fixed bottom-5 right-5 z-[720] flex items-center gap-3"
         initial={{ opacity: 0, y: 16, scale: 0.8 }}
@@ -286,6 +298,7 @@ export default function MelvinAI() {
 
         </button>
       </motion.div>
+      )}
 
       {/* Backdrop — only for the right-side overlay panel (mid-size desktop, not
           docked and not full-screen). Makes the overlap read as intentional and

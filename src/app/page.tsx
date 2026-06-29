@@ -24,6 +24,14 @@ export default function Home() {
     }
   }, []);
 
+  // Tell the Melvin AI launcher (mounted up in layout.tsx) whether the intro is
+  // currently on screen, so it can stay hidden until the intro finishes.
+  useEffect(() => {
+    const active = !introDone;
+    (window as Window & { __mjIntroActive?: boolean }).__mjIntroActive = active;
+    window.dispatchEvent(new CustomEvent("mj:intro", { detail: { active } }));
+  }, [introDone]);
+
   const handleRevealStart = useCallback(() => setHeroLive(true), []);
   const handleIntroDone = useCallback(() => {
     sessionStorage.setItem("intro_played", "1");
