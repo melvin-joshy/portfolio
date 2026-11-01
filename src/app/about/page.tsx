@@ -5,6 +5,7 @@ import { motion, AnimatePresence, useMotionValue, useSpring } from "framer-motio
 import { useRouteTransition } from "@/components/RouteTransition";
 import { ScribbleUnderline } from "@/components/ScribbleUnderline";
 import ContactCard from "@/components/ContactCard";
+import CraftedLine from "@/components/CraftedLine";
 
 function Clock() {
   const [t, setT] = useState("");
@@ -258,6 +259,19 @@ export default function AboutPage() {
                 product designer
               </em>{" "}
               who actually ships :)
+            </motion.p>
+            <motion.p
+              style={{
+                marginTop: 14,
+                fontSize: "clamp(13px, 1.1vw, 15px)",
+                lineHeight: 1.6,
+                color: "rgba(0,0,0,0.5)",
+              }}
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.35, ease: EASE, delay: 0.18 }}
+            >
+              I like making ideas real. Always curious. Often building. Never quite done.
             </motion.p>
           </div>
         </div>
@@ -538,8 +552,7 @@ export default function AboutPage() {
             <div style={{ minHeight: 420, padding: "80px 64px", display: "flex", flexDirection: "column", justifyContent: "flex-end" }}>
               <p style={{ fontSize: 8, letterSpacing: "0.22em", textTransform: "uppercase", color: "rgba(255,255,255,0.38)", marginBottom: 8 }}>© 2026 Melvin Joshy</p>
               <p style={{ fontSize: 8, letterSpacing: "0.22em", textTransform: "uppercase", color: "rgba(255,255,255,0.22)", marginBottom: 8 }}>
-                Crafted with{" "}
-                <span style={{ color: "#c0392b", fontFamily: "var(--font-mono)", letterSpacing: 0, textTransform: "none" }}>:&gt;</span>
+                <CraftedLine />
               </p>
               <a href="mailto:melvinjoshy5@gmail.com" style={{ fontSize: 8, letterSpacing: "0.22em", textTransform: "uppercase", color: "rgba(255,255,255,0.38)", textDecoration: "none" }}>
                 melvinjoshy5@gmail.com

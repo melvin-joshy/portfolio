@@ -6,6 +6,7 @@ import { motion } from "framer-motion";
 import { ScribbleUnderline } from "@/components/ScribbleUnderline";
 import { useRouteTransition } from "@/components/RouteTransition";
 import ContactCard from "@/components/ContactCard";
+import CraftedLine from "@/components/CraftedLine";
 
 function Clock() {
   const [t, setT] = useState("");
@@ -90,8 +91,7 @@ export function ProjectChrome({ children }: { children: React.ReactNode }) {
       >
         <p className="text-[8px] tracking-[0.2em] uppercase text-white/55">© 2026 Melvin Joshy</p>
         <p className="text-[8px] tracking-[0.2em] uppercase text-white/40">
-          Crafted with{" "}
-          <span style={{ color: "#c0392b", fontFamily: "var(--font-mono)", letterSpacing: "0", textTransform: "none" }}>:&gt;</span>
+          <CraftedLine />
         </p>
         <a
           href="mailto:melvinjoshy5@gmail.com"

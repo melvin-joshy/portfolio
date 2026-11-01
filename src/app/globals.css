@@ -137,3 +137,8 @@ button:active {
 .scrollbar-hide::-webkit-scrollbar {
   display: none;
 }
+
+/* Footer typewriter caret */
+@keyframes mj-caret-blink { 50% { opacity: 0; } }
+.mj-caret-blink { animation: mj-caret-blink 1s step-end infinite; }
+@media (prefers-reduced-motion: reduce) { .mj-caret-blink { animation: none; } }

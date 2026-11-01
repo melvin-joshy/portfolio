@@ -181,7 +181,7 @@ export const projects: Project[] = [
     kind: "case-study",
     id: "clarity",
     name: "CLARITY",
-    tag: "Voice AI · Personal Project · 2025",
+    tag: "Voice Journaling App · Personal Project · 2025",
     year: "2025",
     description:
       "Voice-first AI journaling that captures thoughts freely and organises them into life themes.",
@@ -259,168 +259,6 @@ export const projects: Project[] = [
       "The native app exists for one reason: a home screen widget. The PWA still makes you open an app; a widget collapses that to one tap from the home screen, mic open, speak, done. That's the version of Clarity that changes how people capture.",
     outcome:
       "Live PWA, used daily and in active testing with early users. The native app is in progress, with the widget as the goal. Built because I needed it.",
-  },
-  {
-    kind: "client",
-    id: "marys-land-farm",
-    name: "MARY'S LAND FARM",
-    tag: "Booking & Operations Platform · 2025–Present",
-    year: "2025–Present",
-    description: "They came to replace one tool. They left with one platform that replaced seven.",
-    bg: "linear-gradient(155deg, #2a3a1e 0%, #161f0f 55%, #080c06 100%)",
-    accent: "#7c8f4a",
-    cover: "/Marysfarm -cover.webp",
-    heroImage: "/Marysfarm -cover.webp",
-    client: "Mary's Land Farm",
-    role: "Sole Designer",
-    scope: ["End-to-end admin platform"],
-    industry: "Farm Experiences · Hospitality",
-    deliverables: ["Live · Tempo YC S23"],
-    overview:
-      "Mary's Land Farm runs farm experiences across multiple locations: alpaca encounters, cooking classes, barn stays, weddings. The brief was to replace Roller, their booking backend.\n\nMapping how the team actually worked, I found seven tools doing the job of one, and no single view of the business. So I made the case to replace all seven with one platform.",
-    problem:
-      "Each tool did its job; the problem was the gaps between them. A single guest message meant four context switches: read it in Wavelength, open Roller to find the booking, copy the details, switch back to reply.\n\nThe platform had to close those gaps, not compete with the tools.",
-    problemImage: "/Marysfarm -problem.webp",
-    goals: [
-      "No context switching: every decision made without opening another tab.",
-      "One source of truth: bookings, messages, experiences, and reports in one system.",
-      "Role-based access: each employee sees exactly what they need, nothing more.",
-    ],
-    approach:
-      "One constraint drove every screen: the information to make a decision had to live where the work was happening, not a click away, not in another app. Every tool-switch the team used to make became a panel instead.",
-    solutionBlocks: [
-      {
-        index: "01",
-        title: "Appointments, Venues & Rooms",
-        body:
-          "Every experience is an image card: photo, price, duration, capacity, tags. Publishing one auto-creates the customer-facing listing, replacing WordPress. Cards, not a data table: the team sees the product the way a guest does, which keeps decisions grounded.",
-        media: [{ src: "/Marysfarm-1.webp", label: "Experience cards: price, capacity, tags", aspect: "wide" }],
-      },
-      {
-        index: "02",
-        title: "Bookings Management",
-        body:
-          "235 bookings in one table: reference, customer, experience, check-in/out, guests, status, balance, source. The Source column (Web or Admin) replaced manual Excel tracking; filters, calendar view, and Add Booking are always one click away.",
-        media: [{ src: "/Marysfarm-2.webp", label: "235 bookings, one table with Web/Admin source", aspect: "wide" }],
-      },
-      {
-        index: "03",
-        title: "Messaging",
-        body:
-          "Guest SMS lived in Wavelength, so every reply meant four context switches. I built two-way SMS into the platform, with a guest-profile panel showing booking reference, experience, date, and status beside each conversation. Not in the original brief. Should have been.",
-        media: [{ src: "/Marysfarm-3.webp", label: "Messaging with live booking context alongside", aspect: "wide" }],
-      },
-      {
-        index: "04",
-        title: "Notification Templates",
-        body:
-          "The team ran automated emails through SendGrid but couldn't manage templates without technical help; broken formatting and wrong timing were routine. I built a simple editor: rich text, variable insertion, trigger rules (\"24 hours before check-in\"), and a live desktop/mobile preview. They went from filing a request to doing it themselves.",
-        media: [{ src: "/Marysfarm-4.webp", label: "Template editor: variables, triggers, live preview", aspect: "wide" }],
-      },
-      {
-        index: "05",
-        title: "Dashboard",
-        body:
-          "Revenue, bookings, average order value, 12-month trend, today's schedule: one screen. Before, assembling that picture meant opening Excel, Roller, and Google Calendar separately. Quick Actions surface the four most-used tasks; no buried navigation.",
-        media: [{ src: "/Marysfarm-5.webp", label: "Dashboard: the whole business, one screen", aspect: "wide" }],
-      },
-      {
-        index: "06",
-        title: "Reports",
-        body:
-          "The team needed answers about revenue, bookings, and payment status without rebuilding spreadsheets by hand every month. I built a report builder: pick a type, set a date range, choose the fields you need, preview, then export. One place to answer \"how did we do?\", no reconciliation, no spreadsheets.",
-        media: [{ src: "/Marysfarm-6.webp", label: "Report builder: sales summary, fields, live preview", aspect: "wide" }],
-      },
-    ],
-    outcome:
-      "Seven tools replaced by one platform. Live across farm locations, 235+ bookings managed, every employee on one system.",
-    metrics: [
-      { value: "7 → 1", label: "Tools consolidated into one platform" },
-      { value: "235+", label: "Bookings managed" },
-      { value: "Live", label: "Used daily across farm locations" },
-    ],
-    reflection:
-      "The biggest decision wasn't a UI call, it was the scope conversation.\n\nThey asked for a Roller replacement. I mapped their actual workflow first, found seven tools doing the work of one, and made the case to consolidate. That decision changed what we built.\n\nThe messaging panel is where it shows most clearly: a farm host reads a guest message and sees the full booking context (experience, date, status, reference) without leaving the screen. That's the standard every feature gets measured against.",
-    gallery: [],
-  },
-  {
-    kind: "client",
-    id: "ontra",
-    name: "ONTRA",
-    tag: "Multimodal Transit Platform · YC · 2024",
-    year: "2024",
-    description: "Making public transit readable at every zoom level.",
-    bg: "linear-gradient(155deg, #3a2e18 0%, #201a0f 55%, #0c0906 100%)",
-    accent: "#8f7a3a",
-    cover: "/ontra-cover.webp",
-    heroImage: "/ontra-cover.webp",
-    client: "Ontra (YC)",
-    role: "Product Designer",
-    industry: "Transit Technology",
-    scope: ["Trip planner", "Map view", "Iconography"],
-    deliverables: ["Live · YC-backed"],
-    overview:
-      "Ontra is a YC-backed platform helping cities build multimodal transit systems. The public trip planner lets riders plan journeys across bus, rail, and bike using live transit data.\n\nI joined with an existing product. The brief was to redesign the side panel. But redesigning how information is shown in the panel meant redesigning how it's reflected on the map. One component became a connected system.",
-    problem:
-      "Everything had equal visual weight. Every stop looked the same. Every route line had the same treatment. The map didn't react when you selected something in the panel.\n\nTwo things needed fixing: the side panel had no progressive disclosure, and the map was static with no visual connection to user actions.",
-    problemImage: "/ontra-problem.webp",
-    goals: [
-      "Progressive disclosure: a journey timeline riders can read at any depth, from summary to turn-by-turn.",
-      "Map-panel sync: selecting a route in the panel should immediately reflect on the map.",
-      "Iconography system: a consistent visual language across transit modes and zoom levels.",
-    ],
-    approach:
-      "One constraint drove both tracks: a daily commuter and a tourist should use the same interface at different depths. The panel needed progressive disclosure; the map needed to be reactive. Both needed a shared visual language.",
-    solutionBlocks: [
-      {
-        index: "01",
-        title: "Journey Timeline",
-        body: "A full journey timeline breaking every trip into readable segments. Summary at the top: mode icons, total time, visual progress bar. Below that, each segment is collapsible.\n\n\"6 mins, 5 stops\" has a Show Stops toggle. Walking directions collapse to \"Walk 2 mins\" until you need turn-by-turn. A daily commuter never expands. A tourist expands everything. Same interface, different depth.",
-        media: [
-          { src: "/ontra-1.webp", label: "Trip Plan · Collapsed", aspect: "wide" },
-          { src: "/ontra-2.webp", label: "Trip Plan · Expanded with stops", aspect: "wide" },
-        ],
-      },
-      {
-        index: "02",
-        title: "The faded stop pattern",
-        body: "Past stops are faded. Current stop is highlighted. Future stops are full opacity.\n\nNo legend needed. Riders instinctively understand their position. The hierarchy comes from the rider's perspective, not the data's.",
-        media: [{ src: "/ontra-3.webp", label: "Route detail · past / current / future stops", aspect: "wide" }],
-      },
-      {
-        index: "03",
-        title: "Map Iconography System",
-        body: "Bus stops as dark square icons. Current bus position in green, instantly scannable. Each route in its own colour. Icons adapt across zoom levels.\n\nThe hardest part: multiple routes passing through shared stops. Tested outlines, colour blocks, and split indicators. Final solution: individual coloured lines maintaining identity through shared stops. You can trace any route with your finger across the entire map.",
-        media: [
-          { src: "/ontra-4.webp", label: "Map · Route lines and stops", aspect: "wide" },
-        ],
-      },
-      {
-        index: "04",
-        title: "Bike Stations",
-        body: "A completely new layer. The badge answers one question at map level: is it worth walking here? Two numbers side by side: 12 manual, 2 electric. One glance, no tap required.\n\nTapping opens a compact detail: name, distance, counts, free spaces, and a direct deep link to unlock in the Lyft app. Two interactions from \"should I bike?\" to unlocking one.",
-        media: [
-          { src: "/ontra-5.webp", label: "Bike station badges · map view", aspect: "wide" },
-          { src: "/ontra-6.webp", label: "Bike station · detail panel", aspect: "wide" },
-        ],
-      },
-      {
-        index: "05",
-        title: "Map-Panel Sync",
-        body: "Before: selecting a route changed nothing on the map. Panel and map were disconnected.\n\nNow: select a route in the panel, the map highlights it. Active route becomes prominent, others fade. Current bus position appears as a live marker. Walking segments trace in grey. Panel and map are one system.",
-        media: [{ src: "/ontra-7.webp", label: "Trip plan · highlighted route on map", aspect: "wide" }],
-      },
-    ],
-    outcome:
-      "Live trip planner serving Boston and expanding to new cities. Trusted by DC Department of Transportation, City of Fresno, and others. Selected for the 2026 Transit Tech Lab with MTA NYCT and LIRR.",
-    metrics: [
-      { value: "Live", label: "Boston trip planner" },
-      { value: "DC · Fresno", label: "City partners" },
-      { value: "MTA · LIRR", label: "2026 Transit Tech Lab" },
-    ],
-    reflection:
-      "The route line treatment at shared stops.\n\nMultiple routes through one stop is surprisingly hard to show clearly. The final solution lets you trace any single route across the map without losing it, even through intersections with four overlapping routes.\n\nThe kind of detail transit planners notice and daily commuters feel without knowing why.",
-    gallery: [],
   },
   {
     kind: "client",
@@ -712,6 +550,168 @@ export const projects: Project[] = [
         },
       ],
     },
+  },
+  {
+    kind: "client",
+    id: "marys-land-farm",
+    name: "MARY'S LAND FARM",
+    tag: "Booking & Operations Platform · 2025–Present",
+    year: "2025–Present",
+    description: "They came to replace one tool. They left with one platform that replaced seven.",
+    bg: "linear-gradient(155deg, #2a3a1e 0%, #161f0f 55%, #080c06 100%)",
+    accent: "#7c8f4a",
+    cover: "/Marysfarm -cover.webp",
+    heroImage: "/Marysfarm -cover.webp",
+    client: "Mary's Land Farm",
+    role: "Sole Designer",
+    scope: ["End-to-end admin platform"],
+    industry: "Farm Experiences · Hospitality",
+    deliverables: ["Live · Tempo YC S23"],
+    overview:
+      "Mary's Land Farm runs farm experiences across multiple locations: alpaca encounters, cooking classes, barn stays, weddings. The brief was to replace Roller, their booking backend.\n\nMapping how the team actually worked, I found seven tools doing the job of one, and no single view of the business. So I made the case to replace all seven with one platform.",
+    problem:
+      "Each tool did its job; the problem was the gaps between them. A single guest message meant four context switches: read it in Wavelength, open Roller to find the booking, copy the details, switch back to reply.\n\nThe platform had to close those gaps, not compete with the tools.",
+    problemImage: "/Marysfarm -problem.webp",
+    goals: [
+      "No context switching: every decision made without opening another tab.",
+      "One source of truth: bookings, messages, experiences, and reports in one system.",
+      "Role-based access: each employee sees exactly what they need, nothing more.",
+    ],
+    approach:
+      "One constraint drove every screen: the information to make a decision had to live where the work was happening, not a click away, not in another app. Every tool-switch the team used to make became a panel instead.",
+    solutionBlocks: [
+      {
+        index: "01",
+        title: "Appointments, Venues & Rooms",
+        body:
+          "Every experience is an image card: photo, price, duration, capacity, tags. Publishing one auto-creates the customer-facing listing, replacing WordPress. Cards, not a data table: the team sees the product the way a guest does, which keeps decisions grounded.",
+        media: [{ src: "/Marysfarm-1.webp", label: "Experience cards: price, capacity, tags", aspect: "wide" }],
+      },
+      {
+        index: "02",
+        title: "Bookings Management",
+        body:
+          "235 bookings in one table: reference, customer, experience, check-in/out, guests, status, balance, source. The Source column (Web or Admin) replaced manual Excel tracking; filters, calendar view, and Add Booking are always one click away.",
+        media: [{ src: "/Marysfarm-2.webp", label: "235 bookings, one table with Web/Admin source", aspect: "wide" }],
+      },
+      {
+        index: "03",
+        title: "Messaging",
+        body:
+          "Guest SMS lived in Wavelength, so every reply meant four context switches. I built two-way SMS into the platform, with a guest-profile panel showing booking reference, experience, date, and status beside each conversation. Not in the original brief. Should have been.",
+        media: [{ src: "/Marysfarm-3.webp", label: "Messaging with live booking context alongside", aspect: "wide" }],
+      },
+      {
+        index: "04",
+        title: "Notification Templates",
+        body:
+          "The team ran automated emails through SendGrid but couldn't manage templates without technical help; broken formatting and wrong timing were routine. I built a simple editor: rich text, variable insertion, trigger rules (\"24 hours before check-in\"), and a live desktop/mobile preview. They went from filing a request to doing it themselves.",
+        media: [{ src: "/Marysfarm-4.webp", label: "Template editor: variables, triggers, live preview", aspect: "wide" }],
+      },
+      {
+        index: "05",
+        title: "Dashboard",
+        body:
+          "Revenue, bookings, average order value, 12-month trend, today's schedule: one screen. Before, assembling that picture meant opening Excel, Roller, and Google Calendar separately. Quick Actions surface the four most-used tasks; no buried navigation.",
+        media: [{ src: "/Marysfarm-5.webp", label: "Dashboard: the whole business, one screen", aspect: "wide" }],
+      },
+      {
+        index: "06",
+        title: "Reports",
+        body:
+          "The team needed answers about revenue, bookings, and payment status without rebuilding spreadsheets by hand every month. I built a report builder: pick a type, set a date range, choose the fields you need, preview, then export. One place to answer \"how did we do?\", no reconciliation, no spreadsheets.",
+        media: [{ src: "/Marysfarm-6.webp", label: "Report builder: sales summary, fields, live preview", aspect: "wide" }],
+      },
+    ],
+    outcome:
+      "Seven tools replaced by one platform. Live across farm locations, 235+ bookings managed, every employee on one system.",
+    metrics: [
+      { value: "7 → 1", label: "Tools consolidated into one platform" },
+      { value: "235+", label: "Bookings managed" },
+      { value: "Live", label: "Used daily across farm locations" },
+    ],
+    reflection:
+      "The biggest decision wasn't a UI call, it was the scope conversation.\n\nThey asked for a Roller replacement. I mapped their actual workflow first, found seven tools doing the work of one, and made the case to consolidate. That decision changed what we built.\n\nThe messaging panel is where it shows most clearly: a farm host reads a guest message and sees the full booking context (experience, date, status, reference) without leaving the screen. That's the standard every feature gets measured against.",
+    gallery: [],
+  },
+  {
+    kind: "client",
+    id: "ontra",
+    name: "ONTRA",
+    tag: "Multimodal Transit Platform · YC · 2024",
+    year: "2024",
+    description: "Making public transit readable at every zoom level.",
+    bg: "linear-gradient(155deg, #3a2e18 0%, #201a0f 55%, #0c0906 100%)",
+    accent: "#8f7a3a",
+    cover: "/ontra-cover.webp",
+    heroImage: "/ontra-cover.webp",
+    client: "Ontra (YC)",
+    role: "Product Designer",
+    industry: "Transit Technology",
+    scope: ["Trip planner", "Map view", "Iconography"],
+    deliverables: ["Live · YC-backed"],
+    overview:
+      "Ontra is a YC-backed platform helping cities build multimodal transit systems. The public trip planner lets riders plan journeys across bus, rail, and bike using live transit data.\n\nI joined with an existing product. The brief was to redesign the side panel. But redesigning how information is shown in the panel meant redesigning how it's reflected on the map. One component became a connected system.",
+    problem:
+      "Everything had equal visual weight. Every stop looked the same. Every route line had the same treatment. The map didn't react when you selected something in the panel.\n\nTwo things needed fixing: the side panel had no progressive disclosure, and the map was static with no visual connection to user actions.",
+    problemImage: "/ontra-problem.webp",
+    goals: [
+      "Progressive disclosure: a journey timeline riders can read at any depth, from summary to turn-by-turn.",
+      "Map-panel sync: selecting a route in the panel should immediately reflect on the map.",
+      "Iconography system: a consistent visual language across transit modes and zoom levels.",
+    ],
+    approach:
+      "One constraint drove both tracks: a daily commuter and a tourist should use the same interface at different depths. The panel needed progressive disclosure; the map needed to be reactive. Both needed a shared visual language.",
+    solutionBlocks: [
+      {
+        index: "01",
+        title: "Journey Timeline",
+        body: "A full journey timeline breaking every trip into readable segments. Summary at the top: mode icons, total time, visual progress bar. Below that, each segment is collapsible.\n\n\"6 mins, 5 stops\" has a Show Stops toggle. Walking directions collapse to \"Walk 2 mins\" until you need turn-by-turn. A daily commuter never expands. A tourist expands everything. Same interface, different depth.",
+        media: [
+          { src: "/ontra-1.webp", label: "Trip Plan · Collapsed", aspect: "wide" },
+          { src: "/ontra-2.webp", label: "Trip Plan · Expanded with stops", aspect: "wide" },
+        ],
+      },
+      {
+        index: "02",
+        title: "The faded stop pattern",
+        body: "Past stops are faded. Current stop is highlighted. Future stops are full opacity.\n\nNo legend needed. Riders instinctively understand their position. The hierarchy comes from the rider's perspective, not the data's.",
+        media: [{ src: "/ontra-3.webp", label: "Route detail · past / current / future stops", aspect: "wide" }],
+      },
+      {
+        index: "03",
+        title: "Map Iconography System",
+        body: "Bus stops as dark square icons. Current bus position in green, instantly scannable. Each route in its own colour. Icons adapt across zoom levels.\n\nThe hardest part: multiple routes passing through shared stops. Tested outlines, colour blocks, and split indicators. Final solution: individual coloured lines maintaining identity through shared stops. You can trace any route with your finger across the entire map.",
+        media: [
+          { src: "/ontra-4.webp", label: "Map · Route lines and stops", aspect: "wide" },
+        ],
+      },
+      {
+        index: "04",
+        title: "Bike Stations",
+        body: "A completely new layer. The badge answers one question at map level: is it worth walking here? Two numbers side by side: 12 manual, 2 electric. One glance, no tap required.\n\nTapping opens a compact detail: name, distance, counts, free spaces, and a direct deep link to unlock in the Lyft app. Two interactions from \"should I bike?\" to unlocking one.",
+        media: [
+          { src: "/ontra-5.webp", label: "Bike station badges · map view", aspect: "wide" },
+          { src: "/ontra-6.webp", label: "Bike station · detail panel", aspect: "wide" },
+        ],
+      },
+      {
+        index: "05",
+        title: "Map-Panel Sync",
+        body: "Before: selecting a route changed nothing on the map. Panel and map were disconnected.\n\nNow: select a route in the panel, the map highlights it. Active route becomes prominent, others fade. Current bus position appears as a live marker. Walking segments trace in grey. Panel and map are one system.",
+        media: [{ src: "/ontra-7.webp", label: "Trip plan · highlighted route on map", aspect: "wide" }],
+      },
+    ],
+    outcome:
+      "Live trip planner serving Boston and expanding to new cities. Trusted by DC Department of Transportation, City of Fresno, and others. Selected for the 2026 Transit Tech Lab with MTA NYCT and LIRR.",
+    metrics: [
+      { value: "Live", label: "Boston trip planner" },
+      { value: "DC · Fresno", label: "City partners" },
+      { value: "MTA · LIRR", label: "2026 Transit Tech Lab" },
+    ],
+    reflection:
+      "The route line treatment at shared stops.\n\nMultiple routes through one stop is surprisingly hard to show clearly. The final solution lets you trace any single route across the map without losing it, even through intersections with four overlapping routes.\n\nThe kind of detail transit planners notice and daily commuters feel without knowing why.",
+    gallery: [],
   },
   {
     kind: "build",
