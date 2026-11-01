@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Bebas_Neue, Caveat, Pixelify_Sans, Spectral } from "next/font/google";
+import { Bebas_Neue, Caveat, Geist, Geist_Mono, Pixelify_Sans, Spectral } from "next/font/google";
 import "./globals.css";
 import RouteTransition from "@/components/RouteTransition";
 import CustomCursor from "@/components/CustomCursor";
@@ -18,7 +18,10 @@ const spectral = Spectral({
   display: "swap",
 });
 
-const fontVars = `${bebas.variable} ${caveat.variable} ${pixelify.variable} ${spectral.variable}`;
+const geist = Geist({ subsets: ["latin"], variable: "--font-geist", display: "swap" });
+const geistMono = Geist_Mono({ subsets: ["latin"], variable: "--font-geist-mono", display: "swap" });
+
+const fontVars = `${bebas.variable} ${caveat.variable} ${pixelify.variable} ${spectral.variable} ${geist.variable} ${geistMono.variable}`;
 
 export const metadata: Metadata = {
   // Resolves relative OG/icon/canonical URLs to absolute — without this,

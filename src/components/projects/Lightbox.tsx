@@ -3,7 +3,7 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 
-type LightboxItem = { src: string; type?: "video"; caption?: string };
+type LightboxItem = { src: string; type?: "video"; caption?: string; stage?: boolean };
 
 type LightboxCtx = {
   open: (item: LightboxItem) => void;
@@ -12,6 +12,11 @@ type LightboxCtx = {
 const Ctx = createContext<LightboxCtx | null>(null);
 
 const EASE = [0.22, 1, 0.36, 1] as const;
+
+/* Sampled from the cover loop's own background (avg. #d1e8fb) so product
+   screenshots sit on the same soft blue stage the cover video introduces. */
+export const STAGE_BG =
+  "radial-gradient(130% 150% at 18% 8%, #eef6fd 0%, #d1e8fb 50%, #b9d8f0 100%)";
 
 export function useLightbox() {
   return useContext(Ctx);
@@ -83,6 +88,19 @@ export function LightboxProvider({ children }: { children: React.ReactNode }) {
                   className="block rounded-md"
                   style={{ maxHeight: "82vh", maxWidth: "90vw", objectFit: "contain" }}
                 />
+              ) : item.stage ? (
+                <div
+                  className="flex items-center justify-center rounded-md p-8 md:p-14"
+                  style={{ maxHeight: "82vh", maxWidth: "90vw", background: STAGE_BG }}
+                >
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={encodeURI(item.src)}
+                    alt={item.caption ?? ""}
+                    className="block rounded-sm shadow-[0_20px_60px_-24px_rgba(10,25,50,0.5)]"
+                    style={{ maxHeight: "68vh", maxWidth: "80vw", objectFit: "contain" }}
+                  />
+                </div>
               ) : (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img

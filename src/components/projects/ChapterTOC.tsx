@@ -4,7 +4,17 @@ import { useEffect, useState } from "react";
 
 export type TOCItem = { id: string; label: string };
 
-export function ChapterTOC({ title, items }: { title: string; items: TOCItem[] }) {
+export function ChapterTOC({
+  title,
+  items,
+  serifTitle = true,
+}: {
+  title: string;
+  items: TOCItem[];
+  /** The other case-study templates set the panel title in the serif display
+   *  face; the sans story layout opts out to match its own type system. */
+  serifTitle?: boolean;
+}) {
   const [activeId, setActiveId] = useState<string>(items[0]?.id ?? "");
 
   useEffect(() => {
@@ -54,7 +64,10 @@ export function ChapterTOC({ title, items }: { title: string; items: TOCItem[] }
       >
         <p
           className="mb-3 px-2 text-[12px] leading-[1.35] text-white"
-          style={{ fontFamily: "var(--font-serif)", fontWeight: 600 }}
+          style={{
+            fontFamily: serifTitle ? "var(--font-serif)" : "var(--font-geist), var(--font-inter)",
+            fontWeight: 600,
+          }}
         >
           {title}
         </p>
