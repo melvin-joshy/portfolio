@@ -8,7 +8,6 @@ import {
   Compass,
   Eraser,
   Flashlight,
-  Gem,
   Music2,
   PawPrint,
   Paintbrush,
@@ -52,18 +51,18 @@ type ArtifactsProps = {
 };
 
 const ARTIFACTS: ArtifactDef[] = [
-  { id: "theme-switch", title: "SPOTLIGHT", sub: "field scan", Icon: Flashlight, pos: { top: "7%", left: "8%" } },
-  { id: "music-player", title: "MUSIC.PLAYER", sub: "local session", Icon: Music2, pos: { top: "32%", left: "12.5%" } },
-  { id: "raccoon-signal", title: "RACCOON.AI", sub: "status: online", Icon: PawPrint, pos: { top: "56%", left: "7%" } },
-  { id: "sketch-pen", title: "SKETCH.PEN", sub: "ideas.log", Icon: Pencil, pos: { bottom: "22%", left: "22%" } },
-  { id: "archive", title: "MANTRA.LOG", sub: "tap for one", Icon: Quote, pos: { top: "26%", right: "13.5%" } },
-  { id: "origin-point", title: "ORIGIN.POINT", sub: "roots trace", Icon: Compass, pos: { top: "48%", right: "19%" } },
-  { id: "easter-egg", title: "EASTER_EGG.EXE", sub: "do not click", Icon: Bug, pos: { top: "65%", right: "8.5%" } },
+  { id: "theme-switch", title: "Flashlight", sub: "lights out?", Icon: Flashlight, pos: { top: "7%", left: "8%" } },
+  { id: "music-player", title: "Music", sub: "press play", Icon: Music2, pos: { top: "32%", left: "12.5%" } },
+  { id: "raccoon-signal", title: "Raccoon", sub: "say hi", Icon: PawPrint, pos: { top: "56%", left: "7%" } },
+  { id: "sketch-pen", title: "Sketchpad", sub: "doodle something", Icon: Pencil, pos: { bottom: "22%", left: "22%" } },
+  { id: "archive", title: "Mantra", sub: "tap for one", Icon: Quote, pos: { top: "26%", right: "13.5%" } },
+  { id: "origin-point", title: "Origin", sub: "where it started", Icon: Compass, pos: { top: "48%", right: "19%" } },
+  { id: "easter-egg", title: "Don't click", sub: "seriously", Icon: Bug, pos: { top: "65%", right: "8.5%" } },
 ];
 
 function useArtifacts() {
   const [found, setFound] = useState<Set<ArtifactId>>(new Set());
-  const [toastCount, setToastCount] = useState<number | null>(null);
+  const [toast, setToast] = useState<{ count: number; id: ArtifactId } | null>(null);
   const toastTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
@@ -93,8 +92,8 @@ function useArtifacts() {
 
     if (!isNew) return;
     if (toastTimer.current) clearTimeout(toastTimer.current);
-    setToastCount(nextCount);
-    toastTimer.current = setTimeout(() => setToastCount(null), 4500);
+    setToast({ count: nextCount, id });
+    toastTimer.current = setTimeout(() => setToast(null), 4500);
   }, []);
 
   useEffect(() => {
@@ -103,7 +102,7 @@ function useArtifacts() {
     };
   }, []);
 
-  return { found, count: found.size, toastCount, collect };
+  return { found, count: found.size, toast, collect };
 }
 
 function Corners({ size = 6, color }: { size?: number; color: string }) {
@@ -177,22 +176,25 @@ function ArtifactNode({
           bottom: 52,
           left: 0,
           display: "flex",
-          alignItems: "center",
-          gap: 5,
+          alignItems: "baseline",
+          gap: 7,
           pointerEvents: "none",
           whiteSpace: "nowrap",
         }}
         initial={false}
-        animate={{ opacity: hovered ? 0.84 : 0, y: hovered ? 0 : 3 }}
+        animate={{ opacity: hovered ? 1 : 0, y: hovered ? 0 : 3 }}
         transition={{ duration: reducedMotion ? 0 : 0.14 }}
       >
-        <span style={{ width: 10, height: 1, background: "rgba(255,255,255,0.24)" }} />
-        <span style={{ fontFamily: "monospace", fontSize: 7, letterSpacing: "0.15em", color: RED }}>
+        {/* Display font for the name, body sans for the hint — the same two faces as the rest of the site */}
+        <span style={{ fontFamily: "var(--font-bebas)", fontSize: 14, lineHeight: 1, letterSpacing: "0.06em", color: "rgba(255,255,255,0.94)" }}>
           {def.title}
         </span>
-        <span style={{ fontFamily: "monospace", fontSize: 6.5, letterSpacing: "0.12em", color: "rgba(255,255,255,0.36)" }}>
-          {collected ? "FOUND" : def.sub}
-        </span>
+        {collected ? (
+          // Tried already: the raccoon leaves a paw print
+          <PawPrint size={13} color={RED} strokeWidth={1.8} aria-label="tried" style={{ alignSelf: "center" }} />
+        ) : (
+          <span style={{ fontSize: 11, lineHeight: 1, color: "rgba(255,255,255,0.62)" }}>{def.sub}</span>
+        )}
       </motion.div>
 
       <div
@@ -262,105 +264,92 @@ function ArtifactNode({
   );
 }
 
-function Toast({ count }: { count: number }) {
-  const pct = (count / TOTAL) * 100;
+/* Everything is in plain sight, so this isn't a scavenger hunt: it's a tally of curiosity. */
+const CURIOUS_LINES = [
+  "",
+  "You clicked it. Of course you did.",
+  "Two in. You're the curious type.",
+  "Three. You read the fine print too, don't you.",
+  "Four. Past halfway, no turning back.",
+  "Five. At this point it's a habit.",
+  "Six. One left, and you know exactly which.",
+  "Certified curious mind. There's a little something in the nav.",
+];
+
+function Toast({ count, lastId, found }: { count: number; lastId: ArtifactId; found: Set<ArtifactId> }) {
   const done = count === TOTAL;
+  const last = ARTIFACTS.find((a) => a.id === lastId);
+  const reducedMotion = useReducedMotion();
 
   return (
     <motion.div
+      role="status"
+      aria-live="polite"
       className="fixed left-1/2 z-[700] pointer-events-none"
-      style={{ top: 56, x: "-50%", perspective: 800 }}
-      initial={{ opacity: 0, y: -14, rotateX: 18, scale: 0.94 }}
-      animate={{ opacity: 1, y: 0, rotateX: 0, scale: 1 }}
-      exit={{ opacity: 0, y: -10, scale: 0.96, transition: { duration: 0.18, ease: [0.4, 0, 1, 1] } }}
-      transition={{ type: "spring", duration: 0.5, bounce: 0.22 }}
+      style={{ top: 60, x: "-50%" }}
+      initial={{ opacity: 0, y: reducedMotion ? 0 : -8, scale: reducedMotion ? 1 : 0.98 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      exit={{ opacity: 0, y: reducedMotion ? 0 : -6, transition: { duration: 0.16, ease: [0.4, 0, 1, 1] } }}
+      transition={{ duration: 0.32, ease: [0.23, 1, 0.32, 1] }}
     >
-      {/* ── Metallic ID-card shell (shares the ContactCard language) ── */}
+      {/* Same board language as the artifact tiles: square edges, corner brackets, faint dot grid */}
       <div style={{
         position: "relative",
-        width: 320,
-        borderRadius: 8,
-        overflow: "hidden",
-        padding: "13px 16px 14px",
-        background: "linear-gradient(135deg, #1e1614 0%, #341616 26%, #221016 50%, #2c1010 74%, #140a0a 100%)",
-        boxShadow:
-          "0 24px 56px -14px rgba(0,0,0,0.9), " +
-          "0 0 0 1px rgba(255,255,255,0.08), " +
-          "0 0 38px rgba(192,57,43,0.14), " +
-          "inset 0 1px 0 rgba(255,255,255,0.12)",
+        width: 304,
+        padding: "16px 18px 15px",
+        background: "#050505",
+        backgroundImage: "radial-gradient(rgba(255,255,255,0.07) 1px, transparent 1px)",
+        backgroundSize: "12px 12px",
+        border: "1px solid rgba(255,255,255,0.10)",
+        boxShadow: "0 20px 48px -16px rgba(0,0,0,0.9)",
       }}>
-        {/* Red glow blob — bottom-left */}
-        <div style={{ position: "absolute", inset: 0, pointerEvents: "none", zIndex: 0, background: "radial-gradient(ellipse 65% 75% at 12% 100%, rgba(180,20,20,0.42) 0%, transparent 68%)" }} />
-        {/* Brushed-metal hairlines */}
-        <div style={{ position: "absolute", inset: 0, pointerEvents: "none", zIndex: 0, backgroundImage: "repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(255,255,255,0.022) 2px, rgba(255,255,255,0.022) 3px)" }} />
-        {/* Top-left specular glare */}
-        <div style={{ position: "absolute", inset: 0, pointerEvents: "none", zIndex: 0, background: "linear-gradient(140deg, rgba(255,255,255,0.10) 0%, transparent 34%)" }} />
-        {/* Travelling sheen */}
-        <motion.div
-          style={{ position: "absolute", top: 0, bottom: 0, width: "40%", pointerEvents: "none", zIndex: 1, background: "linear-gradient(105deg, transparent, rgba(255,255,255,0.07), transparent)", mixBlendMode: "screen" }}
-          initial={{ left: "-45%" }}
-          animate={{ left: "120%" }}
-          transition={{ duration: 1.4, ease: [0.22, 1, 0.36, 1], delay: 0.25 }}
-        />
+        <Corners size={8} color="rgba(192,57,43,0.7)" />
 
-        <div style={{ position: "relative", zIndex: 2 }}>
-          {/* Header row */}
-          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 11 }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 9 }}>
-              {/* 3D-spinning gem — the "artifact" */}
-              <div style={{ width: 15, height: 15, perspective: 60, display: "flex", alignItems: "center", justifyContent: "center" }}>
-                <motion.div
-                  style={{ transformStyle: "preserve-3d", display: "flex", filter: `drop-shadow(0 0 5px ${RED})` }}
-                  animate={{ rotateY: 360 }}
-                  transition={{ duration: 2.4, repeat: Infinity, ease: "linear" }}
-                >
-                  <Gem size={14} color={RED} strokeWidth={1.6} />
-                </motion.div>
-              </div>
-              <span style={{ fontFamily: "var(--font-mono)", fontSize: 8.5, letterSpacing: "0.28em", color: "rgba(255,255,255,0.92)", textTransform: "uppercase" }}>
-                {done ? "Collection Complete" : "Artifact Located"}
-              </span>
-            </div>
-            {/* Count chip — subtle red-tinted, matches the shell */}
-            <span style={{
-              fontFamily: "var(--font-mono)", fontSize: 8, letterSpacing: "0.14em",
-              padding: "2.5px 8px", borderRadius: 5,
-              background: "rgba(0,0,0,0.32)",
-              border: "1px solid rgba(224,106,90,0.45)",
-              boxShadow: "inset 0 1px 0 rgba(255,255,255,0.05)",
-            }}>
-              {/* lighter red tint so the count clears AA on the near-black chip */}
-              <span style={{ color: "#ef8478" }}>{String(count).padStart(2, "0")}</span>
-              <span style={{ color: "rgba(255,255,255,0.5)" }}>&nbsp;/&nbsp;{String(TOTAL).padStart(2, "0")}</span>
+        {/* Label + tally */}
+        <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", gap: 12 }}>
+          <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+            <span style={{ fontSize: 10, lineHeight: 1, letterSpacing: "0.14em", textTransform: "uppercase", color: "rgba(255,255,255,0.45)" }}>
+              Curiosity
+            </span>
+            <span style={{ fontFamily: "var(--font-bebas)", fontSize: 22, lineHeight: 1, letterSpacing: "0.04em", color: "rgba(255,255,255,0.95)" }}>
+              {done ? "Curious mind" : last?.title ?? "Artifact"}
             </span>
           </div>
-
-          {/* Progress track */}
-          <div style={{ position: "relative", height: 5, background: "rgba(0,0,0,0.4)", marginBottom: 10, borderRadius: 999, overflow: "hidden", boxShadow: "inset 0 1px 2px rgba(0,0,0,0.6)" }}>
-            {/* Segment tick marks */}
-            {Array.from({ length: TOTAL - 1 }).map((_, i) => (
-              <div key={i} style={{
-                position: "absolute", top: 0, bottom: 0, width: 1,
-                left: `${((i + 1) / TOTAL) * 100}%`,
-                background: "rgba(255,255,255,0.10)", zIndex: 1,
-              }} />
-            ))}
-            {/* Fill */}
-            <motion.div
-              style={{ position: "absolute", left: 0, top: 0, bottom: 0, borderRadius: 999, zIndex: 0, background: `linear-gradient(90deg, #7d1f17, ${RED})`, boxShadow: `0 0 10px rgba(192,57,43,0.6)` }}
-              initial={{ width: "0%" }}
-              animate={{ width: `${pct}%` }}
-              transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1], delay: 0.12 }}
-            />
-          </div>
-
-          {/* Footer */}
-          <div style={{ fontFamily: "var(--font-mono)", fontSize: 7.5, letterSpacing: "0.14em", color: "rgba(255,255,255,0.58)", textTransform: "uppercase" }}>
-            {done
-              ? "All artifacts recovered — mission complete"
-              : `${TOTAL - count} artifact${TOTAL - count !== 1 ? "s" : ""} remaining — keep exploring`}
-          </div>
+          <span style={{ fontFamily: "var(--font-bebas)", fontSize: 22, lineHeight: 1, letterSpacing: "0.04em" }}>
+            <span style={{ color: RED }}>{count}</span>
+            <span style={{ color: "rgba(255,255,255,0.35)" }}>/{TOTAL}</span>
+          </span>
         </div>
+
+        {/* Every artifact as a mini tile, lit once tried. The newest one pops in. */}
+        <div style={{ display: "flex", gap: 6, marginTop: 14 }}>
+          {ARTIFACTS.map(({ id, Icon }) => {
+            const has = found.has(id);
+            const isNew = id === lastId;
+            return (
+              <motion.div
+                key={id}
+                style={{
+                  position: "relative", flex: 1, height: 32,
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                  border: `1px solid ${has ? "rgba(192,57,43,0.45)" : "rgba(255,255,255,0.07)"}`,
+                  background: has ? "rgba(192,57,43,0.10)" : "rgba(0,0,0,0.5)",
+                  color: has ? RED : "rgba(255,255,255,0.2)",
+                }}
+                initial={isNew && !reducedMotion ? { scale: 0.7, opacity: 0.4 } : false}
+                animate={{ scale: 1, opacity: 1 }}
+                transition={{ type: "spring", duration: 0.45, bounce: 0.35, delay: 0.12 }}
+              >
+                <Corners size={4} color={has ? "rgba(192,57,43,0.75)" : "rgba(255,255,255,0.14)"} />
+                <Icon size={13} strokeWidth={1.6} />
+              </motion.div>
+            );
+          })}
+        </div>
+
+        <p style={{ marginTop: 12, fontSize: 12, lineHeight: 1.45, color: "rgba(255,255,255,0.66)" }}>
+          {CURIOUS_LINES[count] ?? CURIOUS_LINES[TOTAL]}
+        </p>
       </div>
     </motion.div>
   );
@@ -988,7 +977,7 @@ function PaintModal({ open, onClose }: { open: boolean; onClose: () => void }) {
 }
 
 export default function Artifacts({ onRaccoonSignal, onSpotlightSignal, onEasterEgg, onUnlock, heroVisible = true }: ArtifactsProps) {
-  const { found, count, toastCount, collect } = useArtifacts();
+  const { found, count, toast, collect } = useArtifacts();
   const reducedMotion = Boolean(useReducedMotion());
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const [playing, setPlaying] = useState(false);
@@ -1119,7 +1108,7 @@ export default function Artifacts({ onRaccoonSignal, onSpotlightSignal, onEaster
       <PaintModal open={paintOpen} onClose={() => setPaintOpen(false)} />
 
       <AnimatePresence>
-        {toastCount !== null && <Toast key={`toast-${toastCount}`} count={toastCount} />}
+        {toast && <Toast key={`toast-${toast.count}`} count={toast.count} lastId={toast.id} found={found} />}
       </AnimatePresence>
     </>
   );

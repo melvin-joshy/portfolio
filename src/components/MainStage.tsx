@@ -7,14 +7,17 @@ import {
   useMotionValue,
   useReducedMotion,
   useSpring,
+  type Variants,
 } from "framer-motion";
 import { useRouter } from "next/navigation";
 import dynamic from "next/dynamic";
+import SpaceBackground from "@/components/SpaceBackground";
 import { useRouteTransition } from "@/components/RouteTransition";
 import { ArrowLeft, ArrowRight, ArrowUpRight, ArrowDown } from "lucide-react";
 import { ScribbleUnderline } from "@/components/ScribbleUnderline";
 import Artifacts from "@/components/Artifacts";
 import { projects as allProjects } from "@/data/projects";
+import CraftedLine from "@/components/CraftedLine";
 
 // Code-split: lottie-react is heavy and only some cards use a Lottie face; the
 // two modals are hidden until opened. Splitting them out keeps the home route's
@@ -30,6 +33,7 @@ const projects = allProjects.slice(0, 8);
 
 const N = projects.length;
 const SLIDE_EASE = [0.16, 1, 0.3, 1] as const;
+const EXIT_EASE = [0.23, 1, 0.32, 1] as const;
 const SPRING = { type: "spring" as const, stiffness: 380, damping: 32 };
 
 /* ─────────────── Lottie card face ─────────────── */
@@ -366,60 +370,6 @@ function Clock() {
   return <>{t}</>;
 }
 
-/* ─────────────── Animated divider line ─────────────── */
-
-function Divider({ delay = 0, right = false, theme = "dark" }: { delay?: number; right?: boolean; theme?: string }) {
-  return (
-    <div style={{ width: 20, height: 1, background: theme === "light" ? "rgba(0,0,0,0.1)" : "rgba(255,255,255,0.08)", marginTop: 16, marginBottom: 16, overflow: "hidden", marginLeft: right ? "auto" : undefined }}>
-      <motion.div
-        style={{ height: "100%", background: theme === "light" ? "rgba(0,0,0,0.28)" : "rgba(255,255,255,0.28)", transformOrigin: right ? "right" : "left" }}
-        initial={{ scaleX: 0 }}
-        animate={{ scaleX: 1 }}
-        transition={{ duration: 0.7, delay, ease: SLIDE_EASE }}
-      />
-    </div>
-  );
-}
-
-/* ─────────────── Grid background ─────────────── */
-
-function GridBackground({ theme }: { theme: "dark" | "light" }) {
-  const dark = theme === "dark";
-
-  return (
-    <div style={{ position: "absolute", inset: 0, overflow: "hidden", pointerEvents: "none", zIndex: 0 }}>
-
-      {/* ── Background image ── */}
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
-        src="/bg main.webp"
-        alt=""
-        style={{
-          position: "absolute", inset: 0,
-          width: "100%", height: "100%",
-          objectFit: "cover",
-          opacity: 1,
-        }}
-      />
-
-      {/* ── Darken overlay — mutes the baked-in blueprint chrome so foreground type leads ── */}
-      <div style={{
-        position: "absolute", inset: 0,
-        background: dark ? "rgba(0,0,0,0.46)" : "rgba(255,255,255,0.30)",
-      }} />
-
-      {/* ── Vignette — edges deeper ── */}
-      <div style={{
-        position: "absolute", inset: 0,
-        background: dark
-          ? "radial-gradient(ellipse 75% 65% at 50% 50%, transparent 20%, rgba(0,0,0,0.65) 100%)"
-          : "radial-gradient(ellipse 75% 65% at 50% 50%, transparent 20%, rgba(255,255,255,0.60) 100%)",
-      }} />
-
-    </div>
-  );
-}
-
 /* ─────────────── Thumbnail scribble pool ─────────────── */
 
 const THUMB_SCRIBBLES = [
@@ -495,44 +445,46 @@ function TickerItem({
         background: "transparent",
         cursor: "pointer",
         opacity: isActive ? 1 : 0.35,
-        transition: "opacity 0.15s ease",
+        transition: "opacity 0.3s ease",
       }}
     >
-      {/* Asterisk separator */}
+      {/* Size change is a transform, not font-size, so it never triggers layout mid-slide */}
       <div style={{
-        position: "absolute", right: -10, top: "50%", transform: "translateY(-50%)",
-        fontSize: 16, lineHeight: 1,
-        color: theme === "light" ? "rgba(0,0,0,0.35)" : "rgba(255,255,255,0.35)",
-        zIndex: 1, userSelect: "none", pointerEvents: "none",
-      }}>✱</div>
-
-      <div style={{ display: "flex", alignItems: "center", gap: 5 }}>
+        position: "relative",
+        transform: isActive ? "scale(1)" : "scale(0.8)",
+        transition: "transform 0.4s cubic-bezier(0.23, 1, 0.32, 1)",
+      }}>
         <p
           className="ticker-name"
           style={{
             fontFamily: "var(--font-bebas)",
-            fontSize: isActive ? 22 : 17,
+            fontSize: 30,
             letterSpacing: "0.1em",
             lineHeight: 1,
             whiteSpace: "nowrap",
             color: nameColor,
-            transition: "color 0.15s ease, font-size 0.15s ease",
+            transition: "color 0.15s ease",
           }}
         >
           {p.name}
         </p>
-        {isActive && (
-          <span
-            style={{
-              display: "inline-flex",
-              color: hovered ? "#c0392b" : theme === "light" ? "rgba(0,0,0,0.45)" : "rgba(255,255,255,0.5)",
-              transition: "color 0.15s ease, transform 0.15s ease",
-              transform: hovered ? "translate(1px,-1px)" : "none",
-            }}
-          >
-            <ArrowUpRight size={13} strokeWidth={1.6} />
-          </span>
-        )}
+        {/* Absolutely placed so the name stays centred whether or not the arrow shows */}
+        <span
+          aria-hidden
+          style={{
+            position: "absolute",
+            left: "100%",
+            top: "50%",
+            marginLeft: 6,
+            display: "inline-flex",
+            color: hovered ? "#c0392b" : theme === "light" ? "rgba(0,0,0,0.45)" : "rgba(255,255,255,0.5)",
+            opacity: isActive ? 1 : 0,
+            transform: hovered ? "translate(1px,-60%)" : "translate(0,-50%)",
+            transition: "color 0.15s ease, opacity 0.2s ease, transform 0.15s ease",
+          }}
+        >
+          <ArrowUpRight size={16} strokeWidth={1.6} />
+        </span>
       </div>
     </button>
   );
@@ -583,14 +535,14 @@ export default function MainStage({ visible }: { visible: boolean }) {
 
   /* ── Endless ticker ── */
   const COPIES   = 13;                           // large pool — never runs out
-  const ITEM_W   = 220;
+  const ITEM_W   = 320;
   const MID_COPY = 6;                            // center copy index (0-based)
   const tickerItems = useMemo(() => Array.from({ length: COPIES }, () => projects).flat(), []);
   const vIdxRef  = useRef(MID_COPY * N);         // start: middle of 13-copy array
   const tickerContainerRef = useRef<HTMLDivElement>(null);
   const tickerMX = useMotionValue(0);
   const tickerX  = useSpring(tickerMX, { stiffness: 280, damping: 32, mass: 0.7 });
-  const dragRef = useRef({ active: false, startX: 0, startMX: 0, moved: false, captured: false });
+  const dragRef = useRef({ active: false, startX: 0, startMX: 0, moved: false, captured: false, lastX: 0, lastT: 0, v: 0 });
   const justDraggedRef = useRef(false);
 
   const centerTicker = useCallback((vIdx: number) => {
@@ -613,15 +565,24 @@ export default function MainStage({ visible }: { visible: boolean }) {
 
   const cur = projects[active];
 
-  // Peek (next) card lags `active` until the front-card slide settles. Without this,
-  // `active` jumps instantly and the peek momentarily shows active+2 while the old
-  // front is still sliding out — exposing the wrong project mid-transition.
-  const [peekBase, setPeekBase] = useState(active);
-  useEffect(() => {
-    const t = setTimeout(() => setPeekBase(active), 900); // ≈ full mode="wait" exit+enter
-    return () => clearTimeout(t);
-  }, [active]);
-  const midProj = projects[(peekBase + 1) % N];
+  /* Front card swap. Exit is quicker than enter: the old card gets out of the way while
+     the new one settles; a light blur bridges the overlap so it reads as one motion. */
+  const cardVariants = useMemo<Variants>(() => ({
+    enter: (d: number) => reducedMotion
+      ? { opacity: 0 }
+      : { x: d * 40, opacity: 0, scale: 0.98, filter: "blur(4px)" },
+    exit: (d: number) => ({
+      ...(reducedMotion ? {} : { x: d * -24, scale: 0.98 }),
+      opacity: 0,
+      zIndex: 2,
+      transition: {
+        default: { duration: 0.22, ease: EXIT_EASE },
+        // Sits under the incoming card, so hold its opacity briefly to avoid a see-through dip
+        opacity: { duration: 0.26, ease: [0.4, 0, 1, 1] },
+      },
+    }),
+  }), [reducedMotion]);
+
 
   /* Preload all heroImages once on mount so navigating between cards is instant */
   useEffect(() => {
@@ -726,7 +687,7 @@ export default function MainStage({ visible }: { visible: boolean }) {
 
   /* ── Swipe / drag the ticker (mobile-first) — 1:1 follow, snap to nearest on release ── */
   const onTickerPointerDown = useCallback((e: React.PointerEvent) => {
-    dragRef.current = { active: true, startX: e.clientX, startMX: tickerMX.get(), moved: false, captured: false };
+    dragRef.current = { active: true, startX: e.clientX, startMX: tickerMX.get(), moved: false, captured: false, lastX: e.clientX, lastT: e.timeStamp, v: 0 };
   }, [tickerMX]);
 
   const onTickerPointerMove = useCallback((e: React.PointerEvent) => {
@@ -734,13 +695,19 @@ export default function MainStage({ visible }: { visible: boolean }) {
     if (!d.active) return;
     const dx = e.clientX - d.startX;
     if (!d.moved) {
-      if (Math.abs(dx) <= 4) return;
+      // A mouse click often wobbles a few px; don't let that turn into a drag
+      if (Math.abs(dx) <= (e.pointerType === "mouse" ? 12 : 6)) return;
       d.moved = true;
       try {
         (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
         d.captured = true;
       } catch {}
     }
+    // Smoothed pointer velocity (px/ms) so a flick can carry on release
+    const dt = e.timeStamp - d.lastT;
+    if (dt > 0) d.v = 0.8 * ((e.clientX - d.lastX) / dt) + 0.2 * d.v;
+    d.lastX = e.clientX;
+    d.lastT = e.timeStamp;
     const nx = d.startMX + dx;
     tickerMX.jump(nx);  // bypass spring during drag for a 1:1 grab feel
     tickerX.jump(nx);
@@ -760,7 +727,14 @@ export default function MainStage({ visible }: { visible: boolean }) {
 
     const cw = tickerContainerRef.current?.offsetWidth ?? window.innerWidth;
     const prevMod = ((vIdxRef.current % N) + N) % N;
-    const targetV = Math.round((cw / 2 - ITEM_W / 2 - tickerMX.get()) / ITEM_W);
+    // Project where a flick would coast to (~180ms of travel), capped at 3 items either way
+    // Only a deliberate, fast swipe flings: paused before lifting, short drags and slow drags just snap
+    const travelled = Math.abs(e.clientX - d.startX);
+    const isFling = e.timeStamp - d.lastT <= 80 && travelled > 40 && Math.abs(d.v) > 0.4;
+    const released = isFling ? d.v : 0;
+    const restingV = (cw / 2 - ITEM_W / 2 - tickerMX.get()) / ITEM_W;
+    const fling = Math.max(-3, Math.min(3, (-released * 180) / ITEM_W));
+    const targetV = Math.round(restingV + fling);
     vIdxRef.current = targetV;
     centerTicker(targetV);   // snap: tickerMX moves, tickerX springs to it
     normalizeTicker();
@@ -773,7 +747,8 @@ export default function MainStage({ visible }: { visible: boolean }) {
     }
   }, [tickerMX, centerTicker, normalizeTicker, active, triggerRaccoon]);
 
-  // Auto-advance
+  // Auto-advance. `active` is a dependency so any change (click, key, swipe) restarts the
+  // full 9s; otherwise a pick made just before the tick gets skipped past immediately.
   useEffect(() => {
     if (!visible || reducedMotion) return;
     const id = setInterval(() => {
@@ -784,9 +759,9 @@ export default function MainStage({ visible }: { visible: boolean }) {
       setDir(1);
       setActive(p => (p + 1) % N);
       triggerRaccoon(1);
-    }, 6000);
+    }, 9000);
     return () => clearInterval(id);
-  }, [visible, reducedMotion, triggerRaccoon, centerTicker, normalizeTicker]);
+  }, [visible, reducedMotion, triggerRaccoon, centerTicker, normalizeTicker, active]);
 
   /* Init ticker position before first paint */
   useLayoutEffect(() => {
@@ -842,7 +817,7 @@ export default function MainStage({ visible }: { visible: boolean }) {
         animate={{ opacity: 1 }}
       >
         {/* Background layer — sits at z-index 0, behind content */}
-        <GridBackground theme={theme} />
+        <SpaceBackground theme={theme} />
 
         {/* Artifact layer — collectible HUD nodes, z-index 1 */}
         <Artifacts
@@ -924,13 +899,13 @@ export default function MainStage({ visible }: { visible: boolean }) {
                 color: theme === "light" ? "rgba(0,0,0,0.9)" : "rgba(255,255,255,0.92)",
               }}
             >
-              Product Designer<br />Who Builds.
+              Curious by nature.<br />Designer by choice.
             </h1>
             <p
               className="mx-auto mt-4 max-w-[34ch] text-[14px] leading-relaxed"
               style={{ color: theme === "light" ? "rgba(0,0,0,0.6)" : "rgba(255,255,255,0.55)" }}
             >
-              Currently at <span style={{ color: "#c0392b" }}>Tempo</span> (YC&nbsp;S23). Zero to one, repeatedly.
+              Currently designing @ <span style={{ color: "#c0392b" }}>Tempo</span> (YC&nbsp;S23)
             </p>
             <div
               className="mt-7 flex items-center justify-center gap-2 text-[9px] uppercase tracking-[0.3em]"
@@ -948,66 +923,46 @@ export default function MainStage({ visible }: { visible: boolean }) {
             </div>
           </motion.div>
 
-          {/* ── LEFT column ── */}
-          <motion.div
-            className="hidden lg:flex w-[200px] shrink-0 flex-col justify-center px-8"
-            style={{ borderRight: `1px solid ${theme === "light" ? "rgba(0,0,0,0.14)" : "rgba(255,255,255,0.05)"}` }}
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: visible ? 1 : 0, x: visible ? 0 : -20 }}
-            transition={{ duration: 0.75, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
-          >
-            <h1 className="font-bebas text-[28px] leading-[1.05] tracking-wider uppercase"
-              style={{ color: theme === "light" ? "rgba(0,0,0,0.85)" : "rgba(255,255,255,0.85)" }}>
-              Product Designer<br />
-              Who Builds.
-            </h1>
-            <Divider delay={0.3} theme={theme} />
-            <p className="text-[9px] uppercase tracking-[0.2em] leading-[2.2]"
-              style={{ color: theme === "light" ? "rgba(0,0,0,0.70)" : "rgba(255,255,255,0.5)" }}>
-              Zero to one,<br />
-              repeatedly.
-            </p>
-          </motion.div>
-
           {/* ── CENTER ── */}
-          <div className="flex-1 flex min-h-[520px] flex-col items-center justify-center relative min-w-0 px-4 py-6 lg:px-0 lg:py-0">
+          <div className="flex-1 flex min-h-[520px] flex-col items-center justify-center relative min-w-0 px-4 pb-6 pt-24 lg:px-10 lg:pb-0 lg:pt-16">
 
-            {/* Tag + year */}
-            <AnimatePresence mode="wait">
-              <motion.p
-                key={`tag-${active}`}
-                className="text-[10px] tracking-[0.4em] uppercase mb-4 text-center"
-                style={{ color: theme === "light" ? "rgba(0,0,0,0.65)" : "rgba(255,255,255,0.45)" }}
-                initial={{ opacity: 0, y: 6 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -4 }}
-                transition={{ duration: 0.3, ease: SLIDE_EASE }}
-              >
-                {cur.tag}&nbsp;&nbsp;·&nbsp;&nbsp;{cur.year}
-              </motion.p>
-            </AnimatePresence>
+            {/* Visible title lives in the rail below; keep a heading for screen readers */}
+            <h2 className="sr-only">{cur.name}</h2>
 
-            {/* Project name */}
-            <div className="overflow-hidden mb-5">
-              <AnimatePresence mode="wait">
-                <motion.h2
-                  key={`name-${active}`}
-                  className="font-bebas tracking-wider leading-none text-center"
-                  style={{ fontSize: "clamp(34px, 6.5vw, 96px)", color: theme === "light" ? "rgba(0,0,0,0.94)" : "rgba(255,255,255,0.96)" }}
-                  initial={{ y: dir > 0 ? "65%" : "-65%" }}
-                  animate={{ y: "0%" }}
-                  exit={{ y: dir > 0 ? "-65%" : "65%" }}
-                  transition={{ duration: 0.34, ease: SLIDE_EASE }}
+            {/* Intro + card share one width so the intro lines up with the card's left edge */}
+            <div style={{ width: "min(92%, calc((100dvh - 430px) * 1.6))" }}>
+
+            {/* ── Intro (desktop; the mobile hero above covers small screens) ── */}
+            <motion.div
+              className="hidden lg:block mb-6"
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: visible ? 1 : 0, y: visible ? 0 : 8 }}
+              transition={{ duration: 0.6, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
+            >
+              <h1 className="font-bebas leading-none tracking-wider uppercase whitespace-nowrap"
+                style={{ fontSize: "clamp(22px, 1.9vw, 30px)", color: theme === "light" ? "rgba(0,0,0,0.88)" : "rgba(255,255,255,0.9)" }}>
+                Curious by nature. Designer by choice.
+              </h1>
+              <p className="mt-2.5 text-[13px]"
+                style={{ color: theme === "light" ? "rgba(0,0,0,0.6)" : "rgba(255,255,255,0.55)" }}>
+                Currently designing @{" "}
+                <a
+                  href="https://www.tempo.new/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="underline-offset-4 decoration-1 hover:underline"
+                  style={{ color: "#c0392b" }}
                 >
-                  {cur.name}
-                </motion.h2>
-              </AnimatePresence>
-            </div>
+                  Tempo
+                </a>{" "}
+                (YC S23)
+              </p>
+            </motion.div>
 
             {/* ── Stacked card deck ── */}
             <div
               className="relative"
-              style={{ width: "min(480px, 82vw)", aspectRatio: "16 / 10" }}
+              style={{ width: "100%", aspectRatio: "16 / 10" }}
               onMouseMove={handleCardMouseMove}
               onMouseLeave={() => { setCursorMode("default"); setCardHover(false); }}
               onMouseEnter={() => setCardHover(true)}
@@ -1078,29 +1033,9 @@ export default function MainStage({ visible }: { visible: boolean }) {
                   </AnimatePresence>
                 </motion.div>
               </motion.div>
-              {/* Next card (active + 1) — the single peek the front slides away to reveal */}
-              <motion.div
-                className="absolute inset-0 rounded-[6px] overflow-hidden"
-                animate={{
-                  x: visible ? (cardHover ? 18 : 12) : 0,
-                  y: visible ? (cardHover ? 22 : 16) : 0,
-                  rotate: visible ? (cardHover ? 2.4 : 1.6) : 0,
-                  scale: visible ? (cardHover ? 0.9 : 0.92) : 0.945,
-                  opacity: visible ? (cardHover ? 0.88 : 0.78) : 0,
-                }}
-                transition={SPRING}
-                style={{ background: midProj.bg, zIndex: 2, border: "1px solid rgba(255,255,255,0.05)" }}
-              >
-                {midProj.heroImage && (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img src={encodeURI(midProj.heroImage)} alt="" aria-hidden
-                    className="absolute inset-0 w-full h-full pointer-events-none"
-                    style={{ objectFit: "cover" }} />
-                )}
-              </motion.div>
-
               {/* Front card — lifts on hover */}
-              <AnimatePresence mode="wait" custom={dir}>
+              {/* Sync mode: the outgoing card leaves while the next one arrives, so the deck is never empty */}
+              <AnimatePresence initial={false} custom={dir}>
                 <motion.button
                   type="button"
                   aria-label={`View ${cur.name} project${cur.externalUrl ? " (opens in new tab)" : ""}`}
@@ -1112,20 +1047,22 @@ export default function MainStage({ visible }: { visible: boolean }) {
                     zIndex: 3,
                   }}
                   custom={dir}
-                  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-                  initial={((d: number) => ({ x: d * 64, opacity: 0, scale: 0.97, y: 0 })) as any}
+                  variants={cardVariants}
+                  initial="enter"
+                  exit="exit"
                   animate={{
                     x: artifactTouch && !reducedMotion ? [0, -3, 2, 0] : 0,
                     opacity: 1,
+                    scale: 1,
+                    filter: "blur(0px)",
                     y: cardHover && cursorMode === "view" ? -8 : 0,
                     rotate: artifactTouch && !reducedMotion ? [0, -1.4, 0.7, 0] : 0,
                   }}
-                  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-                  exit={((d: number) => ({ x: d * -64, opacity: 0 })) as any}
-                  transition={cardHover && cursorMode === "view"
-                    ? SPRING
-                    : { duration: 0.44, ease: SLIDE_EASE }
-                  }
+                  transition={{
+                    default: { duration: 0.5, ease: SLIDE_EASE },
+                    filter: { duration: 0.32, ease: EXIT_EASE },
+                    y: SPRING, // hover lift keeps its spring even mid-entrance
+                  }}
                 >
                   {/* Hero image — sits below all overlays */}
                   {cur.heroImage && (
@@ -1166,29 +1103,6 @@ export default function MainStage({ visible }: { visible: boolean }) {
                   />
                   {/* Top edge highlight */}
                   <div className="absolute top-0 inset-x-0 h-px bg-white/12 pointer-events-none" />
-                  {/* Bottom scrim */}
-                  <div className="absolute inset-0 pointer-events-none"
-                    style={{ background: "linear-gradient(to top, rgba(0,0,0,0.38) 0%, transparent 55%)" }}
-                  />
-
-                  {/* View case study affordance — brightens on hover */}
-                  <div
-                    className="absolute left-4 bottom-3.5 z-[4] flex items-center gap-1.5 pointer-events-none"
-                    style={{
-                      fontFamily: "var(--font-mono)",
-                      fontSize: 10,
-                      letterSpacing: "0.16em",
-                      textTransform: "uppercase",
-                      color: cursorMode === "view" ? "#fff" : "rgba(255,255,255,0.9)",
-                      transition: "color 0.2s ease",
-                    }}
-                  >
-                    <span>{cur.externalUrl ? "Visit site" : "View case study"}</span>
-                    {cur.externalUrl
-                      ? <ArrowUpRight className="w-3 h-3" strokeWidth={1.6} />
-                      : <ArrowRight className="w-3 h-3" strokeWidth={1.6} />}
-                  </div>
-
                   {/* Pixel hover overlay */}
                   <AnimatePresence>
                     {cursorMode === "view" && (
@@ -1205,68 +1119,27 @@ export default function MainStage({ visible }: { visible: boolean }) {
               </AnimatePresence>
             </div>
 
-            {/* Description */}
-            <div className="mt-4 h-8 flex items-center">
+            {/* Category · year */}
+            <div className="mt-5 h-8 flex items-center justify-center">
               <AnimatePresence mode="wait">
                 <motion.p
                   key={`desc-${active}`}
-                  className="text-[13px] md:text-[12px] tracking-wide text-center"
-                  style={{ maxWidth: "min(440px, 84vw)", color: theme === "light" ? "rgba(0,0,0,0.72)" : "rgba(255,255,255,0.72)" }}
+                  className="text-[14px] text-center"
+                  style={{ color: theme === "light" ? "rgba(0,0,0,0.72)" : "rgba(255,255,255,0.72)" }}
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
                   transition={{ duration: 0.32, delay: 0.08 }}
                 >
-                  {cur.description}
+                  {cur.tag.includes(cur.year) ? cur.tag : `${cur.tag} · ${cur.year}`}
                 </motion.p>
               </AnimatePresence>
             </div>
 
+            </div>
+
           </div>
 
-          {/* ── RIGHT column ── */}
-          <motion.div
-            className="hidden lg:flex w-[200px] shrink-0 flex-col justify-center px-8 text-right"
-            style={{ borderLeft: `1px solid ${theme === "light" ? "rgba(0,0,0,0.14)" : "rgba(255,255,255,0.05)"}` }}
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: visible ? 1 : 0, x: visible ? 0 : 20 }}
-            transition={{ duration: 0.75, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
-          >
-            <motion.a
-              href="https://www.tempo.new/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="font-bebas text-[28px] leading-[1.05] tracking-wider uppercase block relative"
-              style={{ color: theme === "light" ? "rgba(0,0,0,0.85)" : "rgba(255,255,255,0.85)", textDecoration: "none" }}
-              whileHover={{ color: theme === "light" ? "rgba(0,0,0,1)" : "rgba(255,255,255,1)" }}
-              transition={{ duration: 0.2 }}
-            >
-              {/* Hover highlight bar */}
-              <motion.span
-                className="absolute inset-0 rounded-[3px] pointer-events-none"
-                style={{ background: theme === "light" ? "rgba(0,0,0,0.06)" : "rgba(255,255,255,0.06)", originX: 1 }}
-                initial={{ scaleX: 0 }}
-                whileHover={{ scaleX: 1 }}
-                transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}
-              />
-              <ScribbleUnderline color="#c0392b" strokeWidth={1.6} offsetY={2}>
-                Currently
-                <br />at <span style={{ color: "#c0392b" }}>Tempo.</span>
-                <br />YC S23.
-              </ScribbleUnderline>
-            </motion.a>
-            <Divider delay={0.32} right theme={theme} />
-            <p className="text-[9px] uppercase tracking-[0.2em] leading-[2.2] text-right"
-              style={{ color: theme === "light" ? "rgba(0,0,0,0.70)" : "rgba(255,255,255,0.5)" }}>
-              5+ Products<br />
-              Shipped<br />
-              Taste First
-            </p>
-            <p className="text-[9px] uppercase tracking-[0.18em] leading-[2.2] mt-3 text-right"
-              style={{ color: theme === "light" ? "rgba(0,0,0,0.60)" : "rgba(255,255,255,0.4)" }}>
-              Ships Fast
-            </p>
-          </motion.div>
 
         </div>
 
@@ -1274,7 +1147,7 @@ export default function MainStage({ visible }: { visible: boolean }) {
         <div
           ref={tickerContainerRef}
           className="shrink-0 overflow-hidden relative select-none"
-          style={{ height: 88, minHeight: 88, borderTop: `1px dashed ${theme === "light" ? "rgba(0,0,0,0.18)" : "rgba(255,255,255,0.14)"}`, touchAction: "pan-y", cursor: "grab" }}
+          style={{ height: 120, minHeight: 120, borderTop: `1px dashed ${theme === "light" ? "rgba(0,0,0,0.18)" : "rgba(255,255,255,0.14)"}`, touchAction: "pan-y", cursor: "grab" }}
           onMouseEnter={() => setCursorMode("default")}
           onPointerDown={onTickerPointerDown}
           onPointerMove={onTickerPointerMove}
@@ -1316,18 +1189,17 @@ export default function MainStage({ visible }: { visible: boolean }) {
           style={{ borderTop: `1px solid ${theme === "light" ? "rgba(0,0,0,0.06)" : "rgba(255,255,255,0.05)"}` }}
         >
           {/* Left: copyright + crafted-with */}
-          <div className="flex items-center gap-3 text-[8px] tracking-[0.2em] uppercase md:justify-self-start"
+          <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1 text-[8px] tracking-[0.2em] uppercase md:min-w-0 md:justify-start md:justify-self-start lg:flex-nowrap lg:whitespace-nowrap"
             style={{ color: theme === "light" ? "rgba(0,0,0,0.68)" : "rgba(255,255,255,0.62)" }}>
             <span>© 2026 Melvin Joshy</span>
             <span aria-hidden style={{ color: theme === "light" ? "rgba(0,0,0,0.25)" : "rgba(255,255,255,0.22)" }}>·</span>
             <span style={{ color: theme === "light" ? "rgba(0,0,0,0.55)" : "rgba(255,255,255,0.50)" }}>
-              Crafted with{" "}
-              <span style={{ color: "#c0392b", fontFamily: "var(--font-mono)", letterSpacing: 0, textTransform: "none" }}>:&gt;</span>
+              <CraftedLine />
             </span>
           </div>
 
-          {/* Center: carousel prev/next — bare icons, dead-centered. Also the only step controls on touch. */}
-          <div className="flex items-center justify-center gap-5 md:justify-self-center" onMouseEnter={() => setCursorMode("default")}>
+          {/* Center: carousel prev/next as keycaps — signals the arrow keys also work. Also the only step controls on touch. */}
+          <div className="flex items-center justify-center gap-2.5 md:justify-self-center" onMouseEnter={() => setCursorMode("default")}>
             {([
               { label: "Previous project", onClick: prev, Icon: ArrowLeft },
               { label: "Next project", onClick: next, Icon: ArrowRight },
@@ -1337,13 +1209,18 @@ export default function MainStage({ visible }: { visible: boolean }) {
                 type="button"
                 onClick={onClick}
                 aria-label={label}
-                className="inline-flex items-center justify-center p-1.5"
-                style={{ color: theme === "light" ? "rgba(0,0,0,0.5)" : "rgba(255,255,255,0.5)" }}
-                whileHover={{ scale: 1.18, color: "#c0392b" }}
-                whileTap={{ scale: 0.85 }}
-                transition={{ duration: 0.15 }}
+                className="inline-flex h-8 w-9 items-center justify-center rounded-[6px]"
+                style={{
+                  color: theme === "light" ? "rgba(0,0,0,0.62)" : "rgba(255,255,255,0.7)",
+                  background: theme === "light" ? "rgba(0,0,0,0.03)" : "rgba(255,255,255,0.04)",
+                  border: `1px solid ${theme === "light" ? "rgba(0,0,0,0.2)" : "rgba(255,255,255,0.18)"}`,
+                  borderBottomWidth: 3,
+                }}
+                whileHover={{ color: "#c0392b", borderColor: "rgba(192,57,43,0.6)" }}
+                whileTap={{ y: 2, borderBottomWidth: 1 }}
+                transition={{ duration: 0.12 }}
               >
-                <Icon className="w-4 h-4" strokeWidth={1.6} />
+                <Icon className="w-3.5 h-3.5" strokeWidth={1.8} />
               </motion.button>
             ))}
           </div>
