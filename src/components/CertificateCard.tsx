@@ -159,8 +159,8 @@ export default function CertificateCard({ open, onClose }: Props) {
       text(name || "A Curious Human", py + ph + 150, "italic 600 46px Georgia", "rgba(255,255,255,0.96)", 1);
 
       // body
-      text("For finding all 7 hidden things.", py + ph + 230, "400 28px Georgia", "rgba(255,255,255,0.7)", 0);
-      text("Most people don't make it past 2.", py + ph + 280, "italic 400 26px Georgia", "rgba(255,255,255,0.5)", 0);
+      text("For clicking all 7, just to see what they do.", py + ph + 230, "400 28px Georgia", "rgba(255,255,255,0.7)", 0);
+      text("Curiosity looks good on you.", py + ph + 280, "italic 400 26px Georgia", "rgba(255,255,255,0.5)", 0);
 
       // signature
       text("— Melvin", H - 150, "italic 600 34px Georgia", RED, 1);
@@ -270,10 +270,10 @@ export default function CertificateCard({ open, onClose }: Props) {
 
                 {/* body */}
                 <p style={{ fontFamily: "var(--font-serif)", fontSize: 13.5, lineHeight: 1.6, color: "rgba(255,255,255,0.72)", textAlign: "center", margin: "14px 0 0" }}>
-                  For finding all 7 hidden things.
+                  For clicking all 7, just to see what they do.
                 </p>
                 <p style={{ fontFamily: "var(--font-serif)", fontStyle: "italic", fontSize: 12.5, color: "rgba(255,255,255,0.5)", textAlign: "center", margin: "4px 0 0" }}>
-                  Most people don&apos;t make it past 2.
+                  Curiosity looks good on you.
                 </p>
 
                 {/* signature */}
