@@ -1,0 +1,10 @@
+Sound effects by Kenney (www.kenney.nl), licensed CC0 1.0 (public domain).
+https://creativecommons.org/publicdomain/zero/1.0/
+
+nav-click.mp3   Interface Sounds  click_001
+flashlight.mp3  Interface Sounds  switch_002
+sketch.mp3      Interface Sounds  scratch_003
+glitch.mp3      Interface Sounds  glitch_002
+swish.mp3       RPG Audio         cloth2
+mantra.mp3      RPG Audio         bookFlip1
+compass.mp3     RPG Audio         metalClick

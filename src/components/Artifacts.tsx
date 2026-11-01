@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { BRAND } from "@/lib/brand";
+import { playSfx, type SfxName } from "@/lib/sfx";
 import {
   Bug,
   Compass,
@@ -48,6 +49,14 @@ type ArtifactsProps = {
   onUnlock?: () => void;
   /** Hero is revealed & interactive — gates the first-visit hint pulse */
   heroVisible?: boolean;
+};
+
+const ARTIFACT_SFX: Partial<Record<ArtifactId, SfxName>> = {
+  "theme-switch": "flashlight",
+  "sketch-pen": "sketch",
+  "archive": "mantra",
+  "origin-point": "compass",
+  "easter-egg": "glitch",
 };
 
 const ARTIFACTS: ArtifactDef[] = [
@@ -1036,6 +1045,9 @@ export default function Artifacts({ onRaccoonSignal, onSpotlightSignal, onEaster
 
   const triggerAction = useCallback((id: ArtifactId) => {
     collect(id);
+    // Click sound per artifact (music and raccoon already make their own noise)
+    const sound = ARTIFACT_SFX[id];
+    if (sound) playSfx(sound);
 
     // Any interaction means they've found the mechanic — kill the hint for good.
     setHintActive(false);
