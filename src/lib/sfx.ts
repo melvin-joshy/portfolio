@@ -2,14 +2,11 @@
    Web Audio so clicks fire instantly and can overlap; buffers decode lazily on first use.
    Everything is quiet by design and fails silently (no audio, blocked autoplay, SSR). */
 
+/* One sound per kind of action, so the sound itself tells you what happened */
 const SOUNDS = {
-  click: { src: "/sounds/nav-click.mp3", volume: 0.35 },
-  swish: { src: "/sounds/swish.mp3", volume: 0.45 },
-  flashlight: { src: "/sounds/flashlight.mp3", volume: 0.5 },
-  sketch: { src: "/sounds/sketch.mp3", volume: 0.3 },
-  mantra: { src: "/sounds/mantra.mp3", volume: 0.6 },
-  compass: { src: "/sounds/compass.mp3", volume: 0.7 },
-  glitch: { src: "/sounds/glitch.mp3", volume: 0.25 },
+  tap: { src: "/sounds/tap.mp3", volume: 0.35 },           // buttons and links
+  move: { src: "/sounds/move.mp3", volume: 0.45 },         // moving between projects
+  artifact: { src: "/sounds/artifact.mp3", volume: 0.4 },  // clicking an artifact
 } as const;
 
 export type SfxName = keyof typeof SOUNDS;

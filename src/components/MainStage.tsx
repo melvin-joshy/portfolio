@@ -652,7 +652,7 @@ export default function MainStage({ visible }: { visible: boolean }) {
   }, [active]);
 
   const next = useCallback(() => {
-    playSfx("swish");
+    playSfx("move");
     triggerRaccoon(1);
     vIdxRef.current += 1;
     centerTicker(vIdxRef.current);
@@ -661,7 +661,7 @@ export default function MainStage({ visible }: { visible: boolean }) {
   }, [active, pick, triggerRaccoon, centerTicker, normalizeTicker]);
 
   const prev = useCallback(() => {
-    playSfx("swish");
+    playSfx("move");
     triggerRaccoon(-1);
     vIdxRef.current -= 1;
     centerTicker(vIdxRef.current);
@@ -685,7 +685,7 @@ export default function MainStage({ visible }: { visible: boolean }) {
     centerTicker(vIdxRef.current);
     normalizeTicker();
     pick(i, delta);
-    playSfx("swish");
+    playSfx("move");
     triggerRaccoon(delta > 0 ? 1 : -1);
   }, [active, pick, triggerRaccoon, centerTicker, normalizeTicker]);
 
@@ -747,7 +747,7 @@ export default function MainStage({ visible }: { visible: boolean }) {
       const dir = ((mod - prevMod + N) % N) <= N / 2 ? 1 : -1;
       setDir(dir);
       setActive(mod);
-      playSfx("swish");
+      playSfx("move");
       triggerRaccoon(dir);
     }
   }, [tickerMX, centerTicker, normalizeTicker, active, triggerRaccoon]);
@@ -841,7 +841,7 @@ export default function MainStage({ visible }: { visible: boolean }) {
           className="min-h-11 shrink-0 grid grid-cols-[auto_1fr] lg:grid-cols-3 items-center gap-3 px-4 py-2 lg:px-8 lg:py-0"
           style={{ borderBottom: `1px solid ${theme === "light" ? "rgba(0,0,0,0.15)" : "rgba(255,255,255,0.14)"}` }}
           onMouseEnter={() => setCursorMode("default")}
-          onClickCapture={(e) => { if ((e.target as HTMLElement).closest("a, button")) playSfx("click"); }}
+          onClickCapture={(e) => { if ((e.target as HTMLElement).closest("a, button")) playSfx("tap"); }}
         >
           <div className="hidden lg:flex items-center gap-3 text-[10px] tracking-[0.25em] uppercase"
             style={{ color: theme === "light" ? "rgba(0,0,0,0.72)" : "rgba(255,255,255,0.65)" }}>

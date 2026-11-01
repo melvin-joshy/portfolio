@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { BRAND } from "@/lib/brand";
-import { playSfx, type SfxName } from "@/lib/sfx";
+import { playSfx } from "@/lib/sfx";
 import {
   Bug,
   Compass,
@@ -51,13 +51,6 @@ type ArtifactsProps = {
   heroVisible?: boolean;
 };
 
-const ARTIFACT_SFX: Partial<Record<ArtifactId, SfxName>> = {
-  "theme-switch": "flashlight",
-  "sketch-pen": "sketch",
-  "archive": "mantra",
-  "origin-point": "compass",
-  "easter-egg": "glitch",
-};
 
 const ARTIFACTS: ArtifactDef[] = [
   { id: "theme-switch", title: "Flashlight", sub: "lights out?", Icon: Flashlight, pos: { top: "7%", left: "8%" } },
@@ -1045,9 +1038,8 @@ export default function Artifacts({ onRaccoonSignal, onSpotlightSignal, onEaster
 
   const triggerAction = useCallback((id: ArtifactId) => {
     collect(id);
-    // Click sound per artifact (music and raccoon already make their own noise)
-    const sound = ARTIFACT_SFX[id];
-    if (sound) playSfx(sound);
+    // Shared artifact sound (music and raccoon already make their own noise)
+    if (id !== "music-player" && id !== "raccoon-signal") playSfx("artifact");
 
     // Any interaction means they've found the mechanic — kill the hint for good.
     setHintActive(false);
