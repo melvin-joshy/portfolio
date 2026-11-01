@@ -34,6 +34,7 @@ type Common = {
   accent: string;
   heroImage?: string;
   heroAnimation?: string;   // path to Lottie JSON in /public, used as the card face
+  heroVideo?: string;       // muted loop played on the homepage card; heroImage is its poster/fallback
   cover?: string;
   externalUrl?: string;
   behanceUrl?: string;
@@ -48,6 +49,82 @@ export type SolutionBlock = {
 
 export type Metric = { value: string; label: string };
 
+/** A reserved visual in a story-style client case study.
+ *  Files live in /public/<story.assetDir>/<file>. Leave `ready` off to show a
+ *  labelled placeholder (filename + brief visible in dev only); set `ready: true`
+ *  once the real file has been dropped in. */
+export type StorySlot = {
+  file: string;
+  /** "embed" = a live, looping HTML/SVG diagram (e.g. the Anatomy-style
+   *  system diagram) loaded in an iframe instead of a static image. */
+  kind: "image" | "video" | "embed";
+  /** Production note — never rendered in production builds */
+  brief: string;
+  alt: string;
+  caption?: string;
+  /** Static fallback for videos (also used when reduced motion is on) */
+  poster?: string;
+  /** column = text width · wide = breakout · full = largest showcase */
+  size?: "column" | "wide" | "full";
+  aspect?: "16/9" | "16/10" | "4/3" | "21/9" | "3/2" | "72/25";
+  ready?: boolean;
+  /** For "image" slots whose asset already carries its own background
+   *  (e.g. a diagram exported with a matching stage color) — skips the
+   *  padded blue-stage treatment and renders the image flush, full width. */
+  bare?: boolean;
+};
+
+/** One slide of a StorySection's carousel. */
+export type CarouselSlide = {
+  file: string;
+  brief: string;
+  alt: string;
+  /** Small label above the caption, e.g. "Unassigned" */
+  label: string;
+  caption: string;
+  ready?: boolean;
+};
+
+export type StorySection = {
+  id: string;
+  /** Short label for the side navigation */
+  nav: string;
+  eyebrow: string;
+  title: string;
+  body?: string;
+  /** A second paragraph — used for problem/decision/trade-off beats that read
+   *  better as two short paragraphs than one run-on. */
+  body2?: string;
+  facts?: { label: string; value: string }[];
+  /** Short list items, e.g. learnings */
+  list?: string[];
+  /** Editing note shown above the list in dev only */
+  listNote?: string;
+  slots?: StorySlot[];
+  /** stack = one after another · gallery = first slot large, rest in pairs */
+  slotLayout?: "stack" | "gallery";
+  /** A labelled-slide carousel placed after the section's text. */
+  carousel?: { assetDir?: string; slides: CarouselSlide[] };
+};
+
+/** A TL;DR impact strip shown near the top of the story, after the cover
+ *  credits. Stats here are modelled/estimated unless explicitly marked
+ *  otherwise — `note` should say so plainly rather than let a number stand
+ *  in as a measured result. */
+export type StoryImpact = {
+  body: string;
+  /** A second paragraph — used here for the before/after summary. */
+  body2?: string;
+  stats: { value: string; label: string }[];
+};
+
+export type Story = {
+  assetDir: string;
+  cover: { headline: string; descriptor: string; slot: StorySlot };
+  impact?: StoryImpact;
+  sections: StorySection[];
+};
+
 export type ClientProject = Common & {
   kind: "client";
   client: string;
@@ -61,11 +138,14 @@ export type ClientProject = Common & {
   goals?: string[];
   approach: string;
   solutionBlocks?: SolutionBlock[];
-  outcome: string;
+  outcome?: string;
   metrics?: Metric[];
   reflection?: string;
   gallery: Media[];
   deliverables?: string[];
+  /** When set, the page renders as a story (sections + reserved visuals)
+   *  instead of the standard client layout. */
+  story?: Story;
 };
 
 export type BuildProject = Common & {
@@ -348,75 +428,290 @@ export const projects: Project[] = [
     name: "CREWSLINK",
     tag: "Enterprise Operations Platform",
     year: "2024–2025",
-    description: "Designed for dispatchers who can't afford to look twice.",
+    description: "Keeping crew transportation moving.",
     bg: "linear-gradient(155deg, #1e3a2f 0%, #0f2018 55%, #060c09 100%)",
     accent: "#3a8f62",
-    cover: "/Crewslink -Cover.webp",
-    heroImage: "/Crewslink -Cover.webp",
+    cover: "/crewslink/00_card_poster.webp",
+    heroImage: "/crewslink/00_card_poster.webp",
+    heroVideo: "/crewslink/00_card_loop.mp4",
     client: "CrewsLink",
-    role: "Sole Designer",
-    scope: ["End-to-end admin platform"],
-    industry: "Aviation Ground Transport",
-    deliverables: ["Live"],
-    overview:
-      "The person behind every on-time pickup.\n\nCrewsLink coordinates ground transportation for airlines like WestJet and Air Canada across 37+ airports. The platform moves 24,000+ crew members monthly. Behind that is a dispatcher, someone on screen for 10-hour shifts, managing live trips, tracking drivers, and rebooking pickups in under 4 minutes when flights change.\n\nThat person is who I designed for.",
+    role: "Product Designer",
+    scope: ["Trip management", "Booking", "Live dispatch"],
+    industry: "Airline crew transportation",
     problem:
-      "Dispatch software is built for completeness, not speed. Every field present. Every option visible. The result: dense interfaces that slow down the people who need to move fastest.\n\nOne principle guided every decision: can a tired dispatcher at hour 10 understand this in 2 seconds?",
-    problemImage: "/Crewslink -problem.webp",
-    goals: [
-      "Status legibility: every driver's state visible at a glance, no dropdowns.",
-      "Trip flow: booking, managing, and reconciling trips in fewer screens.",
-      "Operational truth: contracts, billing, and permissions in one platform.",
-    ],
+      "CrewsLink coordinates ground transportation for airline crews. I worked on the experience across booking, trip management, and live dispatch.",
     approach:
-      "Five interconnected modules (Map Overview, New Booking, Trip Management, Contract & Billing, Permissions) built around one principle: every unnecessary click is friction. Friction costs time. Time costs crews.",
-    solutionBlocks: [
-      {
-        index: "01",
-        title: "Map Overview",
-        body:
-          "The command centre. Live driver positions on the map. Left panel shows all drivers with colour-coded status. Persistent pill filter bar at the top, one click to isolate Available, On the way, or Arrived drivers. No dropdowns. No nested menus.",
-        media: [{ src: "/Crewslink -1.webp", label: "Map Overview: live positions, status pills", aspect: "wide" }],
-      },
-      {
-        index: "02",
-        title: "New Booking",
-        body:
-          "Trip details and passenger info side by side. Live trip summary updates as fields are filled. Map visible throughout, so dispatchers confirm pickup and dropoff visually without switching screens.",
-        media: [{ src: "/crewslink -2.webp", label: "New Booking: details, summary, map in one view", aspect: "wide" }],
-      },
-      {
-        index: "03",
-        title: "Trip Management",
-        body:
-          "65 trips in one view. The Flight Connected column tells dispatchers instantly which bookings auto-update with flight data and which need manual attention. Active and Closed trips separated by a single toggle.",
-        media: [{ src: "/crewslink -3.webp", label: "Trip Management: 65 trips, Flight Connected column", aspect: "wide" }],
-      },
-      {
-        index: "04",
-        title: "Contract & Billing Management",
-        body:
-          "Airlines operate on complex contracts per airport, route, and vehicle type. The contract table surfaces expiring contracts proactively. Billing consolidates Client, Vendor, and Driver pay into one place, with no reconciliation across systems.",
-        media: [{ src: "/crewslink -4.webp", label: "Contract & Billing: one consolidated view", aspect: "wide" }],
-      },
-      {
-        index: "05",
-        title: "Permissions",
-        body:
-          "Role-based access across every module. Dispatchers, vendor admins, drivers, and airline clients each see only what they need. New users onboarded with one template click.",
-        media: [{ src: "/crewslink -5.webp", label: "Permissions: role-based access, template onboarding", aspect: "wide" }],
-      },
-    ],
-    outcome:
-      "Replacing the status filter dropdown with a persistent pill bar. Dispatchers filter by driver status dozens of times per shift. Three clicks became one. For someone doing it 50 times a day, that's hundreds of saved interactions per shift.\n\nThe best dispatch software feels like an extension of instinct. Every unnecessary click is friction. Friction costs time. Time costs crews.",
-    metrics: [
-      { value: "99.7%", label: "On-time pickup rate" },
-      { value: "24,000+", label: "Crew moved monthly" },
-      { value: "37+", label: "Airports · 3 airlines" },
-    ],
-    reflection:
-      "Designing for dispatchers means designing for hour 10 of a 10-hour shift. The benchmark isn't \"does this look good?\" It's \"can someone exhausted still get it right at 2 a.m.?\" That question quietly rewrote every layout decision.\n\nWestJet · Air Canada · SkyWest · 37+ airports. The full platform is live.",
+      "Booking, trip management, and live dispatch brought into one connected workflow.",
     gallery: [],
+    story: {
+      assetDir: "crewslink",
+      cover: {
+        headline: "Keeping crew transportation moving.",
+        descriptor:
+          "CrewsLink Connect coordinates ground transportation for airline crews. I worked on the experience across booking, trip management, and live dispatch, bringing the information and actions needed to manage a trip into a connected workflow.",
+        slot: {
+          file: "00_cover_dispatch_loop.mp4",
+          kind: "video",
+          poster: "00_cover_poster.webp",
+          brief:
+            "32s loop, 1920×1080. Real product states. Poster: 00_cover_poster.webp",
+          alt: "Live dispatch map: an urgent trip is selected and a driver offer is sent.",
+          size: "full",
+          aspect: "16/9",
+          ready: true,
+        },
+      },
+      impact: {
+        body:
+          "CrewsLink coordinates ground transportation for airline crews, where booking changes, driver availability, and pickup timing all affect daily operations.",
+        body2:
+          "I worked on connecting the booking, trip management, and live dispatch experiences, with a focus on making operational information easier to find and decisions easier to act on.",
+        stats: [
+          { value: "99.7%", label: "On-Time Pickup Rate" },
+          { value: "24,000+", label: "Crew Members Moved Monthly" },
+          { value: "37+", label: "Airports Served" },
+        ],
+      },
+      sections: [
+        {
+          id: "context",
+          nav: "Context",
+          eyebrow: "Context",
+          title: "A schedule that rarely stays still.",
+          body:
+            "Ground transportation for airline crews depends on a chain of time-sensitive decisions. Trips need to be created, drivers assigned, pickups monitored, and unexpected changes handled without losing track of the wider operation.",
+          body2:
+            "A delayed driver or a change in flight timing can affect more than one trip. Dispatchers need to understand what is happening, identify what requires attention, and act before a small issue becomes a missed pickup.\n\nCrewsLink was building an in-house platform to support its transportation operations, bringing booking and dispatch workflows into a more connected experience.",
+          slots: [
+            {
+              file: "system-overview.html",
+              kind: "embed",
+              brief:
+                "Live looping isometric diagram (Anatomy-style): Booking → Trip Management → Live Dispatch, a job card pulses along the bench to each instrument.",
+              alt: "System overview: Booking, Trip Management, and Live Dispatch as three connected instruments on one bench, with a job card pulsing between them.",
+              size: "column",
+              aspect: "72/25",
+              ready: true,
+            },
+          ],
+        },
+        {
+          id: "challenge",
+          nav: "The challenge",
+          eyebrow: "The challenge",
+          title: "Making the next action clear.",
+          body:
+            "Dispatchers needed to see which trips were progressing normally and which needed attention, without opening every booking to check. And once a trip did need attention, the relevant context and the available options had to sit in the same place instead of being scattered across screens.",
+          body2:
+            "Booking added its own layer of complexity. A single booking already involves flight details, pickup information, passengers, and vehicles, and bulk manifests pile inconsistent or incomplete data on top of that.\n\nThese challenges shaped the experience around three connected activities: creating bookings, managing trips, and responding to live operational changes.",
+        },
+        {
+          id: "approach",
+          nav: "Approach",
+          eyebrow: "Approach",
+          title: "One operation, different levels of attention.",
+          body:
+            "Each workflow calls for a different level of attention. Booking prioritizes accurate inputs, Trip Management supports scanning and comparison, and Live Dispatch brings urgent decisions into focus.",
+          body2:
+            "I used this distinction to determine what information should remain visible and what could be revealed when needed.",
+          slots: [
+            {
+              file: "approach_relationship.webp",
+              kind: "image",
+              brief:
+                "Map of the three modules and how their surfaces connect: New Booking (single/bulk), Trip Management (trip table, columns, peek panel), and Live Dispatch (attention queue, fleet map, driver overview, selected trip), converging on assigning a driver and sending an offer.",
+              alt: "A map of CrewsLink's three modules, New Booking, Trip Management, and Live Dispatch, and how their surfaces connect, converging on assigning a driver and sending an offer.",
+              size: "column",
+              aspect: "16/9",
+              ready: true,
+              bare: true,
+            },
+          ],
+        },
+        {
+          id: "trip-management",
+          nav: "Trip management",
+          eyebrow: "Design decision 01",
+          title: "Keeping the operation visible.",
+          body:
+            "The trip table had to serve two purposes: help dispatchers monitor the wider operation and identify trips that needed intervention.",
+          body2:
+            "I organized trips around their operational status and timing, bringing delayed and unassigned trips into clearer focus. A contextual panel keeps the selected trip and its available actions alongside the table, so dispatchers can investigate an issue without losing their place in the queue.\n\nThe key trade-off was deciding what belonged in the table and what could wait until a trip was selected. Keeping the overview focused made it easier to scan, while the panel provided the detail needed to act.",
+          slots: [
+            {
+              file: "04_trip_management_full.webp",
+              kind: "image",
+              brief: "The trip table: booking ID, status, driver due, driver, ETA, and flight, in one scannable view.",
+              alt: "The trip table with status, timing, driver, and flight columns for every open trip.",
+              caption: "Status, timing, and driver information scannable in one table.",
+              size: "wide",
+              aspect: "16/10",
+              ready: true,
+            },
+            {
+              file: "04_trip_side_panel.webp",
+              kind: "image",
+              brief: "A trip selected, with its contextual side panel open: driver arrival estimates and a Review offer action, table still visible behind it.",
+              alt: "A trip selected from the list, its side panel open showing driver arrival estimates while the table stays visible.",
+              caption: "Selecting a trip opens its panel without leaving the table.",
+              size: "wide",
+              aspect: "16/10",
+              ready: true,
+            },
+          ],
+        },
+        {
+          id: "live-dispatch",
+          nav: "Live dispatch",
+          eyebrow: "Design decision 02",
+          title: "Responding when plans change.",
+          body:
+            "When a trip needs a driver, proximity alone isn't enough. The dispatcher needs to know who can reach the pickup before it becomes late.",
+          body2:
+            "I brought the trip route, driver availability, and estimated arrival times into one workspace, allowing dispatchers to compare options in context before sending an offer.\n\nThe map was designed to support that decision, not simply display vehicle locations. Selecting a trip connects its operational status with the route and the available response options.",
+          slots: [
+            {
+              file: "07_dispatch_hero.mp4",
+              kind: "video",
+              poster: "07_dispatch_hero_poster.webp",
+              brief:
+                "Main showcase: map overview → select unassigned trip → compare drivers → send offer. Real redesigned Map Overview UI, restrained zoom and cursor.",
+              alt: "An unassigned trip is selected, drivers are compared, and an offer is sent.",
+              size: "full",
+              aspect: "16/9",
+              ready: true,
+            },
+            {
+              file: "07_driver_comparison.webp",
+              kind: "image",
+              brief: "The trip's route and ranked driver arrival estimates, shown together for the send-offer decision.",
+              alt: "A trip's route on the map beside ranked driver arrival estimates, before an offer is sent.",
+              caption: "Route and driver estimates shown together before an offer is sent.",
+              size: "wide",
+              aspect: "16/10",
+              ready: true,
+            },
+          ],
+          carousel: {
+            slides: [
+              {
+                file: "carousel_dispatch_offered.webp",
+                brief: "An offer sent to a driver, awaiting their acceptance.",
+                alt: "A trip with an offer pending, awaiting driver acceptance.",
+                label: "Offer pending",
+                caption: "An offer is sent and awaiting acceptance.",
+                ready: true,
+              },
+              {
+                file: "carousel_dispatch_late.webp",
+                brief: "A trip running late, with its timing signal visible.",
+                alt: "A trip showing a late-driver state.",
+                label: "Late driver",
+                caption: "A trip needs attention because of timing.",
+                ready: true,
+              },
+              {
+                file: "carousel_dispatch_monitoring.webp",
+                brief: "An active trip, crew on board, being tracked en route to drop-off.",
+                alt: "An active trip being monitored on the map, crew on board.",
+                label: "In progress",
+                caption: "An active trip is being tracked.",
+                ready: true,
+              },
+            ],
+          },
+        },
+        {
+          id: "booking",
+          nav: "Booking",
+          eyebrow: "Design decision 03",
+          title: "From trip details to a ready booking.",
+          body:
+            "Before a trip can be dispatched, its information needs to be complete enough to act on. Flight details, pickup timing, passengers, and vehicle requirements all need to come together in one booking.",
+          body2:
+            "The single-booking flow organizes these inputs into a guided process, with flight-linked information helping reduce repetitive entry where available. The final review state gives the user an opportunity to verify the booking before it is created.",
+          carousel: {
+            slides: [
+              {
+                file: "carousel_single_start.webp",
+                brief: "The booking flow at its starting state.",
+                alt: "Beginning a single booking: flight lookup linked to client and contract.",
+                label: "Start",
+                caption: "Flight lookup fills client, route, and contract.",
+                ready: true,
+              },
+              {
+                file: "carousel_single_ready.webp",
+                brief: "The completed booking details ready for review.",
+                alt: "A completed booking summary with route map, before saving.",
+                label: "Ready",
+                caption: "Reviewing the completed details before saving.",
+                ready: true,
+              },
+              {
+                file: "carousel_single_saved.webp",
+                brief: "The booking confirmation state.",
+                alt: "A confirmation dialog for a newly created, unassigned booking.",
+                label: "Saved",
+                caption: "Booking created, unassigned until a driver is sent.",
+                ready: true,
+              },
+            ],
+          },
+        },
+        {
+          id: "bulk-booking",
+          nav: "Bulk booking",
+          eyebrow: "Design decision 04",
+          title: "Handling incomplete data without blocking the batch.",
+          body:
+            "Crew manifests aren't always ready to import. Columns may not match the system's fields, and individual rows can contain missing information.",
+          body2:
+            "I structured bulk booking around three steps: upload, map, and review. Rather than treating the entire file as valid or invalid, the review stage identifies rows that need correction while keeping the rest of the batch visible.\n\nThis allows dispatchers to identify and correct individual issues before creating bookings, while keeping the rest of the batch visible for review.",
+          slotLayout: "gallery",
+          slots: [
+            {
+              file: "06_bulk_upload.webp",
+              kind: "image",
+              brief: "The upload step: drop a manifest or try a sample file, with a template download for the expected columns.",
+              alt: "Uploading a crew manifest spreadsheet, with a sample file and template download available.",
+              caption: "Upload a manifest. No bookings are created yet.",
+              size: "wide",
+              aspect: "16/10",
+              ready: true,
+            },
+            {
+              file: "06_bulk_mapping.webp",
+              kind: "image",
+              brief: "Matching spreadsheet columns to CrewsLink fields, with a live first-row preview per field.",
+              alt: "Mapping spreadsheet columns to CrewsLink fields, with a preview of the first row for each field.",
+              caption: "Each column is matched to a field, with a live preview.",
+              aspect: "16/10",
+              ready: true,
+            },
+            {
+              file: "06_bulk_row_edit.webp",
+              kind: "image",
+              brief: "Editing one row flagged as needing details. The rest of the batch stays available for review.",
+              alt: "A single flagged row being corrected, with missing passenger and luggage counts called out.",
+              caption: "A flagged row is corrected without blocking the rest of the batch.",
+              aspect: "16/10",
+              ready: true,
+            },
+          ],
+        },
+        {
+          id: "reflection",
+          nav: "Reflection",
+          eyebrow: "Reflection",
+          title: "Designing for the moments that need attention.",
+          body:
+            "The hardest part of this project wasn't fitting more information onto a screen. It was deciding which information deserved attention at each moment.",
+          body2:
+            "Trip Management needed to preserve the bigger picture, while Live Dispatch needed to support immediate decisions. Designing both experiences showed me how much the same operational data can change in importance depending on the task.\n\nIf I were extending the work, I'd focus on validating how dispatchers handle overlapping exceptions during busy periods, when several trips require attention at once.",
+        },
+      ],
+    },
   },
   {
     kind: "build",

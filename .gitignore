@@ -23,3 +23,7 @@ next-env.d.ts
 # Personal local notes
 /TODO.md
 /IMAGE-SHOTLIST.md
+/review-exports/
+tempo/.tempo/
+tempo/node_modules/
+tempo/dist/

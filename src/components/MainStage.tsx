@@ -1138,6 +1138,21 @@ export default function MainStage({ visible }: { visible: boolean }) {
                     />
                   )}
 
+                  {/* Looping video — skipped under reduced motion, where the poster image stays */}
+                  {cur.heroVideo && !reducedMotion && (
+                    <video
+                      src={encodeURI(cur.heroVideo)}
+                      poster={cur.heroImage ? encodeURI(cur.heroImage) : undefined}
+                      autoPlay
+                      muted
+                      loop
+                      playsInline
+                      aria-hidden
+                      className="absolute inset-0 w-full h-full pointer-events-none"
+                      style={{ objectFit: "cover", zIndex: 0 }}
+                    />
+                  )}
+
                   {/* Lottie animation — sits below all overlays */}
                   {cur.heroAnimation && (
                     <div className="absolute inset-0 overflow-hidden" style={{ zIndex: 0 }}>
