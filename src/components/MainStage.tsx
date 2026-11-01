@@ -1153,7 +1153,7 @@ export default function MainStage({ visible }: { visible: boolean }) {
         <div
           ref={tickerContainerRef}
           className="shrink-0 overflow-hidden relative select-none"
-          style={{ height: 120, minHeight: 120, borderTop: `1px dashed ${theme === "light" ? "rgba(0,0,0,0.18)" : "rgba(255,255,255,0.14)"}`, touchAction: "pan-y", cursor: "grab" }}
+          style={{ height: 96, minHeight: 96, borderTop: `1px dashed ${theme === "light" ? "rgba(0,0,0,0.18)" : "rgba(255,255,255,0.14)"}`, touchAction: "pan-y", cursor: "grab" }}
           onMouseEnter={() => setCursorMode("default")}
           onPointerDown={onTickerPointerDown}
           onPointerMove={onTickerPointerMove}
