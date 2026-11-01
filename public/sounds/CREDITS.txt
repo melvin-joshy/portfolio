@@ -4,4 +4,4 @@ https://creativecommons.org/publicdomain/zero/1.0/
 Three sounds, one per kind of action:
 tap.mp3       Interface Sounds  click_001   buttons and links (top nav)
 move.mp3      RPG Audio         cloth2      moving between projects
-artifact.mp3  Interface Sounds  pluck_002   clicking an artifact
+artifact.mp3  Interface Sounds  pluck_002   clicking any artifact

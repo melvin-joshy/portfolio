@@ -1038,8 +1038,8 @@ export default function Artifacts({ onRaccoonSignal, onSpotlightSignal, onEaster
 
   const triggerAction = useCallback((id: ArtifactId) => {
     collect(id);
-    // Shared artifact sound (music and raccoon already make their own noise)
-    if (id !== "music-player" && id !== "raccoon-signal") playSfx("artifact");
+    // One shared sound for every artifact
+    playSfx("artifact");
 
     // Any interaction means they've found the mechanic — kill the hint for good.
     setHintActive(false);
