@@ -425,8 +425,8 @@ export default function SpaceBackground({ theme }: { theme: "dark" | "light" }) 
       {/* Masked out of the nav and rail/footer rows: glyphs next to type read as stray punctuation */}
       <canvas ref={canvasRef} style={{
         position: "absolute", inset: 0, width: "100%", height: "100%",
-        maskImage: "linear-gradient(to bottom, transparent 46px, #000 64px, #000 calc(100% - 148px), transparent calc(100% - 132px))",
-        WebkitMaskImage: "linear-gradient(to bottom, transparent 46px, #000 64px, #000 calc(100% - 148px), transparent calc(100% - 132px))",
+        maskImage: "linear-gradient(to bottom, transparent 46px, #000 64px, #000 calc(100% - 160px), transparent calc(100% - 144px))",
+        WebkitMaskImage: "linear-gradient(to bottom, transparent 46px, #000 64px, #000 calc(100% - 160px), transparent calc(100% - 144px))",
       }} />
     </div>
   );
