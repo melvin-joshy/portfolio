@@ -181,7 +181,7 @@ export const projects: Project[] = [
     kind: "case-study",
     id: "clarity",
     name: "CLARITY",
-    tag: "Voice AI · Personal Project · 2025",
+    tag: "Voice Journaling App · Personal Project · 2025",
     year: "2025",
     description:
       "Voice-first AI journaling that captures thoughts freely and organises them into life themes.",
