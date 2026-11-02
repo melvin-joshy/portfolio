@@ -1,27 +1,26 @@
+import { FONTS } from "./projectStyle";
+
 type Item = { label: string; value: string };
 
 export function MetaStrip({ items }: { items: Item[] }) {
   return (
-    <div
-      className="grid grid-cols-[1fr_1.1fr] gap-x-20 gap-y-10 border-y py-9 md:gap-x-32"
+    <dl
+      className="grid grid-cols-2 gap-x-14 gap-y-9 border-y py-8 md:grid-cols-4"
       style={{ borderColor: "rgba(255,255,255,0.08)" }}
     >
       {items.map((item) => (
         <div key={item.label}>
-          <p
-            className="text-[10px] tracking-[0.28em] uppercase text-white/40"
-            style={{ fontFamily: "var(--font-mono)", fontWeight: 500 }}
+          <dt
+            className="text-[10px] tracking-[0.24em] uppercase text-white/40"
+            style={{ fontFamily: FONTS.mono, fontWeight: 500 }}
           >
             {item.label}
-          </p>
-          <p
-            className="mt-3 text-[12px] tracking-[0.18em] uppercase text-white/85"
-            style={{ fontFamily: "var(--font-mono)", fontWeight: 400 }}
-          >
+          </dt>
+          <dd className="mt-3 text-[14px] leading-[1.45] text-white/85" style={{ fontFamily: FONTS.text }}>
             {item.value}
-          </p>
+          </dd>
         </div>
       ))}
-    </div>
+    </dl>
   );
 }
