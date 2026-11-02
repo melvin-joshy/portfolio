@@ -94,7 +94,6 @@ export function BuildBody({ project }: { project: BuildProject }) {
 
       {/* 04 · Why I built it */}
       <SectionColumn id="why">
-        <Eyebrow>Why I built it</Eyebrow>
         <SerifHeading>The itch</SerifHeading>
         <div className="mt-5">{paragraphs(project.whyIBuiltIt)}</div>
       </SectionColumn>
@@ -102,14 +101,14 @@ export function BuildBody({ project }: { project: BuildProject }) {
       {/* 05 · What it does */}
       {project.whatItDoes && (
         <SectionColumn id="what">
-          <Eyebrow>What it does</Eyebrow>
+          <SerifHeading>What it does</SerifHeading>
           <div className="mt-5">{paragraphs(project.whatItDoes)}</div>
         </SectionColumn>
       )}
 
       {/* 05b · Stack chips */}
       <SectionColumn id="stack">
-        <Eyebrow>Stack</Eyebrow>
+        <SerifHeading>Stack</SerifHeading>
         <div className="mt-5 flex flex-wrap gap-2">
           {project.stack.map((s) => (
             <span
@@ -129,7 +128,6 @@ export function BuildBody({ project }: { project: BuildProject }) {
 
       {/* 06 · Screens gallery */}
       <SectionColumn id="screens">
-        <Eyebrow>Screens</Eyebrow>
         <SerifHeading>What it looks like</SerifHeading>
       </SectionColumn>
       <div className={`mt-10 ${COLUMN}`}>
@@ -164,7 +162,7 @@ export function BuildBody({ project }: { project: BuildProject }) {
       {/* 06b · Insight / meta moment */}
       {project.insight && (
         <SectionColumn id="insight">
-          <Eyebrow>{project.insightLabel ?? "One thing I got right"}</Eyebrow>
+          <SerifHeading>{project.insightLabel ?? "One thing I got right"}</SerifHeading>
           <div className="mt-5">{paragraphs(project.insight)}</div>
         </SectionColumn>
       )}
@@ -286,7 +284,7 @@ function Eyebrow({ children }: { children: React.ReactNode }) {
 
 function SerifHeading({ children }: { children: React.ReactNode }) {
   return (
-    <h2 className={`mt-4 ${H2_CLASS}`} style={H2_STYLE}>
+    <h2 className={H2_CLASS} style={H2_STYLE}>
       {children}
     </h2>
   );

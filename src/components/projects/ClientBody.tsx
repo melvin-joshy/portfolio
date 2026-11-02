@@ -117,7 +117,6 @@ export function ClientBody({ project }: { project: ClientProject }) {
 
       {/* 04 · Context & Research */}
       <SectionColumn id="overview">
-        <Eyebrow>Context & Research</Eyebrow>
         <SerifHeading>The starting point</SerifHeading>
         {project.overview ? (
           <div className="mt-5">{paragraphs(project.overview)}</div>
@@ -164,7 +163,6 @@ export function ClientBody({ project }: { project: ClientProject }) {
 
       {/* 06 · Problem statement */}
       <SectionColumn id="challenge">
-        <Eyebrow>Problem</Eyebrow>
         <SerifHeading>{project.problem.split(".")[0]}</SerifHeading>
         <div className="mt-5">{paragraphs(project.problem.slice(project.problem.indexOf(".") + 1).trim())}</div>
       </SectionColumn>
@@ -174,7 +172,6 @@ export function ClientBody({ project }: { project: ClientProject }) {
 
       {/* 07 · Approach */}
       <SectionColumn id="approach">
-        <Eyebrow>Solution</Eyebrow>
         <SerifHeading>{project.approach.split(".")[0]}</SerifHeading>
         <div className="mt-5">{paragraphs(project.approach.slice(project.approach.indexOf(".") + 1).trim())}</div>
       </SectionColumn>
@@ -186,8 +183,7 @@ export function ClientBody({ project }: { project: ClientProject }) {
       {project.gallery.length > 0 && (
         <>
           <SectionColumn id="final-designs">
-            <Eyebrow>Final Designs</Eyebrow>
-            <SerifHeading>The shipped work</SerifHeading>
+                <SerifHeading>The shipped work</SerifHeading>
             <p className="sr-only">Final design gallery</p>
           </SectionColumn>
           <div className={`mt-10 ${COLUMN}`}>
@@ -202,7 +198,6 @@ export function ClientBody({ project }: { project: ClientProject }) {
 
       {/* 10 · Impact / Outcome */}
       <SectionColumn id="impact">
-        <Eyebrow>Impact</Eyebrow>
         <SerifHeading>The outcome</SerifHeading>
         <SerifBody>{project.outcome}</SerifBody>
       </SectionColumn>
@@ -263,7 +258,7 @@ export function ClientBody({ project }: { project: ClientProject }) {
 
       {/* 12 · Reflection & Results — multiple short sub-paragraphs (Robert Kan pattern) */}
       <article id="reflection" className={`${COLUMN} mt-28 scroll-mt-24`}>
-        <Eyebrow>Reflection & Results</Eyebrow>
+        <SerifHeading>Reflection & Results</SerifHeading>
         {project.reflection ? (
           <div className="mt-5">{paragraphs(project.reflection)}</div>
         ) : (
@@ -341,20 +336,9 @@ function SectionColumn({ id, children }: { id?: string; children: React.ReactNod
   );
 }
 
-function Eyebrow({ children }: { children: React.ReactNode }) {
-  return (
-    <p
-      className="text-[11px] tracking-[0.2em] uppercase text-white/55"
-      style={{ fontFamily: FONTS.mono, fontWeight: 500 }}
-    >
-      {children}
-    </p>
-  );
-}
-
 function SerifHeading({ children }: { children: React.ReactNode }) {
   return (
-    <h2 className={`mt-4 ${H2_CLASS}`} style={H2_STYLE}>
+    <h2 className={H2_CLASS} style={H2_STYLE}>
       {children}
     </h2>
   );
@@ -439,7 +423,6 @@ function SolutionBlockView({
   return (
     <>
       <SectionColumn id={`solution-${idx}`}>
-        <Eyebrow>Decision · {idx}</Eyebrow>
         <SerifHeading>{block.title}</SerifHeading>
         {block.body ? (
           <div className="mt-5">{paragraphs(block.body)}</div>

@@ -84,13 +84,7 @@ export function Chapter({ chapter, index, id }: { chapter: ChapterT; index: numb
       transition={{ duration: 0.55, ease: EASE }}
       className="mt-28 scroll-mt-24 first:mt-20"
     >
-      <p
-        className="text-[11px] tracking-[0.2em] uppercase text-white/55"
-        style={{ fontFamily: FONTS.mono, fontWeight: 500 }}
-      >
-        {chapter.eyebrow ?? `Chapter ${String(index + 1).padStart(2, "0")}`}
-      </p>
-      <h2 className={`mt-4 ${H2_CLASS}`} style={H2_STYLE}>
+      <h2 className={H2_CLASS} style={H2_STYLE}>
         {chapter.title}
       </h2>
       <p className={`mt-5 ${BODY_P}`} style={{ fontFamily: FONTS.text, fontWeight: 400 }}>

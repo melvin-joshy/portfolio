@@ -9,7 +9,7 @@ import { ChapterTOC, type TOCItem } from "./ChapterTOC";
 import { WireNote } from "./Wireframe";
 import { ScribbleUnderline } from "../ScribbleUnderline";
 import { LightboxProvider, useLightbox } from "./Lightbox";
-import { BODY_P, COLUMN, FONTS, H1_CLASS, H1_STYLE } from "./projectStyle";
+import { BODY_P, COLUMN, FONTS, H1_CLASS, H1_STYLE, H2_CLASS, H2_STYLE } from "./projectStyle";
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 
@@ -124,7 +124,7 @@ function CaseStudyBodyInner({ project }: { project: CaseStudyProject }) {
             transition={{ duration: 0.6, ease: EASE }}
             className="mt-28 scroll-mt-24"
           >
-            <Eyebrow>Reflection</Eyebrow>
+            <h2 className={H2_CLASS} style={H2_STYLE}>Reflection</h2>
             {project.reflection ? (
               <p className={`mt-5 ${BODY_P}`} style={{ fontFamily: FONTS.text, fontWeight: 400 }}>
                 {project.reflection}
@@ -160,7 +160,7 @@ function CaseStudyBodyInner({ project }: { project: CaseStudyProject }) {
                   }}
                 />
               )}
-              <Eyebrow>Outcome</Eyebrow>
+              <h2 className={H2_CLASS} style={H2_STYLE}>Outcome</h2>
               <p className={`mt-5 ${BODY_P}`} style={{ fontFamily: FONTS.text, fontWeight: 400 }}>
                 {project.outcome}
               </p>
