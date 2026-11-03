@@ -4,7 +4,8 @@ import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import type { Chapter as ChapterT, Media } from "@/data/projects";
 import { WireBox, WireNote } from "./Wireframe";
-import { useLightbox } from "./Lightbox";
+import { STAGE_BG, useLightbox } from "./Lightbox";
+import { BODY_P, FONTS, H2_CLASS, H2_STYLE } from "./projectStyle";
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 
@@ -77,29 +78,16 @@ export function Chapter({ chapter, index, id }: { chapter: ChapterT; index: numb
   return (
     <motion.section
       id={id}
-      initial={{ opacity: 0, y: 20 }}
+      initial={{ opacity: 0, y: 16 }}
       whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-100px" }}
-      transition={{ duration: 0.6, ease: EASE }}
-      className="scroll-mt-24 border-t py-14"
-      style={{ borderColor: "rgba(255,255,255,0.06)" }}
+      viewport={{ once: true, margin: "-80px" }}
+      transition={{ duration: 0.55, ease: EASE }}
+      className="mt-28 scroll-mt-24 first:mt-20"
     >
-      <p
-        className="text-[11px] tracking-[0.22em] uppercase text-white/58"
-        style={{ fontFamily: "var(--font-mono)", fontWeight: 500 }}
-      >
-        {chapter.eyebrow ?? `Chapter ${String(index + 1).padStart(2, "0")}`}
-      </p>
-      <h2
-        className="mt-4 text-[clamp(22px,2.4vw,28px)] leading-[1.2] text-white"
-        style={{ fontFamily: "var(--font-serif)", fontWeight: 500, letterSpacing: "-0.005em" }}
-      >
+      <h2 className={H2_CLASS} style={H2_STYLE}>
         {chapter.title}
       </h2>
-      <p
-        className="mt-5 text-[17px] leading-[1.7] text-white/68"
-        style={{ fontFamily: "var(--font-serif)", fontWeight: 300 }}
-      >
+      <p className={`mt-5 ${BODY_P}`} style={{ fontFamily: FONTS.text, fontWeight: 400 }}>
         {chapter.body}
       </p>
 
@@ -110,7 +98,7 @@ export function Chapter({ chapter, index, id }: { chapter: ChapterT; index: numb
             ? <DualPhoneTray items={chapter.media ?? []} />
             : <>
                 {images.length > 0 && (
-                  <div className={`mt-8 grid gap-5 ${images.length > 1 && images.every(m => m.aspect) ? "md:grid-cols-2" : ""}`}>
+                  <div className={`mt-10 grid gap-6 ${images.length > 1 && images.every(m => m.aspect) ? "md:grid-cols-2" : ""}`}>
                     {images.map((m, i) => <ImageTile key={i} media={m} />)}
                   </div>
                 )}
@@ -121,7 +109,7 @@ export function Chapter({ chapter, index, id }: { chapter: ChapterT; index: numb
         </>
       ) : mediaExplicitlyEmpty ? null : (
         <>
-          <div className="mt-8 grid gap-5 md:grid-cols-2">
+          <div className="mt-10 grid gap-6 md:grid-cols-2">
             <WireBox aspect="4/3" label={`Ch. ${String(index + 1).padStart(2, "0")} · A`} hint="screen / sketch / data" />
             <WireBox aspect="4/3" label={`Ch. ${String(index + 1).padStart(2, "0")} · B`} hint="annotation / detail" />
           </div>
@@ -142,8 +130,8 @@ function DualPhoneTray({ items }: { items: Media[] }) {
   const lb = useLightbox();
   return (
     <div
-      className="mt-8 w-full rounded-sm flex items-center justify-center gap-3 px-3 py-5 sm:gap-8 sm:px-10 sm:py-6"
-      style={{ background: "#f5f5f5" }}
+      className="mt-10 w-full rounded-sm flex items-center justify-center gap-3 px-3 py-5 sm:gap-8 sm:px-10 sm:py-6"
+      style={{ background: STAGE_BG }}
     >
       {items.map((m, i) => {
         // Responsive: each phone caps at 40vw on mobile so two fit side-by-side, 220px on desktop.
@@ -157,7 +145,7 @@ function DualPhoneTray({ items }: { items: Media[] }) {
               <img src={encodeURI(m.src)} alt={m.caption ?? ""} onClick={() => lb?.open(m)} loading="lazy" decoding="async" data-cursor="ZOOM" data-cursor-variant="zoom" style={dims} />
             )}
             {m.caption && (
-              <p className="mt-1 text-[10px] sm:text-[12px] text-black/55 text-center" style={{ fontFamily: "var(--font-mono)" }}>
+              <p className="mt-1 text-[10px] sm:text-[12px] text-black/55 text-center" style={{ fontFamily: FONTS.mono }}>
                 {m.caption}
               </p>
             )}
@@ -193,8 +181,8 @@ function ImageTile({ media }: { media: Media }) {
         />
         {media.caption && (
           <figcaption
-            className="mt-3 text-[12px] text-white/62 text-center"
-            style={{ fontFamily: "var(--font-mono)" }}
+            className="mt-3.5 text-[12px] text-white/50 text-center"
+            style={{ fontFamily: FONTS.mono }}
           >
             {media.caption}
           </figcaption>
@@ -209,7 +197,7 @@ function ImageTile({ media }: { media: Media }) {
         className="overflow-hidden rounded-sm w-full flex items-center justify-center"
         style={{
           aspectRatio: ratio,
-          background: fit === "contain" ? "#f5f5f5" : undefined,
+          background: fit === "contain" ? STAGE_BG : undefined,
         }}
       >
         {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -227,8 +215,8 @@ function ImageTile({ media }: { media: Media }) {
       </div>
       {media.caption && (
         <figcaption
-          className="mt-3 text-[12px] text-white/62"
-          style={{ fontFamily: "var(--font-mono)" }}
+          className="mt-3.5 text-[12px] text-white/50"
+          style={{ fontFamily: FONTS.mono }}
         >
           {media.caption}
         </figcaption>
@@ -240,7 +228,7 @@ function ImageTile({ media }: { media: Media }) {
 /* ── Phone mockup video tile ── */
 function PhoneVideoTile({ media }: { media: Media }) {
   return (
-    <figure className="mt-8">
+    <figure className="mt-10">
       {/* Scene background */}
       <div style={{
         width: "100%",
@@ -330,8 +318,8 @@ function PhoneVideoTile({ media }: { media: Media }) {
 
       {media.caption && (
         <figcaption
-          className="mt-3 text-[12px] text-white/62 text-center"
-          style={{ fontFamily: "var(--font-mono)" }}
+          className="mt-3.5 text-[12px] text-white/50 text-center"
+          style={{ fontFamily: FONTS.mono }}
         >
           {media.caption}
         </figcaption>
@@ -347,11 +335,11 @@ function VideoTile({ media }: { media: Media }) {
   const ratio = media.aspect === "tall" ? "9/16" : media.aspect === "square" ? "1/1" : "16/9";
   const isTall = media.aspect === "tall";
   return (
-    <figure className="mt-8">
+    <figure className="mt-10">
       {/* Full-width background strip */}
       <div
         className="w-full rounded-sm flex items-center justify-center py-10"
-        style={{ background: "#ffffff" }}
+        style={{ background: STAGE_BG }}
       >
         {/* Phone-width inner container */}
         <div
@@ -368,8 +356,8 @@ function VideoTile({ media }: { media: Media }) {
       </div>
       {media.caption && (
         <figcaption
-          className="mt-3 text-[12px] text-white/62"
-          style={{ fontFamily: "var(--font-mono)" }}
+          className="mt-3.5 text-[12px] text-white/50"
+          style={{ fontFamily: FONTS.mono }}
         >
           {media.caption}
         </figcaption>

@@ -9,6 +9,7 @@ import { ChapterTOC, type TOCItem } from "./ChapterTOC";
 import { WireNote } from "./Wireframe";
 import { ScribbleUnderline } from "../ScribbleUnderline";
 import { LightboxProvider, useLightbox } from "./Lightbox";
+import { BODY_P, COLUMN, FONTS, H1_CLASS, H1_STYLE, H2_CLASS, H2_STYLE } from "./projectStyle";
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 
@@ -34,24 +35,16 @@ function CaseStudyBodyInner({ project }: { project: CaseStudyProject }) {
   return (
     <div className="px-6 pb-32 pt-12 md:px-10">
       {/* Right-edge TOC — collapses to dash markers, expands on hover (desktop only) */}
-      <ChapterTOC title={`${project.name} · Case Study`} items={tocItems} />
+      <ChapterTOC title={`${project.name} · Case Study`} items={tocItems} serifTitle={false} />
 
-      <article className="mx-auto max-w-[640px]">
+      <article className={COLUMN}>
         {/* Back to work */}
         <motion.div
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, ease: EASE }}
-          className="mb-10"
         >
-          <Link
-            href="/"
-            className="group inline-flex items-center gap-2 text-[10px] tracking-[0.25em] uppercase text-white/55 transition-colors duration-300 hover:text-white"
-            style={{ fontFamily: "var(--font-mono)" }}
-          >
-            <span className="transition-transform duration-300 group-hover:-translate-x-0.5">←</span>
-            <span>Back to work</span>
-          </Link>
+          <BackLink />
         </motion.div>
 
         {/* Hero */}
@@ -59,22 +52,15 @@ function CaseStudyBodyInner({ project }: { project: CaseStudyProject }) {
           initial={{ opacity: 0, y: 14 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7, ease: EASE }}
+          className="mt-10"
         >
-          <p
-            className="text-[11px] tracking-[0.22em] uppercase text-white/58"
-            style={{ fontFamily: "var(--font-mono)", fontWeight: 500 }}
-          >
-            {project.tag}
-          </p>
-          <h1
-            className="mt-5 text-[clamp(32px,4vw,44px)] leading-[1.15] text-white"
-            style={{ fontFamily: "var(--font-serif)", fontWeight: 400, letterSpacing: "-0.01em" }}
-          >
+          <Eyebrow>{project.tag}</Eyebrow>
+          <h1 className={`mt-5 ${H1_CLASS}`} style={H1_STYLE}>
             {project.problem}
           </h1>
           <p
-            className="mt-7 text-[12px] tracking-[0.22em] uppercase text-white/35"
-            style={{ fontFamily: "var(--font-mono)" }}
+            className="mt-6 text-[11px] tracking-[0.2em] uppercase text-white/40"
+            style={{ fontFamily: FONTS.mono }}
           >
             01 / {String(project.chapters.length).padStart(2, "0")} chapters
           </p>
@@ -91,7 +77,7 @@ function CaseStudyBodyInner({ project }: { project: CaseStudyProject }) {
             >
               <p
                 className="text-[11px] tracking-[0.3em] uppercase text-white/55"
-                style={{ fontFamily: "var(--font-mono)" }}
+                style={{ fontFamily: FONTS.mono }}
               >
                 Cover image
               </p>
@@ -107,7 +93,7 @@ function CaseStudyBodyInner({ project }: { project: CaseStudyProject }) {
       </article>
 
       {/* Meta strip — same narrow column as body (matches client / build templates) */}
-      <div className="mx-auto mt-20 max-w-[640px]">
+      <div className={`mt-16 ${COLUMN}`}>
         <MetaStrip
           items={[
             { label: "Role", value: project.role },
@@ -121,8 +107,8 @@ function CaseStudyBodyInner({ project }: { project: CaseStudyProject }) {
         />
       </div>
 
-      {/* Chapter column — same 640px center axis as the cover */}
-      <div className="relative mx-auto mt-8 max-w-[640px]">
+      {/* Chapter column — same 1040px axis as the cover */}
+      <div className={`relative ${COLUMN}`}>
         <div className="min-w-0">
           <div id="overview" className="scroll-mt-24" />
           {project.chapters.map((c, i) => (
@@ -136,20 +122,11 @@ function CaseStudyBodyInner({ project }: { project: CaseStudyProject }) {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-80px" }}
             transition={{ duration: 0.6, ease: EASE }}
-            className="scroll-mt-24 border-t py-14"
-            style={{ borderColor: "rgba(255,255,255,0.06)" }}
+            className="mt-28 scroll-mt-24"
           >
-            <p
-              className="text-[11px] tracking-[0.22em] uppercase text-white/58"
-              style={{ fontFamily: "var(--font-mono)", fontWeight: 500 }}
-            >
-              Reflection
-            </p>
+            <h2 className={H2_CLASS} style={H2_STYLE}>Reflection</h2>
             {project.reflection ? (
-              <p
-                className="mt-5 text-[17px] leading-[1.7] text-white/75"
-                style={{ fontFamily: "var(--font-serif)", fontWeight: 400, fontStyle: "italic" }}
-              >
+              <p className={`mt-5 ${BODY_P}`} style={{ fontFamily: FONTS.text, fontWeight: 400 }}>
                 {project.reflection}
               </p>
             ) : (
@@ -165,8 +142,7 @@ function CaseStudyBodyInner({ project }: { project: CaseStudyProject }) {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-80px" }}
               transition={{ duration: 0.6, ease: EASE }}
-              className="scroll-mt-24 border-t py-14"
-              style={{ borderColor: "rgba(255,255,255,0.06)" }}
+              className="mt-28 scroll-mt-24"
             >
               {project.id === "aura" && (
                 // eslint-disable-next-line @next/next/no-img-element
@@ -184,16 +160,8 @@ function CaseStudyBodyInner({ project }: { project: CaseStudyProject }) {
                   }}
                 />
               )}
-              <p
-                className="text-[11px] tracking-[0.22em] uppercase text-white/58"
-                style={{ fontFamily: "var(--font-mono)", fontWeight: 500 }}
-              >
-                Outcome
-              </p>
-              <p
-                className="mt-5 text-[17px] leading-[1.7] text-white/68"
-                style={{ fontFamily: "var(--font-serif)", fontWeight: 300 }}
-              >
+              <h2 className={H2_CLASS} style={H2_STYLE}>Outcome</h2>
+              <p className={`mt-5 ${BODY_P}`} style={{ fontFamily: FONTS.text, fontWeight: 400 }}>
                 {project.outcome}
               </p>
             </motion.section>
@@ -206,8 +174,7 @@ function CaseStudyBodyInner({ project }: { project: CaseStudyProject }) {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-60px" }}
               transition={{ duration: 0.5, ease: EASE }}
-              className="border-t pt-10"
-              style={{ borderColor: "rgba(255,255,255,0.06)" }}
+              className="mt-16"
             >
               <a
                 href={project.behanceUrl}
@@ -218,7 +185,7 @@ function CaseStudyBodyInner({ project }: { project: CaseStudyProject }) {
                 <ScribbleUnderline offsetY={4}>
                   <span
                     className="text-[11px] tracking-[0.22em] uppercase text-white/70 transition-colors duration-300 group-hover:text-white"
-                    style={{ fontFamily: "var(--font-mono)" }}
+                    style={{ fontFamily: FONTS.mono }}
                   >
                     View full case study on Behance
                   </span>
@@ -277,5 +244,43 @@ function SoftImageCard({ children, className = "" }: { children: React.ReactNode
         {children}
       </div>
     </div>
+  );
+}
+
+function BackLink() {
+  return (
+    <Link
+      href="/"
+      className="group inline-flex min-h-9 items-center gap-2 text-[13px] text-white/75 transition-colors duration-200 hover:text-white focus-visible:rounded-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white/60"
+      style={{ fontFamily: FONTS.text }}
+    >
+      <svg
+        width="16"
+        height="16"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.75"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        aria-hidden="true"
+        className="transition-transform duration-200 group-hover:-translate-x-0.5"
+      >
+        <path d="M19 12H5" />
+        <path d="m12 19-7-7 7-7" />
+      </svg>
+      <span>Back to work</span>
+    </Link>
+  );
+}
+
+function Eyebrow({ children }: { children: React.ReactNode }) {
+  return (
+    <p
+      className="text-[11px] tracking-[0.2em] uppercase text-white/55"
+      style={{ fontFamily: FONTS.mono, fontWeight: 500 }}
+    >
+      {children}
+    </p>
   );
 }

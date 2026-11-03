@@ -8,6 +8,7 @@ import { ChapterTOC, type TOCItem } from "./ChapterTOC";
 import { WireBox, WireNote, WireText } from "./Wireframe";
 import { LightboxProvider, useLightbox } from "./Lightbox";
 import { BRAND } from "@/lib/brand";
+import { BODY_P, COLUMN, FONTS, H1_CLASS, H1_STYLE, H2_CLASS, H2_STYLE } from "./projectStyle";
 
 function aspectKey(a?: string): "16/9" | "16/10" | "4/3" | "3/4" | "1/1" {
   if (a === "tall") return "3/4";
@@ -29,7 +30,7 @@ function ProblemImage({ src }: { src: string }) {
       onClick={() => lb?.open({ src })}
       data-cursor="ZOOM"
       data-cursor-variant="zoom"
-      className="mx-auto mt-8 w-full max-w-[640px] cursor-none rounded-sm block"
+      className="mx-auto mt-10 w-full max-w-[1040px] cursor-none rounded-sm block"
       style={{ display: "block" }}
     />
   );
@@ -37,7 +38,7 @@ function ProblemImage({ src }: { src: string }) {
 
 /* ───────────────── ClientBody ─────────────────
  * Reference: robertkan.com/projects/clubsneu
- * Narrow editorial column, serif body, mono eyebrows, soft image cards.
+ * Single 1040px column in the CrewsLink story system: Geist, mono labels, flush media.
  * Dark version — paper-like image surfaces sit on near-black canvas.
  * ─────────────────────────────────────────────── */
 
@@ -61,24 +62,16 @@ export function ClientBody({ project }: { project: ClientProject }) {
   return (
     <LightboxProvider>
     <div className="px-6 pb-32 pt-12 md:px-10">
-      <ChapterTOC title={`${project.name} · ${project.client}`} items={tocItems} />
+      <ChapterTOC title={`${project.name} · ${project.client}`} items={tocItems} serifTitle={false} />
       {/* ── Narrow editorial column ── */}
-      <article className="mx-auto max-w-[640px]">
+      <article className={COLUMN}>
         {/* Back to work — above headline */}
         <motion.div
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, ease: EASE }}
-          className="mb-10"
         >
-          <Link
-            href="/"
-            className="group inline-flex items-center gap-2 text-[10px] tracking-[0.25em] uppercase text-white/55 transition-colors duration-300 hover:text-white"
-            style={{ fontFamily: "var(--font-mono)" }}
-          >
-            <span className="transition-transform duration-300 group-hover:-translate-x-0.5">←</span>
-            <span>Back to work</span>
-          </Link>
+          <BackLink />
         </motion.div>
 
         {/* 01 · Headline + intro paragraph */}
@@ -86,20 +79,15 @@ export function ClientBody({ project }: { project: ClientProject }) {
           initial={{ opacity: 0, y: 14 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7, ease: EASE }}
+          className="mt-10"
         >
-          <h1
-            className="text-[clamp(32px,4vw,44px)] leading-[1.15] text-white"
-            style={{ fontFamily: "var(--font-serif)", fontWeight: 400, letterSpacing: "-0.01em" }}
-          >
+          <h1 className={H1_CLASS} style={H1_STYLE}>
             {project.description}
           </h1>
           {project.overview ? (
-            <div className="mt-7">{paragraphs(project.overview, true)}</div>
+            <div className="mt-6">{paragraphs(project.overview)}</div>
           ) : (
-            <p
-              className="mt-7 text-[17px] leading-[1.7] text-white/68"
-              style={{ fontFamily: "var(--font-serif)", fontWeight: 300 }}
-            >
+            <p className={`mt-6 ${BODY_P}`} style={{ fontFamily: FONTS.text, fontWeight: 400 }}>
               From {project.year}, as {project.role.toLowerCase()}, I worked with{" "}
               <em className="not-italic underline decoration-dotted decoration-white/30 underline-offset-4">
                 {project.client}
@@ -116,7 +104,7 @@ export function ClientBody({ project }: { project: ClientProject }) {
       </article>
 
       {/* 03 · Meta strip — same narrow column as body */}
-      <div className="mx-auto mt-20 max-w-[640px]">
+      <div className={`mt-16 ${COLUMN}`}>
         <MetaStrip
           items={[
             { label: "Client", value: project.client },
@@ -129,10 +117,9 @@ export function ClientBody({ project }: { project: ClientProject }) {
 
       {/* 04 · Context & Research */}
       <SectionColumn id="overview">
-        <Eyebrow>Context & Research</Eyebrow>
         <SerifHeading>The starting point</SerifHeading>
         {project.overview ? (
-          <div className="mt-5">{paragraphs(project.overview, true)}</div>
+          <div className="mt-5">{paragraphs(project.overview)}</div>
         ) : (
           <SerifBody>{project.problem}</SerifBody>
         )}
@@ -142,15 +129,14 @@ export function ClientBody({ project }: { project: ClientProject }) {
       <SectionColumn id="goals">
         <SerifHeading>What we set out to do</SerifHeading>
         {project.goals && project.goals.length > 0 ? (
-          <ul className="mt-5 space-y-3">
+          <ul className="mt-6 space-y-4">
             {project.goals.map((g, i) => (
               <li
                 key={i}
-                className="flex gap-4 text-[16px] leading-[1.7] text-white/72"
-                style={{ fontFamily: "var(--font-serif)", fontWeight: 300 }}
+                className="border-l pl-5 text-[17px] leading-[1.6] text-white/75"
+                style={{ borderColor: "rgba(255,255,255,0.18)", fontFamily: FONTS.text, fontWeight: 400 }}
               >
-                <span className="mt-[10px] inline-block h-[5px] w-[5px] shrink-0 rounded-full bg-danger" />
-                <span>{g}</span>
+                {g}
               </li>
             ))}
           </ul>
@@ -177,9 +163,8 @@ export function ClientBody({ project }: { project: ClientProject }) {
 
       {/* 06 · Problem statement */}
       <SectionColumn id="challenge">
-        <Eyebrow>Problem</Eyebrow>
         <SerifHeading>{project.problem.split(".")[0]}</SerifHeading>
-        <div>{paragraphs(project.problem.slice(project.problem.indexOf(".") + 1).trim(), true)}</div>
+        <div className="mt-5">{paragraphs(project.problem.slice(project.problem.indexOf(".") + 1).trim())}</div>
       </SectionColumn>
 
       {/* 06b · Problem image — inline, full-bleed, zoomable */}
@@ -187,9 +172,8 @@ export function ClientBody({ project }: { project: ClientProject }) {
 
       {/* 07 · Approach */}
       <SectionColumn id="approach">
-        <Eyebrow>Solution</Eyebrow>
         <SerifHeading>{project.approach.split(".")[0]}</SerifHeading>
-        <div>{paragraphs(project.approach.slice(project.approach.indexOf(".") + 1).trim(), true)}</div>
+        <div className="mt-5">{paragraphs(project.approach.slice(project.approach.indexOf(".") + 1).trim())}</div>
       </SectionColumn>
 
       {/* 08 · Solution blocks — each section carries its own id for TOC anchoring */}
@@ -199,12 +183,11 @@ export function ClientBody({ project }: { project: ClientProject }) {
       {project.gallery.length > 0 && (
         <>
           <SectionColumn id="final-designs">
-            <Eyebrow>Final Designs</Eyebrow>
-            <SerifHeading>The shipped work</SerifHeading>
+                <SerifHeading>The shipped work</SerifHeading>
             <p className="sr-only">Final design gallery</p>
           </SectionColumn>
-          <div className="mx-auto mt-2 max-w-[640px]">
-            <div className="flex flex-col gap-8">
+          <div className={`mt-10 ${COLUMN}`}>
+            <div className="flex flex-col gap-6">
               {project.gallery.map((m, i) => (
                 <AnnotatedImage key={i} media={m} />
               ))}
@@ -215,29 +198,28 @@ export function ClientBody({ project }: { project: ClientProject }) {
 
       {/* 10 · Impact / Outcome */}
       <SectionColumn id="impact">
-        <Eyebrow>Impact</Eyebrow>
         <SerifHeading>The outcome</SerifHeading>
         <SerifBody>{project.outcome}</SerifBody>
       </SectionColumn>
 
       {/* 11 · Metrics inline (smaller, lives inside narrow column) */}
-      <div className="mx-auto mt-10 max-w-[640px]">
+      <div className={`mt-9 ${COLUMN}`}>
         {project.metrics && project.metrics.length > 0 ? (
           <div
-            className="grid gap-6 border-y py-8 sm:grid-cols-2 md:grid-cols-3"
+            className="grid grid-cols-1 gap-x-10 gap-y-8 border-t pt-8 sm:grid-cols-3"
             style={{ borderColor: "rgba(255,255,255,0.08)" }}
           >
             {project.metrics.map((m, i) => (
               <div key={i}>
                 <p
-                  className="text-[clamp(28px,3vw,40px)] leading-none text-white"
-                  style={{ fontFamily: "var(--font-serif)", fontWeight: 500, letterSpacing: "-0.02em" }}
+                  className="text-[clamp(32px,4vw,44px)] leading-[1.05] text-white"
+                  style={{ fontFamily: FONTS.text, fontWeight: 500, letterSpacing: "-0.02em" }}
                 >
                   {m.value}
                 </p>
                 <p
-                  className="mt-3 text-[10px] tracking-[0.22em] uppercase text-white/50"
-                  style={{ fontFamily: "var(--font-mono)" }}
+                  className="mt-2 text-[13px] leading-[1.4] text-white/50"
+                  style={{ fontFamily: FONTS.text, fontWeight: 400 }}
                 >
                   {m.label}
                 </p>
@@ -247,7 +229,7 @@ export function ClientBody({ project }: { project: ClientProject }) {
         ) : (
           <>
             <div
-              className="grid gap-6 border-y py-8 sm:grid-cols-2 md:grid-cols-3"
+              className="grid grid-cols-1 gap-x-10 gap-y-8 border-t pt-8 sm:grid-cols-3"
               style={{ borderColor: "rgba(255,255,255,0.08)" }}
             >
               {Array.from({ length: 3 }).map((_, i) => (
@@ -275,10 +257,10 @@ export function ClientBody({ project }: { project: ClientProject }) {
       </div>
 
       {/* 12 · Reflection & Results — multiple short sub-paragraphs (Robert Kan pattern) */}
-      <article id="reflection" className="mx-auto mt-24 max-w-[640px] scroll-mt-24">
-        <Eyebrow>Reflection & Results</Eyebrow>
+      <article id="reflection" className={`${COLUMN} mt-28 scroll-mt-24`}>
+        <SerifHeading>Reflection & Results</SerifHeading>
         {project.reflection ? (
-          paragraphs(project.reflection, true)
+          <div className="mt-5">{paragraphs(project.reflection)}</div>
         ) : (
           <>
             <SerifHeading>Distribution can break a product</SerifHeading>
@@ -347,30 +329,16 @@ function SectionColumn({ id, children }: { id?: string; children: React.ReactNod
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-80px" }}
       transition={{ duration: 0.55, ease: EASE }}
-      className="mx-auto mt-24 max-w-[640px] scroll-mt-24"
+      className="mx-auto mt-28 w-full max-w-[1040px] scroll-mt-24"
     >
       {children}
     </motion.section>
   );
 }
 
-function Eyebrow({ children }: { children: React.ReactNode }) {
-  return (
-    <p
-      className="text-[11px] tracking-[0.22em] uppercase text-white/58"
-      style={{ fontFamily: "var(--font-mono)", fontWeight: 500 }}
-    >
-      {children}
-    </p>
-  );
-}
-
 function SerifHeading({ children }: { children: React.ReactNode }) {
   return (
-    <h2
-      className="mt-4 text-[clamp(22px,2.4vw,26px)] leading-[1.2] text-white"
-      style={{ fontFamily: "var(--font-serif)", fontWeight: 500, letterSpacing: "-0.005em" }}
-    >
+    <h2 className={H2_CLASS} style={H2_STYLE}>
       {children}
     </h2>
   );
@@ -378,28 +346,45 @@ function SerifHeading({ children }: { children: React.ReactNode }) {
 
 function SerifBody({ children }: { children: React.ReactNode }) {
   return (
-    <p
-      className="mt-5 text-[17px] leading-[1.7] text-white/68"
-      style={{ fontFamily: "var(--font-serif)", fontWeight: 300 }}
-    >
+    <p className={`mt-5 ${BODY_P}`} style={{ fontFamily: FONTS.text, fontWeight: 400 }}>
       {children}
     </p>
   );
 }
 
-function paragraphs(text: string, serif = false) {
+function paragraphs(text: string) {
   return text.split(/\n\n+/).map((p, i) => (
-    <p
-      key={i}
-      className="mt-5 text-[17px] leading-[1.7] text-white/68 first:mt-0"
-      style={{
-        fontFamily: serif ? "var(--font-serif)" : "var(--font-inter)",
-        fontWeight: serif ? 300 : 400,
-      }}
-    >
+    <p key={i} className={`mt-4 ${BODY_P} first:mt-0`} style={{ fontFamily: FONTS.text, fontWeight: 400 }}>
       {p}
     </p>
   ));
+}
+
+function BackLink() {
+  return (
+    <Link
+      href="/"
+      className="group inline-flex min-h-9 items-center gap-2 text-[13px] text-white/75 transition-colors duration-200 hover:text-white focus-visible:rounded-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white/60"
+      style={{ fontFamily: FONTS.text }}
+    >
+      <svg
+        width="16"
+        height="16"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.75"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        aria-hidden="true"
+        className="transition-transform duration-200 group-hover:-translate-x-0.5"
+      >
+        <path d="M19 12H5" />
+        <path d="m12 19-7-7 7-7" />
+      </svg>
+      <span>Back to work</span>
+    </Link>
+  );
 }
 
 /* ─────── Solution blocks ─────── */
@@ -417,7 +402,7 @@ function SolutionBlocks({ project }: { project: ClientProject }) {
         <SolutionBlockView key={i} block={b} fallbackIndex={i} hasContent={!!project.solutionBlocks} />
       ))}
       {!project.solutionBlocks && (
-        <div className="mx-auto mt-6 max-w-[640px]">
+        <div className={`mt-6 ${COLUMN}`}>
           <WireNote>add <code>solutionBlocks[]</code> — each one a decision / chapter</WireNote>
         </div>
       )}
@@ -438,17 +423,16 @@ function SolutionBlockView({
   return (
     <>
       <SectionColumn id={`solution-${idx}`}>
-        <Eyebrow>Decision · {idx}</Eyebrow>
         <SerifHeading>{block.title}</SerifHeading>
         {block.body ? (
-          <div>{paragraphs(block.body, true)}</div>
+          <div className="mt-5">{paragraphs(block.body)}</div>
         ) : hasContent ? null : (
           <div className="mt-5">
             <WireText lines={3} />
           </div>
         )}
       </SectionColumn>
-      <div className="mx-auto mt-8 max-w-[640px]">
+      <div className={`mt-10 ${COLUMN}`}>
         {block.media && block.media.length > 0 ? (
           <div className="flex flex-col gap-6">
             {block.media.map((m, i) => (
@@ -472,8 +456,8 @@ function AnnotatedImage({ media }: { media: Media }) {
           {media.status === "iteration" && <StatusDot color={BRAND.red} symbol="✕" />}
           {media.status === "final" && <StatusDot color="#3a8f62" symbol="✓" />}
           <p
-            className="text-[10px] tracking-[0.22em] uppercase text-white/58"
-            style={{ fontFamily: "var(--font-mono)" }}
+            className="text-[11px] tracking-[0.18em] uppercase text-white/50"
+            style={{ fontFamily: FONTS.mono, fontWeight: 500 }}
           >
             {media.label}
           </p>
@@ -496,9 +480,9 @@ function AnnotatedImage({ media }: { media: Media }) {
         <WireBox aspect={aspectKey(media.aspect)} label={media.label ?? "Image"} hint="add src to media[]" />
       )}
       {media.annotations && media.annotations.length > 0 && (
-        <ul className="space-y-2 px-4 py-3" style={{ fontFamily: "var(--font-mono)" }}>
+        <ul className="mt-3.5 space-y-2" style={{ fontFamily: FONTS.mono }}>
           {media.annotations.map((a) => (
-            <li key={a.n} className="flex items-center gap-3 text-[12px] text-white/65">
+            <li key={a.n} className="flex items-center gap-3 text-[12px] text-white/50">
               <span
                 className="inline-flex h-5 w-5 items-center justify-center rounded-sm text-[10px] text-white"
                 style={{ background: BRAND.red }}
@@ -512,8 +496,8 @@ function AnnotatedImage({ media }: { media: Media }) {
       )}
       {media.caption && !media.label && (
         <figcaption
-          className="px-4 py-3 text-[12px] text-white/62"
-          style={{ fontFamily: "var(--font-mono)" }}
+          className="mt-3.5 text-[12px] text-white/50"
+          style={{ fontFamily: FONTS.mono }}
         >
           {media.caption}
         </figcaption>
