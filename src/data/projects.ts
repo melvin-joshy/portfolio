@@ -900,25 +900,6 @@ export const projects: Project[] = [
     outcome:
       "End-to-end UX case study covering research, competitive analysis, and a high-fidelity prototype. Full process available on Behance.",
   },
-  {
-    kind: "client",
-    id: "tempo",
-    name: "TEMPO",
-    tag: "YC S23 · Product Designer · 2024–Present",
-    year: "2024–Present",
-    description: "Product designer on Tempo's agent side. Sole designer for 5+ product companies, taking their products from zero to launch.",
-    bg: "linear-gradient(155deg, #0f1a2e 0%, #090f1a 55%, #040609 100%)",
-    accent: "#4a7abf",
-    heroImage: "/intro 4.webp",
-    externalUrl: "https://www.tempo.new/",
-    client: "Tempo",
-    role: "Product Designer",
-    scope: ["Product Design", "AI Tools", "Design Systems"],
-    problem: "Designing AI-native tooling at Tempo (YC S23), and helping companies building on its agent platform ship real products.",
-    approach: "Worked on the agent side of Tempo as the sole designer for 5+ product companies, taking each from zero to launch.",
-    outcome: "Products live. Details available on request.",
-    gallery: [],
-  },
 ];
 
 export function getProject(id: string): Project | undefined {
